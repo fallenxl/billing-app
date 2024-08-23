@@ -57,7 +57,7 @@ export const columns: ColumnDef<IRelation>[] = [
         id: "actions",
         header: "Actions",
         enableHiding: false,
-        cell: ({ row }: any) => {
+        cell: () => {
             return (
                 <DropdownMenu >
                     <DropdownMenuTrigger asChild >
