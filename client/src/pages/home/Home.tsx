@@ -27,7 +27,7 @@ export function Home() {
     setIsLoading(true)
     if (branchId) {
       GetCustomerByIdService(branchId).then((response) => {
-        
+        console.log(response)
         if (response) {
           GetCustomerRelationsById(branchId).then((response) => {
 
@@ -57,18 +57,18 @@ export function Home() {
         }
 
         GetAssetGroupService().then(response => {
-          if (response.data.length === 1) {
+          if (response.length === 1) {
             dispatch(setCustomer(response.data[0]))
-            return navigate('/dashboard?customer=' + response.data[0].id.id)
+            return navigate('/dashboard?customer=' + response[0].id.id)
           }
-          navigate('/select')
+          // navigate('/select')
         })
       }).finally(() => setIsLoading(false))
     } else {
       GetAssetGroupService().then(response => {
         if (response.data.length === 1) {
           dispatch(setCustomer(response.data[0]))
-          return navigate('/dashboard?customer=' + response.data[0].id.id)
+          return navigate('/dashboard?customer=' + response[0].id.id)
         }
         navigate('/select')
       }).finally(() => setIsLoading(false))
@@ -88,6 +88,8 @@ export function Home() {
   }
 
   return (
+   <>
+  
     <Layout title={branchSelected ? branchSelected.toName : 'Branches'} >
       {isLoading && (
         <Loading />
@@ -122,5 +124,6 @@ export function Home() {
      {branchRelations && <SitesDataTable  data={branchRelations}/>}
 
     </Layout>
+   </>
   );
 }

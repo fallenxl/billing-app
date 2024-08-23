@@ -10,13 +10,12 @@ export function SelectAsset() {
     const navigate = useNavigate()
     useEffect(() => {
         GetAssetGroupService().then((response) => {
-            console.log(response)
-            if(response.data.length === 1) {
+            if(response.length === 1) {
                
-                dispatch(setCustomer(response.data[0]))
-                navigate('/dashboard?customer=' + response.data[0].id.id)
+                dispatch(setCustomer(response[0]))
+                navigate('/dashboard?customer=' + response[0].id.id)
             }
-            setAssets(response.data)
+            setAssets(response)
 
         })
     }, [])
@@ -47,7 +46,7 @@ export function SelectAsset() {
                                 key={index} className="bg-white flex flex-col min-w-[12rem] items-center justify-center p-4 rounded-md shadow-md cursor-pointer hover:shadow-lg">
                                 {
                                     asset.img ? (
-                                        <img src={asset.img} alt="logo" className="w-20 h-20 object-cover rounded-md" />
+                                        <img src={asset.img} alt="logo" className="w-20 h-20 object-contain rounded-md" />
                                     ) : (
                                         <div className="w-20 h-20 bg-gray-100 flex items-center justify-center rounded-md">
                                             <span className="text-gray-400 text-2xl">{asset.name.charAt(0)}</span>

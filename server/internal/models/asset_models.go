@@ -6,32 +6,29 @@ type AssetAttributes struct {
 	LastUpdateTs int         `json:"lastUpdateTs"`
 }
 
-type RateInfo struct {
-	Unit string      `json:"unit"`
-	Rate interface{} `json:"rate"`
-}
 type Rate struct {
-	Water    RateInfo `json:"water"`
-	Energy   RateInfo `json:"energy"`
-	HotWater RateInfo `json:"hotWater"`
-	Air      RateInfo `json:"air"`
-	Gas      RateInfo `json:"gas"`
+	Water    *float64 `json:"water"`
+	Energy   *float64 `json:"energy"`
+	HotWater *float64 `json:"hotWater"`
+	Air      *float64 `json:"air"`
+	Gas      *float64 `json:"gas"`
+}
+
+type Settings struct {
+	Currency *string          `json:"currency"`
+	Rate     *map[string]Rate `json:"rate"`
+	RateType *string          `json:"rateType"`
 }
 type Asset struct {
 	Id struct {
 		Id         string `json:"id"`
 		EntityType string `json:"entityType"`
 	} `json:"id"`
-	Name           string                  `json:"name"`
-	Label          string                  `json:"label"`
-	Img            *interface{}            `json:"img"`
-	Rate           *map[string]interface{} `json:"rate"`
-	Currency       *interface{}            `json:"currency"`
-	AssetProfileId struct {
-		Id         string `json:"id"`
-		EntityType string `json:"entityType"`
-	} `json:"assetProfileId"`
+	Name     string    `json:"name"`
+	Label    string    `json:"label"`
+	Settings *Settings `json:"settings"`
 }
+
 type AssetGroup struct {
 	Data []Asset `json:"data"`
 }

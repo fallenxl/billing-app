@@ -8,7 +8,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 	"time"
+
+	"golang.org/x/text/encoding/charmap"
+	"golang.org/x/text/transform"
 )
 
 // Request realiza una solicitud HTTP y devuelve el cuerpo de la respuesta y cualquier error encontrado
@@ -118,7 +122,7 @@ func GetCurrencySymbol(currency string) string {
 	case "EUR":
 		return "€"
 	case "LPS":
-		return "L"
+		return "L."
 	default:
 		return ""
 	}
@@ -126,4 +130,63 @@ func GetCurrencySymbol(currency string) string {
 
 func ParseDate(date int64) string {
 	return time.UnixMilli(date).Format("02/01/2006")
+}
+
+func GetResolution(startDate int64, endDate int64) int64 {
+	diff := endDate - startDate
+	// if the difference is less than 1 day
+
+	if diff <= 86400000 {
+		return 3600000
+	}
+	// if the difference is less than 1 month, RESOLUTION_PER_day
+	if diff <= 2764740000 {
+		return 86400000
+	}
+	return 2592000000
+
+}
+
+func GetRateByDeviceType(deviceType string, rate map[string]interface{}) float64 {
+	if strings.Contains(strings.ToLower(deviceType), "water meter") {
+		return rate["water"].(float64)
+	}
+	if strings.Contains(strings.ToLower(deviceType), "energy meter") {
+		return rate["energy"].(float64)
+	}
+	if strings.Contains(strings.ToLower(deviceType), "hot water meter") {
+		return rate["hotWater"].(float64)
+	}
+	if strings.Contains(strings.ToLower(deviceType), "air meter") {
+		return rate["air"].(float64)
+	}
+	if strings.Contains(strings.ToLower(deviceType), "gas meter") {
+		return rate["gas"].(float64)
+	}
+	return 0
+}
+
+func GetUnitByDeviceType(deviceType string, units map[string]interface{}) string {
+	if strings.Contains(strings.ToLower(deviceType), "water meter") {
+		return units["water"].(string)
+	}
+	if strings.Contains(strings.ToLower(deviceType), "energy meter") {
+		return units["energy"].(string)
+	}
+	if strings.Contains(strings.ToLower(deviceType), "hot water meter") {
+		return units["hotWater"].(string)
+	}
+	if strings.Contains(strings.ToLower(deviceType), "air meter") {
+		return units["air"].(string)
+	}
+	if strings.Contains(strings.ToLower(deviceType), "gas meter") {
+		return units["gas"].(string)
+	}
+	return ""
+}
+
+func ParseUTF8(input string) string {
+	reader := transform.NewReader(strings.NewReader(input), charmap.ISO8859_1.NewDecoder())
+	utf8String, _ := ioutil.ReadAll(reader)
+	return string(utf8String)
 }

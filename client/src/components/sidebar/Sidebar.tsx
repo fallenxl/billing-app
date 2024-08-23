@@ -36,9 +36,9 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
     }
   ]
   return (
-    <div className={`${!isOpen && ' -left-[10rem]'} md:left-0 absolute top-[4rem] md:relative md:top-0 bg-white md:flex flex-col h-[calc(100vh-64px)] md:h-screen   border-r   text-gray-600 ${isOpen ? 'w-72 ' : 'w-20 items-center '} transition-width duration-300 `}>
+    <div className={`${!isOpen ? '-left-[10rem]' : "z-[100]"} md:left-0 absolute top-[4rem] md:relative md:top-0 bg-white md:flex flex-col h-[calc(100vh-64px)] md:h-screen   border-r   text-gray-600 ${isOpen ? 'w-72 ' : 'w-20 items-center '} transition-width duration-300 `}>
       <div className="flex items-center justify-center py-2  mb-6 border-b relative h-[4rem]">
-        {customer?.img && <img src={customer?.img} alt="logo" className={`${!isOpen ? 'block' : 'rounded-md w-12 h-12 '} duration-300`} />}
+        {customer?.img && <img src={customer?.img} alt="logo" className={`${!isOpen ? 'block ' : 'rounded-md w-12 h-12'} w-12 h-12 object-contain `} />}
    
         {customer && !customer.img && (
           <div className={`w-12 h-12 rounded-md bg-gray-100 flex items-center justify-center duration-300`}>

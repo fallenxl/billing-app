@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { ChevronLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Sidebar from "../sidebar/Sidebar";
 import Header from "../header/Header";
 import { useSelector } from "react-redux";
@@ -19,8 +19,17 @@ export default function Layout({ children, title, button }: LayoutProps) {
     function handleBack() {
         navigate(-1);
     }
+
+    const user = useSelector((state: AppState) => state.auth.user);
     return (
         <>
+            {user?.authority === 'TENANT_ADMIN' && (
+                <div className="bg-yellow-500 text-white text-center p-1 text-sm">
+                    You are logged in as a Tenant Admin, select a customer 
+                    <Link to="/select" className="text-white underline font-bold"> here</Link>
+                </div>
+            )}
+            <div className="flex">
             {isLoading.isLoading && (
                 <div className="fixed top-0 left-0 w-full h-full bg-gray-100 bg-opacity-70 z-50 flex items-center justify-center">
                     <div className="bg-white p-5 rounded-md shadow-md w-72 text-center">
@@ -29,6 +38,7 @@ export default function Layout({ children, title, button }: LayoutProps) {
                     </div>
                 </div>
             )}
+       
             <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
             <div className="w-full  ">
                 <Header isOpen={isOpen} setIsOpen={setIsOpen} />
@@ -50,6 +60,7 @@ export default function Layout({ children, title, button }: LayoutProps) {
                 </footer>
                 </main>
                 
+            </div>
             </div>
         </>
     )

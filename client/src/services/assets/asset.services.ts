@@ -4,7 +4,7 @@ import config from "../../config";
 export async function GetAssetGroupService() {
     try {
         const response = await axios.get(`${config.API}/assets/group`);
-        return response.data;
+        return response.data.data
     } catch (error: any | AxiosError) {
         const errorMessage = error.response?.data.split(": ")[1];
         return errorMessage;
@@ -33,7 +33,8 @@ export async function GetCustomerRelationsById(id: string) {
 
 export async function GetAssetRelationsById(id: string) {
     try {
-        const response = await axios.get(`${config.API}/asset/${id}/relation`);
+        const response = await axios.get(`${config.API}/assets/${id}/relation`);
+        console.log(response.data)
         return response.data;
     } catch (error: any | AxiosError) {
         const errorMessage = error.response?.data.split(": ")[1];

@@ -28,6 +28,10 @@ export async function ExportDataService(data: IExportData){
 
 
         return response.data;
+
+        // const response = await axios.post(`${config.API}/data/export`, data)
+        // console.log(response.data)
+        // return response.data
     } catch (error: any | AxiosError) {
         const message = error.response.data.split(': ')[1]
         if (message) {

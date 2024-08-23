@@ -7,37 +7,36 @@ import (
 	"server/internal/utils"
 )
 
-func GetAssetsByGroupIDService(token string) (models.AssetGroup, error) {
+func GetAssetsByGroupIDService(token string) (models.CustomerGroup, error) {
 
 	response, err := utils.Request(config.ThingsboardApiURL+"entityGroup/ce0482e0-5425-11ef-aa15-a127638e3a77/customers?pageSize=100&page=0", "GET", "", token)
 	if err != nil {
-		return models.AssetGroup{}, err
+		return models.CustomerGroup{}, err
 	}
-	var assets models.AssetGroup
-	err = utils.ParseResponse(response, &assets)
+	var customer models.CustomerGroup
+	err = utils.ParseResponse(response, &customer)
 	if err != nil {
 		fmt.Println(err)
-		return models.AssetGroup{}, err
+		return models.CustomerGroup{}, err
 	}
 
-	for i := 0; i < len(assets.Data); i++ {
-		assetAttributes, err := GetAssetAttributesService(token, assets.Data[i].Id.Id, assets.Data[i].Id.EntityType)
+	for i := 0; i < len(customer.Data); i++ {
+		assetAttributes, err := GetAssetAttributesService(token, customer.Data[i].Id.Id, customer.Data[i].Id.EntityType)
 		if err != nil {
 			fmt.Println(err)
-			return models.AssetGroup{}, err
+			return models.CustomerGroup{}, err
 		}
 
-		rate := FindAtrributeByKey(assetAttributes, "rate").(map[string]interface{})
-		img := FindAtrributeByKey(assetAttributes, "img")
-		currency := FindAtrributeByKey(assetAttributes, "currency")
-
-		assets.Data[i].Rate = &rate
-		assets.Data[i].Img = &img
-		assets.Data[i].Currency = &currency
+		//rate := FindAtrributeByKey(assetAttributes, "rate").(map[string]interface{})
+		img := FindAttributeByKey(assetAttributes, "img")
+		if img != nil {
+			img := img.(string)
+			customer.Data[i].Img = &img
+		}
 
 	}
 
-	return assets, nil
+	return customer, nil
 }
 
 func GetAssetByIdService(token string, assetId string) (models.Asset, error) {
@@ -59,43 +58,39 @@ func GetAssetByIdService(token string, assetId string) (models.Asset, error) {
 		return models.Asset{}, err
 	}
 
-	img := FindAtrributeByKey(assetAttributes, "img")
-	rate := FindAtrributeByKey(assetAttributes, "rate").(map[string]interface{})
-	currency := FindAtrributeByKey(assetAttributes, "currency")
-	asset.Img = &img
-	asset.Rate = &rate
-	asset.Currency = &currency
+	rate := FindAttributeByKey(assetAttributes, "rate").(map[string]models.Rate)
+	currency := FindAttributeByKey(assetAttributes, "currency").(string)
+	rateType := FindAttributeByKey(assetAttributes, "rateType").(string)
+
+	asset.Settings.RateType = &rateType
+	asset.Settings.Rate = &rate
+	asset.Settings.Currency = &currency
 
 	return asset, nil
 
 }
 
-func GetCustomerByIdService(token string, assetId string) (models.Asset, error) {
+func GetCustomerByIdService(token string, assetId string) (models.Customer, error) {
 	response, err := utils.Request(config.ThingsboardApiURL+"customer/info/"+assetId, "GET", "", token)
 	if err != nil {
-		return models.Asset{}, err
+		return models.Customer{}, err
 	}
-	var asset models.Asset
+	var asset models.Customer
 	err = utils.ParseResponse(response, &asset)
 	if err != nil {
 		fmt.Println(err)
-		return models.Asset{}, err
+		return models.Customer{}, err
 	}
 
 	var assetAttributes []models.AssetAttributes
 	assetAttributes, err = GetAssetAttributesService(token, assetId, "CUSTOMER")
 	if err != nil {
 		fmt.Println(err)
-		return models.Asset{}, err
+		return models.Customer{}, err
 	}
 
-	img := FindAtrributeByKey(assetAttributes, "img")
-	rate := FindAtrributeByKey(assetAttributes, "rate").(map[string]interface{})
-	currency := FindAtrributeByKey(assetAttributes, "currency")
+	img := FindAttributeByKey(assetAttributes, "img").(string)
 	asset.Img = &img
-
-	asset.Rate = &rate
-	asset.Currency = &currency
 
 	return asset, nil
 
@@ -115,7 +110,7 @@ func GetAssetAttributesService(token string, assetId string, entityType string) 
 	return assetAttributes, nil
 }
 
-func FindAtrributeByKey(assetAttributes []models.AssetAttributes, key string) interface{} {
+func FindAttributeByKey(assetAttributes []models.AssetAttributes, key string) interface{} {
 	for i := 0; i < len(assetAttributes); i++ {
 		if assetAttributes[i].Key == key {
 			return assetAttributes[i].Value

@@ -39,14 +39,15 @@ export function Auth() {
             if (response.status && response.status !== 200) {
                 return setError(response.message);
             }
-
+            console.log(response)
             dispatch(login(response));
             localStorage.setItem('jwt', JSON.stringify({
                 token: response.token,
                 refreshToken: response.refreshToken
             }));
 
-            navigate('/select', { replace: true });
+           
+           response.authority === 'TENANT_ADMIN' ? navigate('/select', { replace: true }) : navigate('/dashboard');
           
         }).catch((_error) => {
             dispatch(setIsLoading({

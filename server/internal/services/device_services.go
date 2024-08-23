@@ -13,12 +13,13 @@ func getKeysByDeviceType(deviceType string) string {
 		return "pulseCount"
 	}
 	if strings.Contains(strings.ToLower(deviceType), "energy meter") {
-		return "energyCount"
+		return "deltaEnergyCount"
 	}
 	return ""
 }
-func GetDeviceById(id string, token string) (models.Device, error) {
-	response, err := utils.Request(config.ThingsboardApiURL+"device/"+id, "GET", "", token)
+func GetDeviceById(id string, entityType string, token string) (models.Device, error) {
+	url := fmt.Sprintf("%s%s/%s", config.ThingsboardApiURL, strings.ToLower(entityType), id)
+	response, err := utils.Request(url, "GET", "", token)
 	if err != nil {
 		return models.Device{}, err
 	}
@@ -32,9 +33,14 @@ func GetDeviceById(id string, token string) (models.Device, error) {
 	return device, nil
 }
 
-func GetDeviceTelemetryById(id string, entityType string, deviceType string, startDate int64, endDate int64, token string) models.Telemetry {
-	resolution := getResolution(startDate, endDate)
-	telemetryPath := fmt.Sprintf("plugins/telemetry/%s/%s/values/timeseries?keys=%s&startTs=%d&endTs=%d&limit=50000&interval=%d&lagg=AVG&orderBy=ASC&useStrictDataTypes=false", entityType, id, getKeysByDeviceType(deviceType), startDate, endDate, resolution)
+func GetDeviceTelemetryById(id string, entityType string, deviceType string, startDate int64, endDate int64, resolution int64, key string, agg string, token string) models.Telemetry {
+	if agg == "" {
+		agg = "NONE"
+	}
+	if key == "" {
+		key = getKeysByDeviceType(deviceType)
+	}
+	telemetryPath := fmt.Sprintf("plugins/telemetry/%s/%s/values/timeseries?keys=%s&startTs=%d&endTs=%d&limit=50000&interval=%d&agg=%s&orderBy=ASC&useStrictDataTypes=false", entityType, id, key, startDate, endDate, resolution, agg)
 	response, err := utils.Request(config.ThingsboardApiURL+telemetryPath, "GET", "", token)
 	if err != nil {
 		return models.Telemetry{}
@@ -45,24 +51,4 @@ func GetDeviceTelemetryById(id string, entityType string, deviceType string, sta
 		return models.Telemetry{}
 	}
 	return telemetry
-
-}
-
-func getResolution(startDate int64, endDate int64) int64 {
-	diff := endDate - startDate
-	// if the difference is less than 1 day
-	if diff < 86400 {
-		return 3600000
-	}
-	// if the difference is less than 1 month, RESOLUTION_PER_WEEK
-	if diff <= 2419200 {
-		return 604800000
-	}
-
-	//	if the difference is less than 1 year, RESOLUTION_PER_MONTH
-	if diff <= 31536000 {
-		return 2592000000
-	}
-
-	return 3600000 * 24
 }

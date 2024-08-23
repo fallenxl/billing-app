@@ -32,6 +32,7 @@ export function AuthGuard() {
 
             }).catch(() => {
                 localStorage.removeItem("jwt");
+                dispatch(login(null));
             })
         }else{
             setIsAuthenticated(false);

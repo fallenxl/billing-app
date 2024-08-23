@@ -85,6 +85,7 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
     
    const startDateTs = startDate ? new Date(dateRange[0]).getTime() : firsDateOfTheMonth
     const endDateTs = endDate ? new Date(dateRange[1]).getTime() : new Date().getTime()
+    console.log(branch)
     const data: IExportData = {
       format: type,
       img: customer?.img,
@@ -92,8 +93,20 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
       endDateTs,
       customer: customer?.name ?? '',
       branch: branch?.toName ?? '',
-      currency: customer?.currency ?? 'LPS',
-      rate: customer?.rate,
+      currency: branch?.settings.currency ?? 'LPS',
+      rate: branch?.settings.rate ??{
+        water: 0.324,
+        energy: 6.23,
+        gas: 0.324,
+        air: 0.324,
+        hotWater: 0.324
+      },
+      units: {
+        water: 'm3',
+        energy: 'kWh',
+        gas: 'm3',
+        air: 'm3'
+      },
       selectedDevices: table.getSelectedRowModel().rows.map((row) => row.original) as IRelation[]
     }
     dispatch(setIsLoading({
@@ -158,7 +171,7 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
             <>
                 <div className="flex items-center relative w-full self-end justify-end">
               <div className="flex items-center gap-2 relative w-full self-end justify-end py-2 ">
-                <span className="text-gray-500 gap-2 text-xs">Filtrar por fecha:</span>
+                <span className="text-gray-500 gap-2 text-xs">Filter by date</span>
                 <div className="border border-gray-300 rounded-md flex items-center w-auto cursor-pointer" onClick={toggleCalendar}>
                   <input
                     type="text"

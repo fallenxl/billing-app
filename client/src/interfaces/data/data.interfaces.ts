@@ -7,26 +7,19 @@ export interface IExportData {
     endDateTs: number;
     customer: string;
     branch: string;
-    rate?:{
-        water: {
-            rate: number | null;
-            unit: string;
-        },
-        hotWater: {
-            rate: number | null;
-            unit: string;
-        
-        },energy: {
-            rate: number | null;
-            unit: string;
-        },air:{
-            rate: number | null;
-            unit: string;
-        },gas:{
-            rate: number | null;
-            unit: string;
-        }
-    } | null;
+    units: {
+        water: string | null;
+        energy: string | null;
+        gas: string | null;
+        air: string | null;
+    },
+    rate:{
+        water: number | null;
+        energy: number | null;
+        gas: number | null;
+        air: number | null;
+        hotWater: number | null;
+    }
     currency: string;
     selectedDevices: IRelation[]
 }
