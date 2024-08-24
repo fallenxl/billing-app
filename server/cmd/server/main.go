@@ -8,7 +8,7 @@ import (
 
 func main() {
 	r := handlers.NewRouter()
-	log.Println("Server started on: http://localhost:8080")
+	log.Println("Server started on: http://localhost:4001")
 
 	//filename := "sample.pdf"
 	//err := pdf.CreatePDF(filename)
@@ -24,7 +24,7 @@ func main() {
 	//}
 	//fmt.Println("PDF file created and opened successfully")
 
-	if err := http.ListenAndServe(":8080", r); err != nil {
+	if err := http.ListenAndServe(":4001", r); err != nil {
 		log.Fatal(err)
 	}
 
