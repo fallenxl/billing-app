@@ -156,26 +156,26 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
           Here are the sites that are currently active.
         </small>
       </div>
-      <div className="flex items-center justify-between py-4">
+      <div className="flex flex-col lg:flex-row items-center w-full justify-between py-4">
         <Input
           placeholder="Filter sites..."
           value={(table.getColumn("label")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("label")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm outline-none focus:ring-transparent "
+          className="lg:max-w-sm outline-none focus:ring-transparent "
         />
 
-        <div className="flex   items-center gap-3">
+        <div className="flex  flex-col md:flex-row  items-center gap-3 w-full">
           {exportData && (
             <>
                 <div className="flex items-center relative w-full self-end justify-end">
               <div className="flex items-center gap-2 relative w-full self-end justify-end py-2 ">
-                <span className="text-gray-500 gap-2 text-xs">Filter by date</span>
-                <div className="border border-gray-300 rounded-md flex items-center w-auto cursor-pointer" onClick={toggleCalendar}>
+                <span className="text-gray-500 gap-2 text-xs hidden xl:block">Filter by date</span>
+                <div className="border border-gray-300 rounded-md flex items-center w-full lg:w-auto cursor-pointer" onClick={toggleCalendar}>
                   <input
                     type="text"
-                    className=" rounded-md px-3 py-[.4rem] outline-none  cursor-pointer w-[11.5rem] flex-grow"
+                    className=" rounded-md px-3 py-[.4rem] outline-none  cursor-pointer w-full lg:w-[11.5rem] flex-grow "
                     value={`${startDate} - ${endDate}`}
                     readOnly
                   />
@@ -204,7 +204,7 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
             </div>
               <DropdownMenu >
                 <DropdownMenuTrigger asChild disabled={table.getSelectedRowModel().rows.length === 0}>
-                  <Button variant="outline" className="ml-auto">
+                  <Button variant="outline" className="ml-auto w-full lg:w-auto">
                     Export <ChevronDown className="ml-2 h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -223,7 +223,7 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
           )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
+              <Button variant="outline" className="ml-auto w-full lg:w-auto">
                 Columns <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
