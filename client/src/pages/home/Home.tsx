@@ -77,7 +77,7 @@ export function Home() {
           navigate('/select')
         }).finally(() => setIsLoading(false))
       }else if (user?.authority === 'CUSTOMER_USER'){
-        console.log(user)
+      
         GetCustomerByIdService(user.customerId.id).then((response) => {
           dispatch(setCustomer(response))
           GetCustomerRelationsById(user.customerId.id).then((response) => {
@@ -91,9 +91,7 @@ export function Home() {
       }
     }
   
-    if (!branch) {
-      setBranchSelected(null)
-    }
+
 
   }, [branch]);
 

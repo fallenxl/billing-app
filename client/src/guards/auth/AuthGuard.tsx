@@ -7,14 +7,16 @@ import { Loading } from "../../components/loading/Loading";
 
 export function AuthGuard() {
     // get param from url
-    const urlParams = new URLSearchParams(window.location.search);
-    let token =  urlParams.get('token') ?? localStorage.getItem("jwt");
+
+    let token =   localStorage.getItem("jwt");
     const dispatch = useDispatch();
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
     // const user = useSelector((state: AppState) => state.auth.user);
     useEffect(() => {
         if (token) {
+            console.log('token')
             getCurrentUserService(JSON.parse(token).token).then((response) => {
+                console.log(response)
                 if (!response) {
                     dispatch(login(null));
                     localStorage.removeItem("jwt");
@@ -39,6 +41,7 @@ export function AuthGuard() {
                 dispatch(login(null));
             })
         }else{
+            console.log('no token')
             setIsAuthenticated(false);
         }
     }, [])

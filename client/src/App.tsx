@@ -8,7 +8,7 @@ function App() {
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get('token')?? localStorage.getItem("jwt");
   useEffect(() => {
-    if (token) {
+    if (token && !localStorage.getItem('jwt')) {
       localStorage.setItem('jwt', JSON.stringify({ token }))
     }
   }, [])
