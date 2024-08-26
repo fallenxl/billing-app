@@ -3,8 +3,15 @@ import { Home } from "./pages/home/Home"
 import { Auth } from "./pages/auth/Auth"
 import { AuthGuard } from "./guards/auth/AuthGuard"
 import { SelectAsset } from "./pages/select-asset/SelectAsset"
+import { useEffect } from "react"
 function App() {
-
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = localStorage.getItem("jwt") ?? urlParams.get('token');
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem('jwt', JSON.stringify({ token }))
+    }
+  }, [])
   return (
     <>  
       <Router>

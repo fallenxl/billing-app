@@ -38,13 +38,12 @@ export function Home() {
                 if(!response){
                   return
                 }
+      
                 setBranchRelations(response)
-               
-              
-                
               })
             } else {
               if (response.length === 1) {
+             
                 navigate('/dashboard?customer=' + response[0].from.id + '&branch=' + response[0].to.id)
               } else {
                 setRelations(response)
@@ -52,27 +51,33 @@ export function Home() {
               }
             }
           })
+          document.querySelector("link[rel='icon']")?.setAttribute('href', response.img)
           return dispatch(setCustomer(response));
         }
 
         GetAssetGroupService().then(response => {
           if (response.length === 1) {
             dispatch(setCustomer(response.data[0]))
+            // setear el icono de la empresa en la pestaña
+            document.querySelector("link[rel='icon']")?.setAttribute('href', response.data[0].img)
             return navigate('/dashboard?customer=' + response[0].id.id)
           }
           // navigate('/select')
         })
       }).finally(() => setIsLoading(false))
     } else {
+  
       if (user?.authority === 'TENANT_ADMIN') {
         GetAssetGroupService().then(response => {
-          if (response.data.length === 1) {
-            dispatch(setCustomer(response.data[0]))
+          console.log(response)
+          if (response.length === 1) {
+            dispatch(setCustomer(response[0]))
             return navigate('/dashboard?customer=' + response[0].id.id)
           }
           navigate('/select')
         }).finally(() => setIsLoading(false))
       }else if (user?.authority === 'CUSTOMER_USER'){
+        console.log(user)
         GetCustomerByIdService(user.customerId.id).then((response) => {
           dispatch(setCustomer(response))
           GetCustomerRelationsById(user.customerId.id).then((response) => {
@@ -85,7 +90,7 @@ export function Home() {
         })
       }
     }
-
+  
     if (!branch) {
       setBranchSelected(null)
     }

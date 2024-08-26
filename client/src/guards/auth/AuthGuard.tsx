@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector} from "react-redux";
+import { useDispatch} from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
 import { getCurrentUserService } from "../../services/auth/auth.services";
 import { login } from "../../store/slices/auth-slice";
 import { Loading } from "../../components/loading/Loading";
-import { AppState } from "../../interfaces/app-state/app-state";
 
 export function AuthGuard() {
-    const token = localStorage.getItem("jwt")
+    // get param from url
+    const urlParams = new URLSearchParams(window.location.search);
+    let token = localStorage.getItem("jwt")?? urlParams.get('token');
     const dispatch = useDispatch();
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-    const user = useSelector((state: AppState) => state.auth.user);
+    // const user = useSelector((state: AppState) => state.auth.user);
     useEffect(() => {
-        console.log(user)
+        console.log(token, urlParams.get('token'), window.location);
         if (token) {
             getCurrentUserService(JSON.parse(token).token).then((response) => {
                 if (!response) {
@@ -25,6 +26,7 @@ export function AuthGuard() {
                     localStorage.removeItem("jwt");
                     setIsAuthenticated(false);
                 }
+        
                 setIsAuthenticated(true);
                 dispatch(login(response));
                 localStorage.setItem('user.data', JSON.stringify({

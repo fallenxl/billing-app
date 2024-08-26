@@ -18,6 +18,7 @@ export const clearLocalStorage = () => {
 
 export const getLocalStorageToken = () => {
     const response = localStorage.getItem('jwt')
+
     const token = response ? JSON.parse(response).token : undefined
     return token
 }
