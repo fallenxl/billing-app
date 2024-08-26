@@ -46,9 +46,9 @@ export function Auth() {
                 refreshToken: response.refreshToken
             }));
 
-           
-           response.authority === 'TENANT_ADMIN' ? navigate('/select', { replace: true }) : navigate('/dashboard');
-          
+
+            response.authority === 'TENANT_ADMIN' ? navigate('/select', { replace: true }) : navigate('/dashboard');
+
         }).catch((_error) => {
             dispatch(setIsLoading({
                 isLoading: false,
@@ -70,11 +70,18 @@ export function Auth() {
             </div>}
             <main className="flex items-center justify-center w-full h-[100vh] bg-gray-100 ">
                 <div className="bg-white p-10 rounded-md shadow-md w-96 ">
-                    <div className="mb-5">
-                        <h1 className="text-2xl font-semibold text-gray-600">Sign in</h1>
+                    <div className="mb-5  gap-4">
+
+
+                        <h1 className="text-2xl font-semibold text-gray-600">Welcome back!</h1>
+                        {/* Billing */}
+                    
                         <small className="text-gray-400">Sign in to your account</small>
-                        {error && <div className="bg-red-100 text-red-500 p-2 border-l-2 border-red-500 mt-2 text-sm">{error}</div>}
+
+                        {error && <div className="bg-red-100 text-red-500 p-2 border-l-2 border-red-500 mt-2 text-sm mb-2">{error}Error</div>}
+
                     </div>
+
                     <form onSubmit={handleSubmit}>
                         <div className="mb-5">
                             <label htmlFor="username" className="text-sm text-gray-500">Username</label>
@@ -92,7 +99,10 @@ export function Auth() {
                             <button className="w-full bg-blue-500 text-white p-2 rounded-md">Sign In</button>
                         </div>
                     </form>
-
+                    <div className="flex items-center justify-center gap-4 mt-7">
+                        <img src="/lumen.png" alt="logo" className="w-14 " />
+                        <small className="text-gray-400">Lumen Energy Solutions</small>
+                    </div>
 
                 </div>
             </main>

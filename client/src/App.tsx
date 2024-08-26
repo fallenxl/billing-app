@@ -6,7 +6,7 @@ import { SelectAsset } from "./pages/select-asset/SelectAsset"
 import { useEffect } from "react"
 function App() {
   const urlParams = new URLSearchParams(window.location.search);
-  const token = localStorage.getItem("jwt") ?? urlParams.get('token');
+  const token = urlParams.get('token')?? localStorage.getItem("jwt");
   useEffect(() => {
     if (token) {
       localStorage.setItem('jwt', JSON.stringify({ token }))

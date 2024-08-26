@@ -8,12 +8,11 @@ import { Loading } from "../../components/loading/Loading";
 export function AuthGuard() {
     // get param from url
     const urlParams = new URLSearchParams(window.location.search);
-    let token = localStorage.getItem("jwt")?? urlParams.get('token');
+    let token =  urlParams.get('token') ?? localStorage.getItem("jwt");
     const dispatch = useDispatch();
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
     // const user = useSelector((state: AppState) => state.auth.user);
     useEffect(() => {
-        console.log(token, urlParams.get('token'), window.location);
         if (token) {
             getCurrentUserService(JSON.parse(token).token).then((response) => {
                 if (!response) {

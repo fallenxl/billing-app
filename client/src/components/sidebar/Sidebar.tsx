@@ -42,7 +42,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
     window.location.reload();
 };
   return (
-    <div className={`${!isOpen ? '-left-[10rem]' : "z-[100]"} md:left-0 absolute top-[4rem] md:relative md:top-0 bg-white md:flex flex-col h-[calc(100vh-64px)] md:h-screen   border-r   text-gray-600 ${isOpen ? 'w-72 ' : 'w-20 items-center '} transition-width duration-300 `}>
+    <div className={`${!isOpen ? '-left-[10rem]' : "z-[100]"} md:left-0 absolute top-[4rem] md:relative md:top-0 bg-white md:flex flex-col h-[calc(100vh-64px)]  md:h-screen   border-r   text-gray-600 ${isOpen ? 'w-72 ' : 'w-20 items-center '} transition-width duration-300 `}>
       <div className="flex items-center justify-center py-2  mb-6 border-b relative h-[4rem]">
         {customer?.img && <img src={customer?.img} alt="logo" className={`${!isOpen ? 'block ' : 'rounded-md w-12 h-12'} w-12 h-12 object-contain `} />}
 
@@ -57,7 +57,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
       <button onClick={toggleSidebar} className="hidden lg:block absolute -right-[1.1rem] bg-white top-[2.75rem] p-2 border rounded-full text-gray-500 z-10">
         {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
       </button>
-      <nav className='h-full flex flex-col'>
+      <nav className='h-[calc(100vh-170px)] md:h-full flex flex-col'>
         <ul className='flex flex-col gap-2 px-4 flex-grow'>
           {links.map((link, index) => {
             const Icon = link.icon;
