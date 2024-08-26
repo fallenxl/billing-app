@@ -32,8 +32,8 @@ func CreatePDF(filename string, exportedData models.ExportedData) (string, error
 		pdf.SetFont("Arial", "B", 8) // Headers en bold
 		headers := []string{
 			"Name",
-			fmt.Sprintf("Previous Month (%s)", unit),
-			fmt.Sprintf("Current Month (%s)", unit),
+			fmt.Sprintf("Last Measure (%s)", unit),
+			fmt.Sprintf("Current Measure (%s)", unit),
 			fmt.Sprintf("Total Consumed (%s)", unit),
 			"Rate",
 			"Total to Pay",

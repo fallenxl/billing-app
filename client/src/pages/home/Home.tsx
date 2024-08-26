@@ -136,7 +136,7 @@ export function Home() {
         )
       }
 
-     {<SitesDataTable  data={branchRelations??[]}/>}
+     {<SitesDataTable  data={branchRelations}/>}
 
     </Layout>
    </>

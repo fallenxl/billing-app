@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"server/internal/models"
 	"server/internal/utils"
+	"strconv"
 	"strings"
 	"time"
 
@@ -20,6 +21,11 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 	// currency := utils.GetCurrencySymbol(data.Currency)
 	parseStartDate := time.UnixMilli(data.StartDateTs).Format("02/01/2006")
 	parseEndDate := time.UnixMilli(data.EndDateTs).Format("02/01/2006")
+	// create unique identifier for the file only 6 digits
+	uniqueID := strconv.FormatInt(time.Now().UnixNano(), 10)[10:16]
+
+	filename = fmt.Sprintf("%s-%s", uniqueID, filename)
+	fmt.Println(filename)
 	zipFile, err := os.Create(filename)
 	if err != nil {
 		return "", err
@@ -150,8 +156,8 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 				DeviceTypePdf(pdf, device, data, rate, unit)
 			}
 		}
-		timeNow := time.Now()
-		pdfFileName := fmt.Sprintf("%s-%s.pdf", strings.Join(strings.Split(asset.Name, " "), "-"), timeNow)
+
+		pdfFileName := fmt.Sprintf("%s-%s.pdf", uniqueID, strings.Join(strings.Split(asset.Name, " "), "-"))
 		err := pdf.OutputFileAndClose(pdfFileName)
 		if err != nil {
 			return "", err

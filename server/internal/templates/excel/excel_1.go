@@ -23,8 +23,8 @@ func CreateExcel(filename string, exportedData models.ExportedData) (string, err
 	createHeaders := func(f *excelize.File, sheet string, startRow int, unit string) {
 		headers := []string{
 			"Name",
-			fmt.Sprintf("Previous Month (%s)", unit),
-			fmt.Sprintf("Current Month (%s)", unit),
+			fmt.Sprintf("Last Measure (%s)", unit),
+			fmt.Sprintf("Current Measure (%s)", unit),
 			fmt.Sprintf("Total Consumed (%s)", unit),
 			"Rate",
 			"Total to Pay",

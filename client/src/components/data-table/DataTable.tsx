@@ -40,8 +40,9 @@ import { IRelation } from "../../interfaces/relation/relation.interface"
 import { setIsLoading } from "../../store/slices/is-loading.slice"
 import Calendar from "react-calendar"
 import 'react-calendar/dist/Calendar.css';
+import { Skeleton } from "../ui/skeleton"
 interface DataTableProps {
-  data: any[]
+  data: any[] | null
   columns: ColumnDef<any>[]
   exportData?: boolean
 }
@@ -56,7 +57,7 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
   const [rowSelection, setRowSelection] = React.useState({})
 
   const table = useReactTable({
-    data,
+    data: data ?? [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -83,8 +84,9 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
     // get hours, minutes, seconds, and milliseconds
     
    const startDateTs = startDate ? new Date(dateRange[0]).getTime() : firsDateOfTheMonth
-    const endDateTs = endDate ? new Date(dateRange[1]).getTime() : new Date().getTime()
-  
+    let endDateTs = endDate ? new Date(dateRange[1]).getTime() : new Date().getTime()
+    // set endDate to start of the day
+    endDateTs = new Date(endDateTs).setHours(0, 0, 0, 0)
     const data: IExportData = {
       format: type,
       img: customer?.img,
@@ -120,6 +122,10 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
     })
   }
 
+
+  React.useEffect(() => {
+    console.log(data)
+  }, [data])
   const [startDate, setStartDate] = React.useState('');
   const [endDate, setEndDate] = React.useState('');
   const [calendarVisible, setCalendarVisible] = React.useState(false);
@@ -269,7 +275,7 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length > 0 ? (
+            {(data && data.length > 0 )? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -285,7 +291,19 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
                   ))}
                 </TableRow>
               ))
-            ) : (
+            ) : !data?(
+              [...Array(10)].map((_, index) => {
+                return (
+                  <TableRow key={index}>
+                    <TableCell colSpan={columns.length}>
+                      <Skeleton className="h-6" />
+                    </TableCell>
+                  </TableRow>
+                )
+              })
+            ) : 
+            
+            (
               <TableRow>
                 <TableCell
                   colSpan={columns.length}

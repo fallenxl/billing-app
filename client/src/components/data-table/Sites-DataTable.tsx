@@ -84,7 +84,7 @@ export const columns: ColumnDef<IRelation>[] = [
 
 
 interface SitesDataTableProps {
-    data: IRelation[]
+    data: IRelation[] | null    ;
 }
 
 export function SitesDataTable({ data }: SitesDataTableProps) {
