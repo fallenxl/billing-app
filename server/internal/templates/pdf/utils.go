@@ -126,7 +126,7 @@ func AddHeaderDue(pdf *gofpdf.Fpdf, data models.ExportedData, dueType string, to
 	pdf.SetFont("Arial", "B", 16) // Fuente más pequeña
 	// color gris claro
 	pdf.SetTextColor(80, 80, 80) // R, G, B
-	pdf.Cell(0, 10, fmt.Sprintf("%s %s", utils.GetCurrencySymbol(data.Currency), fmt.Sprintf("%.2f", total)))
+	pdf.Cell(0, 10, fmt.Sprintf("%s %s", utils.GetCurrencySymbol(data.Currency), utils.FormatNumber(total)))
 
 	// Avanzar la línea
 	pdf.Ln(30)

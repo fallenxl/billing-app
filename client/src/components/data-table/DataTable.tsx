@@ -81,11 +81,10 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
   function handleExport(type: 'pdf' | 'excel' | 'support') {
     const firsDateOfTheMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).setHours(0, 0, 0, 0)
     // get hours, minutes, seconds, and milliseconds
-
     
    const startDateTs = startDate ? new Date(dateRange[0]).getTime() : firsDateOfTheMonth
     const endDateTs = endDate ? new Date(dateRange[1]).getTime() : new Date().getTime()
-    console.log(branch)
+
     const data: IExportData = {
       format: type,
       img: customer?.img,

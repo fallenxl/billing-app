@@ -43,7 +43,6 @@ func GetAssetsByGroupIDService(token string) (models.CustomerGroup, error) {
 
 func GetAssetsByGroupID(id string, token string) (models.Customer, error) {
 
-	fmt.Println(token)
 	url := fmt.Sprintf("%scustomer/%s", config.ThingsboardApiURL, id)
 	fmt.Println(url)
 	response, err := utils.Request(url, "GET", "", token)

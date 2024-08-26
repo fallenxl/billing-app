@@ -85,7 +85,7 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 				pdf.CellFormat(0, 10, tr("Cargos por Energía"), "", 0, "L", false, 0, "")
 
 				pdf.SetXY(140, 80.5)
-				pdf.CellFormat(0, 10, fmt.Sprintf("%s %.2f", utils.GetCurrencySymbol(data.Currency), *energyDevice.TotalToPay), "", 0, "L", false, 0, "")
+				pdf.CellFormat(0, 10, fmt.Sprintf("%s %s", utils.GetCurrencySymbol(data.Currency), utils.FormatNumber(*energyDevice.TotalToPay)), "", 0, "L", false, 0, "")
 			}
 
 			if waterDevice != (models.DeviceData{}) {
@@ -98,7 +98,7 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 				pdf.CellFormat(0, 10, tr("Cargos por Agua"), "", 0, "L", false, 0, "")
 
 				pdf.SetXY(140, 103)
-				pdf.CellFormat(0, 10, fmt.Sprintf("%s %.2f", utils.GetCurrencySymbol(data.Currency), *waterDevice.TotalToPay), "", 0, "L", false, 0, "")
+				pdf.CellFormat(0, 10, fmt.Sprintf("%s %s", utils.GetCurrencySymbol(data.Currency), utils.FormatNumber(*waterDevice.TotalToPay)), "", 0, "L", false, 0, "")
 			}
 
 			// TOTAL CHARGES
@@ -116,7 +116,7 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 			if energyDevice != (models.DeviceData{}) {
 				totalToPay += float64(*energyDevice.TotalToPay)
 			}
-			pdf.CellFormat(0, 10, fmt.Sprintf("%s %.2f", utils.GetCurrencySymbol(data.Currency), totalToPay), "", 0, "L", false, 0, "")
+			pdf.CellFormat(0, 10, fmt.Sprintf("%s %s", utils.GetCurrencySymbol(data.Currency), utils.FormatNumber(totalToPay)), "", 0, "L", false, 0, "")
 
 			// Como pagar su factura
 
@@ -227,7 +227,7 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 		}
 
 	}
-	pdf.Cell(0, 10, fmt.Sprintf("%.2f Total %s", *device.PreviousMonth, unit))
+	pdf.Cell(0, 10, fmt.Sprintf("%s Total %s", utils.FormatNumber(*device.PreviousMonth), unit))
 	pdf.Ln(5)
 	pdf.SetFont("Arial", "", 8)
 	pdf.Cell(0, 10, fmt.Sprintf("( %s )", firstReading))
@@ -237,7 +237,7 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 	pdf.Cell(0, 10, tr("Fin de Lectura"))
 	pdf.Ln(5)
 	pdf.SetTextColor(80, 80, 80)
-	pdf.Cell(0, 10, fmt.Sprintf("%.2f Total %s", *device.CurrentMonth, unit))
+	pdf.Cell(0, 10, fmt.Sprintf("%s Total %s", utils.FormatNumber(*device.CurrentMonth), unit))
 	pdf.Ln(5)
 	pdf.SetFont("Arial", "", 8)
 	pdf.Cell(0, 10, fmt.Sprintf("( %s )", lastReading))
@@ -251,11 +251,11 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 
 	pdf.Cell(0, 10, fmt.Sprintf("@ %s%.3f / Total %s", utils.GetCurrencySymbol(data.Currency), rate, unit))
 	pdf.SetXY(120, 70)
-	pdf.MultiCell(0, 10, fmt.Sprintf("%.2f Total %s X", *device.TotalConsumed, unit), "", "L", false)
+	pdf.MultiCell(0, 10, fmt.Sprintf("%s Total %s X", utils.FormatNumber(*device.TotalConsumed), unit), "", "L", false)
 	pdf.SetXY(120, 75)
 	pdf.Cell(0, 10, fmt.Sprintf("%s %.2f", utils.GetCurrencySymbol(data.Currency), rate))
 	pdf.SetXY(170, 70)
-	pdf.Cell(0, 10, fmt.Sprintf("%s%.3f", utils.GetCurrencySymbol(data.Currency), *device.TotalToPay))
+	pdf.Cell(0, 10, fmt.Sprintf("%s%s", utils.GetCurrencySymbol(data.Currency), utils.FormatNumber(*device.TotalToPay)))
 	pdf.SetXY(80, 90)
 	pdf.SetFillColor(245, 245, 245)
 	pdf.Rect(80, 90, 117, 10, "F")
@@ -263,7 +263,7 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 	pdf.SetFont("Arial", "", 12)
 	pdf.Cell(0, 10, tr("Total a Pagar"))
 	pdf.SetXY(170, 90)
-	pdf.Cell(0, 10, fmt.Sprintf("%s %.2f", utils.GetCurrencySymbol(data.Currency), *device.TotalToPay))
+	pdf.Cell(0, 10, fmt.Sprintf("%s %s", utils.GetCurrencySymbol(data.Currency), utils.FormatNumber(*device.TotalToPay)))
 	pdf.SetXY(20, 130)
 	pdf.Cell(0, 10, tr("Información de Uso"))
 	pdf.SetDrawColor(80, 80, 80)
@@ -300,11 +300,22 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 	pdf.SetTextColor(150, 150, 150)
 	pdf.SetFont("Arial", "", 9)
 	pdf.SetXY(90, 155)
-	pdf.Cell(0, 10, "33.33")
+
+	days := time.UnixMilli(deviceTelemetry[len(deviceTelemetry)-1].Ts).Sub(time.UnixMilli(deviceTelemetry[0].Ts).AddDate(0, 0, 0)).Hours() / 24
+	weeks := days / 7
+	months := days / 30
+	if days < 7 {
+		weeks = 1
+	}
+	if days < 30 {
+		months = 1
+	}
+
+	pdf.Cell(0, 10, utils.FormatNumber(*device.TotalConsumed/days))
 	pdf.SetXY(120, 155)
-	pdf.Cell(0, 10, "333.33")
+	pdf.Cell(0, 10, utils.FormatNumber(*device.TotalConsumed/weeks))
 	pdf.SetXY(150, 155)
-	pdf.Cell(0, 10, "1230.33")
+	pdf.Cell(0, 10, utils.FormatNumber(*device.TotalConsumed/months))
 	// CONVERTIR deviceTelemetry A JSON
 	deviceTelemetryJson, err := json.Marshal(deviceTelemetry)
 	if err != nil {
@@ -317,11 +328,14 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 	}
 
 	// pdf.Image(string(output), 20, 20, 170, 170, false, "", 0, "")
+	if days < 30 {
+		pdf.SetXY(20, 170)
+		pdf.SetTextColor(120, 120, 120)
+		// italic
+		pdf.SetFont("Arial", "I", 10)
+		pdf.Cell(0, 10, fmt.Sprintf(tr("Nota: No hay mediciones de un mes completo (%d días). Por favor, consulte con el administrador."), int(days)))
+		pdf.SetFont("Arial", "", 10)
+	}
 
 	pdf.Image("grafica.png", 20, 180, 170, 0, false, "", 0, "")
-}
-
-func OpenPdf(filename string) {
-	cmd := exec.Command("xdg-open", filename)
-	cmd.Run()
 }

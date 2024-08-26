@@ -190,3 +190,23 @@ func ParseUTF8(input string) string {
 	utf8String, _ := ioutil.ReadAll(reader)
 	return string(utf8String)
 }
+
+// parse number to pay format ex. 1000 -> 1,000.00 with comma and two decimals
+func FormatNumber(num float64) string {
+	// Formatea el número con dos decimales
+	parts := strings.Split(fmt.Sprintf("%.2f", num), ".")
+
+	// Parte entera con comas
+	intPart := parts[0]
+	decPart := parts[1]
+
+	var formattedIntPart strings.Builder
+	for i, digit := range intPart {
+		if i > 0 && (len(intPart)-i)%3 == 0 {
+			formattedIntPart.WriteString(",")
+		}
+		formattedIntPart.WriteRune(digit)
+	}
+
+	return formattedIntPart.String() + "." + decPart
+}

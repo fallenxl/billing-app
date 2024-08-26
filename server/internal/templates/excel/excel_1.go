@@ -248,8 +248,8 @@ func CreateExcel(filename string, exportedData models.ExportedData) (string, err
 						// unit = unitWater
 						rate = exportedData.Rate["water"]
 					}
-					f.SetCellValue(sheet, fmt.Sprintf("E%d", row), fmt.Sprintf("%.2f %s", rate, utils.GetCurrencySymbol(exportedData.Currency)))
-					f.SetCellValue(sheet, fmt.Sprintf("F%d", row), fmt.Sprintf("%.2f %s", *relation.TotalToPay, utils.GetCurrencySymbol(exportedData.Currency)))
+					f.SetCellValue(sheet, fmt.Sprintf("E%d", row), fmt.Sprintf("%s%.2f", utils.GetCurrencySymbol(exportedData.Currency), rate))
+					f.SetCellValue(sheet, fmt.Sprintf("F%d", row), fmt.Sprintf("%s%.2f", utils.GetCurrencySymbol(exportedData.Currency), *relation.TotalToPay))
 					row++
 				}
 			}
@@ -308,8 +308,8 @@ func CreateExcel(filename string, exportedData models.ExportedData) (string, err
 						f.SetCellValue(sheet, fmt.Sprintf("B%d", row), *relation.PreviousMonth)
 						f.SetCellValue(sheet, fmt.Sprintf("C%d", row), *relation.CurrentMonth)
 						f.SetCellValue(sheet, fmt.Sprintf("D%d", row), *relation.TotalConsumed)
-						f.SetCellValue(sheet, fmt.Sprintf("E%d", row), fmt.Sprintf("%.2f %s", exportedData.Rate["energy"], utils.GetCurrencySymbol(exportedData.Currency)))
-						f.SetCellValue(sheet, fmt.Sprintf("F%d", row), fmt.Sprintf("%.2f %s", *relation.TotalToPay, utils.GetCurrencySymbol(exportedData.Currency)))
+						f.SetCellValue(sheet, fmt.Sprintf("E%d", row), fmt.Sprintf("%s%.2f", utils.GetCurrencySymbol(exportedData.Currency), exportedData.Rate["energy"]))
+						f.SetCellValue(sheet, fmt.Sprintf("F%d", row), fmt.Sprintf("%s%.2f", utils.GetCurrencySymbol(exportedData.Currency), *relation.TotalToPay))
 						row++
 					}
 				}
@@ -342,8 +342,8 @@ func CreateExcel(filename string, exportedData models.ExportedData) (string, err
 						f.SetCellValue(sheet, fmt.Sprintf("B%d", row), *relation.PreviousMonth)
 						f.SetCellValue(sheet, fmt.Sprintf("C%d", row), *relation.CurrentMonth)
 						f.SetCellValue(sheet, fmt.Sprintf("D%d", row), *relation.TotalConsumed)
-						f.SetCellValue(sheet, fmt.Sprintf("E%d", row), fmt.Sprintf("%.2f %s", exportedData.Rate["water"], utils.GetCurrencySymbol(exportedData.Currency)))
-						f.SetCellValue(sheet, fmt.Sprintf("F%d", row), fmt.Sprintf("%.2f %s", *relation.TotalToPay, utils.GetCurrencySymbol(exportedData.Currency)))
+						f.SetCellValue(sheet, fmt.Sprintf("E%d", row), fmt.Sprintf("%s%.2f", utils.GetCurrencySymbol(exportedData.Currency), exportedData.Rate["water"]))
+						f.SetCellValue(sheet, fmt.Sprintf("F%d", row), fmt.Sprintf("%s%.2f", utils.GetCurrencySymbol(exportedData.Currency), *relation.TotalToPay))
 						row++
 					}
 				}
