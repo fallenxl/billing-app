@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
-import { useDispatch} from "react-redux";
+import { useDispatch, useSelector} from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
 import { getCurrentUserService } from "../../services/auth/auth.services";
 import { login } from "../../store/slices/auth-slice";
 import { Loading } from "../../components/loading/Loading";
+import { AppState } from "../../interfaces/app-state/app-state";
 
 export function AuthGuard() {
     const token = localStorage.getItem("jwt")
     const dispatch = useDispatch();
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+    const user = useSelector((state: AppState) => state.auth.user);
     useEffect(() => {
+        console.log(user)
         if (token) {
             getCurrentUserService(JSON.parse(token).token).then((response) => {
                 if (!response) {

@@ -7,4 +7,7 @@ export interface User {
     id: string;
     token: string;
     refreshToken: string;
+    customerId: {
+        id: string;
+    };
 }

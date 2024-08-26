@@ -13,6 +13,7 @@ export interface AuthResponse {
     id: string;
     token: string;
     refreshToken: string;
+    customerId: string;
 }
 
 export interface AuthError {

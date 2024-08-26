@@ -8,6 +8,10 @@ type RelationInfo struct {
 	Name       string `json:"name"`
 	Id         string `json:"id"`
 }
+
+type CustomerID struct {
+	Id string `json:"id"`
+}
 type LoginResponse struct {
 	RefreshToken string `json:"refreshToken"`
 	Token        string `json:"token"`
@@ -17,10 +21,11 @@ type LoginResponse struct {
 	Authority    string `json:"authority"`
 	Name         string `json:"name"`
 	Id           string `json:"id"`
+	CustomerId   string `json:"customerId"`
 	//AssetInfo    RelationInfo `json:"assetInfo"`
 }
 type RequestResponse struct {
 	StatusCode int
 	Response   []byte
-	error      error
+	Error      error
 }

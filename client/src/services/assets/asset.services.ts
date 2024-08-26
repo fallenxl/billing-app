@@ -11,6 +11,17 @@ export async function GetAssetGroupService() {
     }
 }
 
+export async function GetAssetByIdService(id: string) {
+    try {
+        const response = await axios.get(`${config.API}/assets/group/${id}`);
+        console.log(response)
+        return response.data;
+    } catch (error: any | AxiosError) {
+        const errorMessage = error.response?.data.split(": ")[1];
+        return errorMessage;
+    }
+}
+
 export async function GetCustomerByIdService(id: string) {
     try {
         const response = await axios.get(`${config.API}/customer/${id}`);

@@ -9,8 +9,10 @@ import (
 
 func GetAssetsByGroupIDService(token string) (models.CustomerGroup, error) {
 
+	fmt.Println(token)
 	response, err := utils.Request(config.ThingsboardApiURL+"entityGroup/ce0482e0-5425-11ef-aa15-a127638e3a77/customers?pageSize=100&page=0", "GET", "", token)
 	if err != nil {
+		fmt.Println(err)
 		return models.CustomerGroup{}, err
 	}
 	var customer models.CustomerGroup
@@ -34,6 +36,39 @@ func GetAssetsByGroupIDService(token string) (models.CustomerGroup, error) {
 			customer.Data[i].Img = &img
 		}
 
+	}
+
+	return customer, nil
+}
+
+func GetAssetsByGroupID(id string, token string) (models.Customer, error) {
+
+	fmt.Println(token)
+	url := fmt.Sprintf("%scustomer/%s", config.ThingsboardApiURL, id)
+	fmt.Println(url)
+	response, err := utils.Request(url, "GET", "", token)
+	if err != nil {
+		fmt.Println(err)
+		return models.Customer{}, err
+	}
+	var customer models.Customer
+	err = utils.ParseResponse(response, &customer)
+	if err != nil {
+		fmt.Println(err)
+		return models.Customer{}, err
+	}
+
+	assetAttributes, err := GetAssetAttributesService(token, customer.Id.Id, customer.Id.EntityType)
+	if err != nil {
+		fmt.Println(err)
+		return models.Customer{}, err
+	}
+
+	//rate := FindAtrributeByKey(assetAttributes, "rate").(map[string]interface{})
+	img := FindAttributeByKey(assetAttributes, "img")
+	if img != nil {
+		img := img.(string)
+		customer.Img = &img
 	}
 
 	return customer, nil

@@ -20,6 +20,7 @@ func NewRouter() http.Handler {
 	protectedRoutes.HandleFunc("/auth/current", GetCurrentUser).Methods("GET")
 	protectedRoutes.HandleFunc("/assets/group", GetAssetsGroup).Methods("GET")
 	protectedRoutes.HandleFunc("/assets/{assetId}", GetAssetById).Methods("GET")
+	protectedRoutes.HandleFunc("/assets/group/{groupId}", GetAssetsByGroupID).Methods("GET")
 	protectedRoutes.HandleFunc("/customer/{customerId}", GetCustomerById).Methods("GET")
 	protectedRoutes.HandleFunc("/customer/{customerId}/relation", GetCustomerRelationById).Methods("GET")
 	protectedRoutes.HandleFunc("/assets/{assetId}/relation", GetAssetRelationById).Methods("GET")

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Layout from "../../components/layout/Layout";
-import { GetAssetGroupService, GetAssetRelationsById, GetCustomerByIdService, GetCustomerRelationsById } from "../../services/assets/asset.services";
+import {  GetAssetGroupService, GetAssetRelationsById, GetCustomerByIdService, GetCustomerRelationsById } from "../../services/assets/asset.services";
 import { useDispatch, useSelector } from "react-redux";
 import { setCustomer } from "../../store/slices/customer.slice";
 import { useNavigate } from "react-router-dom";
@@ -23,17 +23,16 @@ export function Home() {
   const [branchSelected, setBranchSelected] = useState<any>(null);
 
   const [branchRelations, setBranchRelations] = useState<IRelation[] | null>(null);
+  const user = useSelector((state: AppState) => state.auth.user);
   useEffect(() => {
     setIsLoading(true)
     if (branchId) {
       GetCustomerByIdService(branchId).then((response) => {
-        console.log(response)
         if (response) {
           GetCustomerRelationsById(branchId).then((response) => {
 
             if (branch) {
               setBranchSelected(response.find((relation: any) => relation.to.id === branch))
-              console.log(response.find((relation: any) => relation.to.id === branch))
               dispatch(setBranch(response.find((relation: any) => relation.to.id === branch)))
               GetAssetRelationsById(branch).then((response) => {
                 if(!response){
@@ -65,13 +64,26 @@ export function Home() {
         })
       }).finally(() => setIsLoading(false))
     } else {
-      GetAssetGroupService().then(response => {
-        if (response.data.length === 1) {
-          dispatch(setCustomer(response.data[0]))
-          return navigate('/dashboard?customer=' + response[0].id.id)
-        }
-        navigate('/select')
-      }).finally(() => setIsLoading(false))
+      if (user?.authority === 'TENANT_ADMIN') {
+        GetAssetGroupService().then(response => {
+          if (response.data.length === 1) {
+            dispatch(setCustomer(response.data[0]))
+            return navigate('/dashboard?customer=' + response[0].id.id)
+          }
+          navigate('/select')
+        }).finally(() => setIsLoading(false))
+      }else if (user?.authority === 'CUSTOMER_USER'){
+        GetCustomerByIdService(user.customerId.id).then((response) => {
+          dispatch(setCustomer(response))
+          GetCustomerRelationsById(user.customerId.id).then((response) => {
+            if (response.length === 1) {
+              navigate('/dashboard?customer=' + response[0].from.id + '&branch=' + response[0].to.id)
+            } else {
+              setRelations(response)
+            }
+          })
+        })
+      }
     }
 
     if (!branch) {
