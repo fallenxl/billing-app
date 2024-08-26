@@ -6,9 +6,14 @@ import (
 	"server/internal/models"
 	"server/internal/services"
 	"server/internal/utils"
+	"sync"
 )
 
+var mu sync.Mutex
+
 func HandleDataExport(w http.ResponseWriter, r *http.Request) {
+	mu.Lock()
+	defer mu.Unlock()
 	var body models.DataDTO
 	err := utils.ParseBody(r, &body)
 	if err != nil {

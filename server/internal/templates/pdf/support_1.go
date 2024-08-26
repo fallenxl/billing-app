@@ -25,7 +25,6 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 	uniqueID := strconv.Itoa(utils.GenerateRandomNumber(1000, 9999))
 
 	filename = fmt.Sprintf("%s-%s", uniqueID, filename)
-	fmt.Println(filename)
 	zipFile, err := os.Create(filename)
 	if err != nil {
 		return "", err
