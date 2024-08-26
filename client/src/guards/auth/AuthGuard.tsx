@@ -14,9 +14,7 @@ export function AuthGuard() {
     // const user = useSelector((state: AppState) => state.auth.user);
     useEffect(() => {
         if (token) {
-            console.log('token')
             getCurrentUserService(JSON.parse(token).token).then((response) => {
-                console.log(response)
                 if (!response) {
                     dispatch(login(null));
                     localStorage.removeItem("jwt");
