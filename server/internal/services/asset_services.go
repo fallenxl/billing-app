@@ -8,8 +8,6 @@ import (
 )
 
 func GetAssetsByGroupIDService(token string) (models.CustomerGroup, error) {
-
-	fmt.Println(token)
 	response, err := utils.Request(config.ThingsboardApiURL+"entityGroup/ce0482e0-5425-11ef-aa15-a127638e3a77/customers?pageSize=100&page=0", "GET", "", token)
 	if err != nil {
 		fmt.Println(err)
@@ -44,7 +42,6 @@ func GetAssetsByGroupIDService(token string) (models.CustomerGroup, error) {
 func GetAssetsByGroupID(id string, token string) (models.Customer, error) {
 
 	url := fmt.Sprintf("%scustomer/%s", config.ThingsboardApiURL, id)
-	fmt.Println(url)
 	response, err := utils.Request(url, "GET", "", token)
 	if err != nil {
 		fmt.Println(err)

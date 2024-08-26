@@ -149,9 +149,8 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 				rate := utils.GetRateByDeviceType(device.Type, data.Rate)
 				DeviceTypePdf(pdf, device, data, rate, unit)
 			}
-
 		}
-		timeNow := time.Now().Format("2006-01-02")
+		timeNow := time.Now()
 		pdfFileName := fmt.Sprintf("%s-%s.pdf", strings.Join(strings.Split(asset.Name, " "), "-"), timeNow)
 		err := pdf.OutputFileAndClose(pdfFileName)
 		if err != nil {
@@ -333,7 +332,7 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 		pdf.SetTextColor(120, 120, 120)
 		// italic
 		pdf.SetFont("Arial", "I", 10)
-		pdf.Cell(0, 10, fmt.Sprintf(tr("Nota: No hay mediciones de un mes completo (%d días). Por favor, consulte con el administrador."), int(days)))
+		pdf.MultiCell(0, 10, fmt.Sprintf(tr("Nota: No hay mediciones del periodo completo de facturación (%d días). Por favor, consulte con el administrador."), int(days)), "", "L", false)
 		pdf.SetFont("Arial", "", 10)
 	}
 

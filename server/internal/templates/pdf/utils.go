@@ -22,8 +22,8 @@ func AddHeader(pdf *gofpdf.Fpdf, data models.ExportedData) {
 	}
 
 	// Continuar con el resto del header
-	parseStartDate := time.UnixMilli(data.StartDateTs).Format("02/01/2006")
-	parseEndDate := time.UnixMilli(data.EndDateTs).Format("02/01/2006")
+	parseStartDate := time.UnixMilli(data.StartDateTs).AddDate(0, 0, 0).Format("02/01/2006")
+	parseEndDate := time.UnixMilli(data.EndDateTs).AddDate(0, 0, 0).Format("02/01/2006")
 	pdf.SetFont("Arial", "B", 12)
 	pdf.Cell(0, 10, data.Customer)
 

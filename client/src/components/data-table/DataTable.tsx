@@ -84,7 +84,7 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
     
    const startDateTs = startDate ? new Date(dateRange[0]).getTime() : firsDateOfTheMonth
     const endDateTs = endDate ? new Date(dateRange[1]).getTime() : new Date().getTime()
-
+  
     const data: IExportData = {
       format: type,
       img: customer?.img,
@@ -269,7 +269,7 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows?.length > 0 ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}

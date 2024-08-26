@@ -22,7 +22,6 @@ function App() {
             <Route path="/dashboard" element={<Home/>} />
             <Route path="/select" element={<SelectAsset/>} />
             <Route path="/settings" element={<Home/>} />
-          
           </Route>
           <Route path="*" element={<h1>Not Found</h1>} />
         </Routes>
