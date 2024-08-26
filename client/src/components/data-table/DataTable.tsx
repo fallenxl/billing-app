@@ -123,9 +123,7 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
   }
 
 
-  React.useEffect(() => {
-    console.log(data)
-  }, [data])
+  
   const [startDate, setStartDate] = React.useState('');
   const [endDate, setEndDate] = React.useState('');
   const [calendarVisible, setCalendarVisible] = React.useState(false);
@@ -200,8 +198,8 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
                   <Calendar
                     selectRange
                     onChange={handleDateChange}
-                    className={"absolute w-[20rem] top-[1rem] left-1 z-[100] scale-[.85] "}
-                    
+                    className={"absolute w-[20rem] top-[1.5rem] right-0 z-[50] scale-[.85] "}
+                  
                     value={dateRange as any}
                   />
                 )}
