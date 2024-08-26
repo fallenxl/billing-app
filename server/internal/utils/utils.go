@@ -210,3 +210,7 @@ func FormatNumber(num float64) string {
 
 	return formattedIntPart.String() + "." + decPart
 }
+
+func GenerateRandomNumber(start int, end int) int {
+	return start + time.Now().Nanosecond()%(end-start)
+}

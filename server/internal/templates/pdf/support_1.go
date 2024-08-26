@@ -21,8 +21,8 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 	// currency := utils.GetCurrencySymbol(data.Currency)
 	parseStartDate := time.UnixMilli(data.StartDateTs).Format("02/01/2006")
 	parseEndDate := time.UnixMilli(data.EndDateTs).Format("02/01/2006")
-	// create unique identifier for the file only 6 digits
-	uniqueID := strconv.FormatInt(time.Now().UnixNano(), 10)[10:16]
+	// generate a random number between 1000 and 9999
+	uniqueID := strconv.Itoa(utils.GenerateRandomNumber(1000, 9999))
 
 	filename = fmt.Sprintf("%s-%s", uniqueID, filename)
 	fmt.Println(filename)
