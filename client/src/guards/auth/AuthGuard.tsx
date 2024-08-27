@@ -37,10 +37,12 @@ export function AuthGuard() {
             }).catch(() => {
                 localStorage.removeItem("jwt");
                 dispatch(login(null));
+                setIsAuthenticated(false);
             })
         }else{
             console.log('no token')
             setIsAuthenticated(false);
+            dispatch(login(null));
         }
     }, [])
     if(isAuthenticated === null){

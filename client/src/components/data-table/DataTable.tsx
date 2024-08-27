@@ -294,7 +294,7 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
                 return (
                   <TableRow key={index}>
                     <TableCell colSpan={columns.length}>
-                      <Skeleton className="h-6" />
+                      <Skeleton className="h-4" />
                     </TableCell>
                   </TableRow>
                 )
