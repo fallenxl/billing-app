@@ -71,7 +71,7 @@ export function Auth() {
             <main className="flex items-center justify-center w-full h-[100vh] bg-gray-100 ">
                 <div className="bg-white p-10 rounded-md shadow-md w-96 ">
                 <div className="flex items-center justify-center gap-4 mb-7">
-                        <img src="/lumen.png" alt="logo" className="w-32 " />
+                        <img src="/lumen.png" alt="logo" className="w-72 " />
                         {/* <small className="text-gray-400">Lumen Energy Solutions</small> */}
                     </div>
                     <div className="mb-5  gap-4">

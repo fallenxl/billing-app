@@ -40,7 +40,6 @@ export function AuthGuard() {
                 setIsAuthenticated(false);
             })
         }else{
-            console.log('no token')
             setIsAuthenticated(false);
             dispatch(login(null));
         }
