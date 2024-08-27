@@ -57,10 +57,8 @@ func AddHeaderSupport(pdf *gofpdf.Fpdf, data models.ExportedData, support string
 	pdf.Line(0, 30, 300, 30) // Línea en la parte inferior del rectángulo
 
 	// Configurar el estilo de fuente para el nombre del cliente (grande y en la izquierda)
-	pdf.SetXY(10, 12)              // Establecer posición para el texto
-	pdf.SetFont("Arial", "B", 22)  // Fuente más grande
-	pdf.SetTextColor(86, 111, 183) // Color azul
-	pdf.Cell(0, 10, data.Customer) // Nombre del cliente
+	pdf.SetXY(10, 12) // Establecer posición para el texto
+	AddImageByUrl(pdf, data.Img, 15, 8, 30, 30)
 
 	// Posicionar el nombre de la sucursal en la parte derecha (encima del cliente)
 	pdf.SetXY(170, 8)
@@ -133,12 +131,18 @@ func AddHeaderDue(pdf *gofpdf.Fpdf, data models.ExportedData, dueType string, to
 }
 
 func AddImageByUrl(pdf *gofpdf.Fpdf, url string, x, y, width, height float64) {
-	tempImageFile := "temp.png"
-	err := utils.DownloadImage(url, tempImageFile)
-	if err != nil {
-		fmt.Println("Error downloading image: ", err)
+	urlParts := strings.Split(url, "/")
+	tempImageFile := fmt.Sprintf("./img/%s.png", urlParts[len(urlParts)-1])
+
+	// verificar si la imagen ya está descargada
+	if _, err := os.Stat(tempImageFile); os.IsNotExist(err) {
+		// Realizar la solicitud HTTP para obtener la imagen
+		err := utils.DownloadImage(url, tempImageFile)
+		if err != nil {
+			fmt.Println("Error downloading image:", err)
+			return
+		}
 	}
-	defer os.Remove(tempImageFile)
 
 	// Obtener dimensiones originales de la imagen
 	file, err := os.Open(tempImageFile)
@@ -164,5 +168,5 @@ func AddImageByUrl(pdf *gofpdf.Fpdf, url string, x, y, width, height float64) {
 	finalHeight := origHeight * scale
 
 	// Añadir imagen en el header, ajustada proporcionalmente
-	pdf.Image("temp.png", x, y, finalWidth, finalHeight, false, "", 0, "")
+	pdf.Image(tempImageFile, x, y, finalWidth, finalHeight, false, "", 0, "")
 }

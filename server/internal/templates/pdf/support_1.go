@@ -53,7 +53,7 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 
 				AddHeaderSupport(pdf, data, asset.Label)
 
-			}, true)
+			}, false)
 
 			pdf.SetFooterFunc(func() {
 				AddFooter(pdf)
@@ -178,11 +178,11 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 		}
 
 		file.Close()
-		os.Remove(pdfFileName)
+		defer os.Remove(pdfFileName)
 
 	}
 
-	os.Remove("grafica.png")
+	defer os.Remove("grafica.png")
 	return filename, nil
 
 }
@@ -336,10 +336,10 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 		pdf.SetXY(20, 170)
 		pdf.SetTextColor(120, 120, 120)
 		// italic
-		pdf.SetFont("Arial", "I", 10)
+		pdf.SetFont("Arial", "I", 8)
 		pdf.MultiCell(0, 10, fmt.Sprintf(tr("Nota: No hay mediciones del periodo completo de facturación (%d días). Por favor, consulte con el administrador."), int(days)), "", "L", false)
 		pdf.SetFont("Arial", "", 10)
 	}
 
-	pdf.Image("grafica.png", 20, 180, 170, 0, false, "", 0, "")
+	pdf.Image("grafica.png", 20, 190, 170, 0, false, "", 0, "")
 }

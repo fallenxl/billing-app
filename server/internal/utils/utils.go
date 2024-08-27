@@ -97,6 +97,11 @@ func DownloadImage(url, filepath string) error {
 	}
 	defer resp.Body.Close()
 
+	// crear el directorio img si no existe
+	if _, err := os.Stat("img"); os.IsNotExist(err) {
+		os.Mkdir("img", os.ModePerm)
+	}
+
 	// Crear el archivo donde se guardará la imagen
 	file, err := os.Create(filepath)
 	if err != nil {
