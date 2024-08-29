@@ -6,6 +6,7 @@ import (
 	"server/internal/models"
 	"server/internal/utils"
 	"strings"
+	"sync"
 )
 
 func getKeysByDeviceType(deviceType string) string {
@@ -34,6 +35,11 @@ func GetDeviceById(id string, entityType string, token string) (models.Device, e
 }
 
 func GetDeviceTelemetryById(id string, entityType string, deviceType string, startDate int64, endDate int64, resolution int64, key string, agg string, token string) models.Telemetry {
+	var mux sync.Mutex
+
+	mux.Lock()
+	defer mux.Unlock()
+
 	if agg == "" {
 		agg = "NONE"
 	}

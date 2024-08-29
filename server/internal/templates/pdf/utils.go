@@ -8,6 +8,7 @@ import (
 	"server/internal/models"
 	"server/internal/utils"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/jung-kurt/gofpdf/v2"
@@ -131,6 +132,10 @@ func AddHeaderDue(pdf *gofpdf.Fpdf, data models.ExportedData, dueType string, to
 }
 
 func AddImageByUrl(pdf *gofpdf.Fpdf, url string, x, y, width, height float64) {
+	var mux sync.Mutex
+
+	mux.Lock()
+	defer mux.Unlock()
 	urlParts := strings.Split(url, "/")
 	tempImageFile := fmt.Sprintf("./img/%s.png", urlParts[len(urlParts)-1])
 

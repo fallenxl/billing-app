@@ -110,6 +110,16 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
         isLoading: false,
         message: ''
       }))
+    }).catch((error) => {
+      dispatch(setIsLoading({
+        isLoading: false,
+        message: error.message
+      }))
+    }).finally(() => {
+    dispatch(setIsLoading({
+      isLoading: false,
+      message: ''
+    }))
     })
   }
 

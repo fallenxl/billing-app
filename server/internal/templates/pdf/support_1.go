@@ -2,6 +2,7 @@ package pdf
 
 import (
 	"archive/zip"
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -19,6 +20,7 @@ import (
 )
 
 func CreateSupportPdf(filename string, data models.ExportedData) (string, error) {
+	var chartName string
 	// currency := utils.GetCurrencySymbol(data.Currency)
 	parseStartDate := time.UnixMilli(data.StartDateTs).Format("02/01/2006")
 	parseEndDate := time.UnixMilli(data.EndDateTs).Format("02/01/2006")
@@ -37,6 +39,7 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 
 	var wg sync.WaitGroup
 	errChan := make(chan error, len(data.Relations))
+	var mu sync.Mutex
 	for _, asset := range data.Relations {
 		wg.Add(1)
 
@@ -161,7 +164,7 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 					pdf.AddPage()
 					unit := utils.GetUnitByDeviceType(device.Type, data.Units)
 					rate := utils.GetRateByDeviceType(device.Type, data.Rate)
-					DeviceTypePdf(pdf, device, data, rate, unit)
+					chartName = DeviceTypePdf(pdf, device, data, rate, unit)
 				}
 			}
 
@@ -171,6 +174,9 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 				errChan <- err
 				return
 			}
+
+			mu.Lock()
+			defer mu.Unlock()
 
 			zipFile, err := zipWriter.Create(filepath.Base(pdfFileName))
 			if err != nil {
@@ -184,14 +190,34 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 				return
 			}
 
-			_, err = io.Copy(zipFile, file)
+			bufferedReader := bufio.NewReader(file)
+			bufferedWriter := bufio.NewWriter(zipFile)
+
+			defer bufferedWriter.Flush()
+
+			buffer := make([]byte, 1024*128)
+			_, err = io.CopyBuffer(bufferedWriter, bufferedReader, buffer)
 			if err != nil {
 				errChan <- err
 				return
 			}
 
 			file.Close()
-			defer os.Remove(pdfFileName)
+			// Comprueba si el archivo existe antes de eliminarlo
+			if _, err := os.Stat(chartName); err == nil {
+				err = os.Remove(chartName)
+				if err != nil {
+					fmt.Println("Error al eliminar la imagen:", chartName, err)
+				}
+			}
+
+			// Verifica y elimina el archivo PDF
+			if _, err := os.Stat(pdfFileName); err == nil {
+				err = os.Remove(pdfFileName)
+				if err != nil {
+					fmt.Println("Error al eliminar el archivo PDF:", pdfFileName, err)
+				}
+			}
 		}(asset)
 
 	}
@@ -205,12 +231,12 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 		}
 		return "", <-errChan
 	}
-	defer os.Remove("grafica.png")
 	return filename, nil
 
 }
 
-func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.ExportedData, rate float64, unit string) {
+func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.ExportedData, rate float64, unit string) string {
+	var chartName string = fmt.Sprintf("./img/grafica-%s.png", strings.ToLower(strings.ReplaceAll(device.Label, " ", "-")))
 	parseStartDate := time.UnixMilli(data.StartDateTs).Format("02/01/2006")
 	parseEndDate := time.UnixMilli(data.EndDateTs).Format("02/01/2006")
 	tr := pdf.UnicodeTranslatorFromDescriptor("")
@@ -352,15 +378,15 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 		pdf.Cell(0, 10, utils.FormatNumber(*device.TotalConsumed/months))
 		// CONVERTIR deviceTelemetry A JSON
 		deviceTelemetryJson, err := json.Marshal(deviceTelemetry)
+		resolution := utils.GetResolution(data.StartDateTs, data.EndDateTs)
 		if err != nil {
 			fmt.Println("Error marshalling device telemetry: ", err)
 		}
-		cmd := exec.Command("python", "./scripts/chart.py", "#ffc45a", unit, string(deviceTelemetryJson), parseStartDate, parseEndDate)
+		cmd := exec.Command("python", "./scripts/chart.py", "#ffc45a", unit, string(deviceTelemetryJson), parseStartDate, parseEndDate, chartName, strconv.FormatInt(resolution, 10))
 		_, err = cmd.Output()
 		if err != nil {
 			fmt.Println("Error running python script: ", err)
 		}
-
 		// pdf.Image(string(output), 20, 20, 170, 170, false, "", 0, "")
 		if days < 30 {
 			pdf.SetXY(20, 170)
@@ -371,6 +397,8 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 			pdf.SetFont("Arial", "", 10)
 		}
 
-		pdf.Image("grafica.png", 20, 190, 170, 0, false, "", 0, "")
+		pdf.Image(chartName, 20, 190, 170, 0, false, "", 0, "")
 	}
+
+	return chartName
 }

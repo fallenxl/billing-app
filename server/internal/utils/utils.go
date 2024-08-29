@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"archive/zip"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -146,8 +148,14 @@ func GetResolution(startDate int64, endDate int64) int64 {
 	}
 	// if the difference is less than 1 month, RESOLUTION_PER_day
 	if diff <= 2764740000 {
-		return 86400000
+		return 86400000 * 3
 	}
+
+	// if the difference is less than 6 month, RESOLUTION_PER_week
+	if diff <= 15778476000 {
+		return 86400000 * 7
+	}
+
 	return 2592000000
 
 }
@@ -218,4 +226,26 @@ func FormatNumber(num float64) string {
 
 func GenerateRandomNumber(start int, end int) int {
 	return start + time.Now().Nanosecond()%(end-start)
+}
+
+// addFileToZip agrega un archivo al archivo ZIP
+func AddFileToZip(zipWriter *zip.Writer, filePath string) error {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return fmt.Errorf("error opening file %s: %w", filePath, err)
+	}
+	defer file.Close()
+
+	zipFileWriter, err := zipWriter.Create(filepath.Base(filePath))
+	if err != nil {
+		return fmt.Errorf("error creating ZIP entry for file %s: %w", filePath, err)
+	}
+
+	buffer := make([]byte, 1024*64) // 64 KB buffer
+	_, err = io.CopyBuffer(zipFileWriter, file, buffer)
+	if err != nil {
+		return fmt.Errorf("error copying data to ZIP entry for file %s: %w", filePath, err)
+	}
+
+	return nil
 }
