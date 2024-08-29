@@ -69,7 +69,7 @@ export function Auth() {
                 </div>
             </div>}
             <main className="flex items-center justify-center w-full h-[100vh] bg-gray-100 ">
-                <div className="bg-white p-10 rounded-md shadow-md w-96 ">
+                <div className="bg-white p-10 rounded-md shadow-md w-full sm:w-96 h-full sm:h-auto flex flex-col justify-center">
                 <div className="flex items-center justify-center gap-4 mb-7">
                         <img src="/lumen.png" alt="logo" className="w-72 " />
                         {/* <small className="text-gray-400">Lumen Energy Solutions</small> */}

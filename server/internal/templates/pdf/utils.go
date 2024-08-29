@@ -31,7 +31,7 @@ func AddHeader(pdf *gofpdf.Fpdf, data models.ExportedData) {
 	pdf.Cell(0, 10, data.Branch)
 	pdf.SetFont("Arial", "", 10)
 	pdf.Ln(5)
-	pdf.Cell(0, 10, fmt.Sprintf("Fecha de corte: %s - %s", parseStartDate, parseEndDate))
+	pdf.Cell(0, 10, fmt.Sprintf("Billing Period: %s - %s", parseStartDate, parseEndDate))
 	pdf.Ln(10)
 }
 

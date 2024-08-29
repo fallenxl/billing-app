@@ -41,6 +41,8 @@ import { setIsLoading } from "../../store/slices/is-loading.slice"
 import Calendar from "react-calendar"
 import 'react-calendar/dist/Calendar.css';
 import { Skeleton } from "../ui/skeleton"
+import { DEFAULT_RATE } from "../../const/rate"
+import { DEFAULT_UNITS } from "../../const/units"
 interface DataTableProps {
   data: any[] | null
   columns: ColumnDef<any>[]
@@ -95,19 +97,8 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
       customer: customer?.name ?? '',
       branch: branch?.toName ?? '',
       currency: branch?.settings.currency ?? 'LPS',
-      rate: branch?.settings.rate ??{
-        water: 0.324,
-        energy: 6.23,
-        gas: 0.324,
-        air: 0.324,
-        hotWater: 0.324
-      },
-      units: {
-        water: 'm3',
-        energy: 'kWh',
-        gas: 'm3',
-        air: 'm3'
-      },
+      rate: branch?.settings.rate ??DEFAULT_RATE,
+      units: branch?.settings.units ?? DEFAULT_UNITS,
       selectedDevices: table.getSelectedRowModel().rows.map((row) => row.original) as IRelation[]
     }
     dispatch(setIsLoading({

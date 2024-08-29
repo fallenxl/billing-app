@@ -260,11 +260,11 @@ func CreatePDF(filename string, exportedData models.ExportedData) (string, error
 						} else {
 							pdf.CellFormat(colWidths[0], 10, tr(relation.Label), "1", 0, "C", false, 0, "")
 						}
-						pdf.CellFormat(colWidths[1], 10, fmt.Sprintf("%.2f", *relation.PreviousMonth), "1", 0, "C", false, 0, "")
-						pdf.CellFormat(colWidths[2], 10, fmt.Sprintf("%.2f", *relation.CurrentMonth), "1", 0, "C", false, 0, "")
-						pdf.CellFormat(colWidths[3], 10, fmt.Sprintf("%.2f", *relation.TotalConsumed), "1", 0, "C", false, 0, "")
+						pdf.CellFormat(colWidths[1], 10, utils.FormatNumber(*relation.PreviousMonth), "1", 0, "C", false, 0, "")
+						pdf.CellFormat(colWidths[2], 10, utils.FormatNumber(*relation.CurrentMonth), "1", 0, "C", false, 0, "")
+						pdf.CellFormat(colWidths[3], 10, utils.FormatNumber(*relation.TotalConsumed), "1", 0, "C", false, 0, "")
 						pdf.CellFormat(colWidths[4], 10, fmt.Sprintf("%s%.2f", currency, exportedData.Rate["energy"]), "1", 0, "C", false, 0, "")
-						pdf.CellFormat(colWidths[5], 10, fmt.Sprintf("%s%.2f", currency, *relation.TotalToPay), "1", 0, "C", false, 0, "")
+						pdf.CellFormat(colWidths[5], 10, fmt.Sprintf("%s%s", currency, utils.FormatNumber(*relation.TotalToPay)), "1", 0, "C", false, 0, "")
 						pdf.Ln(-1)
 					}
 				}
