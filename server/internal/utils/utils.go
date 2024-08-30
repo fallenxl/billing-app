@@ -249,3 +249,12 @@ func AddFileToZip(zipWriter *zip.Writer, filePath string) error {
 
 	return nil
 }
+
+// ReadBody lee el cuerpo de una solicitud HTTP y lo convierte en una cadena
+func ReadBody(body io.ReadCloser) string {
+	bodyBytes, err := ioutil.ReadAll(body)
+	if err != nil {
+		return ""
+	}
+	return string(bodyBytes)
+}

@@ -3,19 +3,27 @@ import {
   ChevronRight,
   ChevronLeft,
   Settings,
-  LogOut
+  LogOut,
+  CircleX,
+  CircleCheck
 } from 'lucide-react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AppState } from '../../interfaces/app-state/app-state';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal } from '../modal/Modal';
+import { SetAssetAttributesService } from '../../services/assets/asset.services';
+import { setBranch } from '../../store/slices/branch.slice';
 
 
 interface SidebarProps {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 
+}
+interface IAlert {
+  type: 'error' | 'success';
+  message: string;
 }
 
 const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
@@ -38,10 +46,86 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
     localStorage.removeItem("jwt");
     window.location.reload();
   };
+  const dispatch = useDispatch();
   const branch = useSelector((state: AppState) => state.branch);
 
   const [isOpenSettings, setIsOpenSettings] = useState(false);
+  const [settings, setSettings] = useState({
+    "currency": branch?.settings.currency ?? 'LPS',
+    "rate": branch?.settings.rate,
+    "units": branch?.settings.units,
+    "eneeTariff": branch?.settings.eneeTariff
+  });
 
+  useEffect(() => {
+    if (branch?.settings) {
+      setSettings({
+        "currency": branch.settings.currency,
+        "rate": branch.settings.rate,
+        "units": branch.settings.units,
+        "eneeTariff": branch.settings.eneeTariff
+      })
+    }
+  }, [branch])
+
+  function handleSettingsChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+    const { name, value, type, ariaChecked } = e.target;
+    const [key, subKey] = name.split('.');
+    if (subKey) {
+      setSettings((prev: any) => ({
+        ...prev,
+        [key]: {
+          ...prev[key],
+          [subKey]: type === 'number' ? parseFloat(value) : value
+        }
+      }))
+    } else if (ariaChecked) {
+      setSettings((prev: any) => ({
+        ...prev,
+        [key]: !prev[key]
+      }))
+    } else {
+      setSettings((prev: any) => ({
+        ...prev,
+        [key]: type === 'number' ? parseFloat(value) : value
+      }))
+    }
+
+  }
+
+  function handleSettingsSave(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (branch) {
+      SetAssetAttributesService(branch.id, {
+        "settings": settings
+      }).then((response) => {
+        if (!response) {
+          setAlert({
+            type: 'error',
+            message: 'Error saving settings'
+          })
+          return 
+        }
+        const payload = {
+          ...branch,
+          settings: settings
+        }
+        setAlert({
+          type: 'success',
+          message: 'Settings saved successfully'
+        })
+        dispatch(setBranch(payload))
+      }
+      )
+    }
+  }
+  useEffect(() => {
+    if (isOpenSettings) {
+      setAlert(null)
+    }
+  }, [isOpenSettings])
+
+  const [alert, setAlert] = useState<IAlert | null>(null);
   return (
     <>
       {/* modal settings */}
@@ -49,7 +133,15 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
 
         <Modal isOpen={isOpenSettings} setIsOpen={setIsOpenSettings} title="Settings">
           <div className="flex flex-col gap-4">
-            <form className='flex flex-col gap-4'>
+            {
+              alert && (
+                <div className={`p-2 text-sm flex items-center gap-4 rounded-md text-white ${alert.type === 'error' ? 'bg-red-400' : 'bg-green-500'}`}>
+                  {alert.type === 'error' ? <CircleX size={20} /> : <CircleCheck size={20} />}
+                  {alert.message}
+                </div>
+              )
+            }
+            <form className='flex flex-col gap-4' onSubmit={handleSettingsSave}>
               <div className='flex flex-col gap-1'>
                 <label htmlFor="branchName" className='font-medium text-sm text-gray-500'>Branch Name</label>
                 <input
@@ -58,11 +150,13 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
               </div>
               <div className='flex flex-col gap-1'>
                 <label htmlFor="branchName" className='font-medium text-sm text-gray-500'>Currency</label>
-                <select value={branch?.settings.currency} className="w-full p-2 border rounded-md ">
+                <select name='currency' value={settings.currency}
+                  onChange={handleSettingsChange}
+                  className="w-full p-2 border rounded-md ">
                   <option value="USD">USD</option>
                   <option value="EUR">EUR</option>
-                  <option value="GBP">LPS</option>
-                  </select>
+                  <option value="LPS">LPS</option>
+                </select>
               </div>
               {/* rate */}
               <small className='text-gray-500 text-sm font-medium'>Tariff</small>
@@ -70,30 +164,38 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 <div className='flex flex-col gap-1'>
                   <label htmlFor="energyRate" className='font-medium text-xs text-gray-500'>Energy Tariff</label>
                   <input
-                    value={branch?.settings.rate.energy ?? 0}
+                    name='rate.energy'
+                    onChange={handleSettingsChange}
+                    value={settings.rate?.energy ?? 0}
                     type="number" placeholder="Energy Rate" className="w-full p-2 border rounded-md" />
-                   <div className='flex items-center gap-2 mt-2'>
-                   <input type='checkbox' className='' />
-                   <small className='text-xs text-gray-500'>ENEE Tariff <span className='font-bold text-[0.6rem]'>(beta)</span></small>
-                   </div>
+                  <div className='flex items-center gap-2 mt-2'>
+                    <input type='checkbox' className='' checked={settings.eneeTariff} name='eneeTariff' onChange={handleSettingsChange} aria-checked={settings.eneeTariff} />
+                    <small className='text-xs text-gray-500'>ENEE Tariff <span className='font-bold text-[0.6rem]'>(beta)</span></small>
+                  </div>
                 </div>
                 <div className='flex flex-col gap-1'>
                   <label htmlFor="energyRate" className='font-medium text-xs text-gray-500'>Water Tariff</label>
                   <input
-                    value={branch?.settings.rate.water ?? 0}
-                    type="number" placeholder="Energy Rate" className="w-full p-2 border rounded-md" />
+                    name='rate.water'
+                    onChange={handleSettingsChange}
+                    value={settings.rate?.water ?? 0}
+                    type="number" placeholder="Water Rate" className="w-full p-2 border rounded-md" />
                 </div>
                 <div className='flex flex-col gap-1'>
                   <label htmlFor="energyRate" className='font-medium text-xs text-gray-500'>Gas Tariff</label>
                   <input
-                    value={branch?.settings.rate.gas ?? 0}
-                    type="number" placeholder="Energy Rate" className="w-full p-2 border rounded-md" />
+                    name='rate.gas'
+                    value={settings.rate?.gas ?? 0}
+                    onChange={handleSettingsChange}
+                    type="number" placeholder="Gas Rate" className="w-full p-2 border rounded-md" />
                 </div>
                 <div className='flex flex-col gap-1'>
                   <label htmlFor="energyRate" className='font-medium text-xs text-gray-500'>Air Tariff</label>
                   <input
-                    value={branch?.settings.rate.air ?? 0}
-                    type="number" placeholder="Energy Rate" className="w-full p-2 border rounded-md" />
+                    name='rate.air'
+                    onChange={handleSettingsChange}
+                    value={settings.rate?.air ?? 0}
+                    type="number" placeholder="Air Rate" className="w-full p-2 border rounded-md" />
                 </div>
               </div>
               {/* units */}
@@ -102,31 +204,44 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 <div className='flex flex-col gap-1'>
                   <label htmlFor="energyRate" className='font-medium text-xs text-gray-500'>Energy Unit</label>
                   <input
-                    value={branch?.settings.units.energy ?? ''}
+                    name='units.energy'
+                    onChange={handleSettingsChange}
+                    value={settings.units?.energy ?? ''}
                     type="text" placeholder="Energy Unit" className="w-full p-2 border rounded-md" />
                 </div>
                 <div className='flex flex-col gap-1'>
                   <label htmlFor="energyRate" className='font-medium text-xs text-gray-500'>Water Unit</label>
                   <input
-                    value={branch?.settings.units.water ?? ''}
+                    name='units.water'
+                    onChange={handleSettingsChange}
+                    value={settings.units?.water ?? ''}
                     type="text" placeholder="Water Unit" className="w-full p-2 border rounded-md" />
                 </div>
                 <div className='flex flex-col gap-1'>
                   <label htmlFor="energyRate" className='font-medium text-xs text-gray-500'>Gas Unit</label>
                   <input
-                    value={branch?.settings.units.gas ?? ''}
+                    name='units.gas'
+                    onChange={handleSettingsChange}
+                    value={settings.units?.gas ?? ''}
                     type="text" placeholder="Gas Unit" className="w-full p-2 border rounded-md" />
                 </div>
                 <div className='flex flex-col gap-1'>
                   <label htmlFor="energyRate" className='font-medium text-xs text-gray-500'>Air Unit</label>
                   <input
-                    value={branch?.settings.units.air ?? ''}
+
+                    name='units.air'
+                    onChange={handleSettingsChange}
+                    value={settings.units?.air ?? ''}
                     type="text" placeholder="Air Unit" className="w-full p-2 border rounded-md" />
                 </div>
               </div>
 
               <div className='flex gap-4 mt-4'>
-                <button className='flex-grow bg-gray-400 text-white p-2 rounded-md'>Cancel</button>
+                <span
+                onClick={() => 
+                  setIsOpenSettings(false)
+                  }
+                className='flex-grow bg-gray-400 text-white p-2 rounded-md text-center cursor-pointer'>Cancel</span>
                 <button className='flex-grow bg-blue-500 text-white p-2 rounded-md'>Save</button>
               </div>
             </form>

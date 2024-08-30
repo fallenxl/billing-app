@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Layout from "../../components/layout/Layout";
-import {  GetAssetGroupService, GetAssetRelationsById, GetCustomerByIdService, GetCustomerRelationsById } from "../../services/assets/asset.services";
+import {  GetAssetGroupService, GetAssetRelationsById, GetCustomerByIdService, GetCustomerRelationsById} from "../../services/assets/asset.services";
 import { useDispatch, useSelector } from "react-redux";
 import { setCustomer } from "../../store/slices/customer.slice";
 import { useNavigate } from "react-router-dom";
@@ -43,7 +43,7 @@ export function Home() {
               })
             } else {
               if (response.length === 1) {
-             
+               
                 navigate('/dashboard?customer=' + response[0].from.id + '&branch=' + response[0].to.id)
               } else {
                 setRelations(response)
@@ -83,6 +83,7 @@ export function Home() {
           GetCustomerRelationsById(user.customerId.id).then((response) => {
             if (response.length === 1) {
               navigate('/dashboard?customer=' + response[0].from.id + '&branch=' + response[0].to.id)
+            
             } else {
               setRelations(response)
             }

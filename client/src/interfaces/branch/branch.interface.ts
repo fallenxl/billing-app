@@ -1,8 +1,13 @@
 export interface IBranch {
-    id: {
+    to: {
         id: string,
         entityType: string,
     },
+    from: {
+        id: string,
+        entityType: string, 
+    },
+    id: string,
     toName: string,
     settings: {
         currency: string,
@@ -20,6 +25,7 @@ export interface IBranch {
             hotWater: number | null,
         },
         rateType: string,
+        eneeTariff: boolean,
         
     }
     

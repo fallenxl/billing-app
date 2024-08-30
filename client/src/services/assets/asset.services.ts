@@ -52,3 +52,14 @@ export async function GetAssetRelationsById(id: string) {
         return errorMessage;
     }
 }
+
+export async function SetAssetAttributesService(id: string, data: any) {
+    try {
+        const response = await axios.post(`${config.API}/assets/${id}/attributes`, data.settings);
+        console.log(response.data)
+        return response.data;
+    } catch (error: any | AxiosError) {
+        const errorMessage = error.response?.data.split(": ")[1];
+        return errorMessage;
+    }
+}

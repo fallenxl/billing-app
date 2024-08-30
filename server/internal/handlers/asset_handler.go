@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"server/internal/services"
 	"server/internal/utils"
@@ -60,4 +61,21 @@ func GetCustomerById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	utils.RespondWithJSON(w, http.StatusOK, customer)
+}
+
+func SetAssetAttributes(w http.ResponseWriter, r *http.Request) {
+	//Get token from request
+	token := r.Context().Value("token").(string)
+	//Get asset id from request
+	assetId := mux.Vars(r)["assetId"]
+	//Get asset by id
+	// r.body to string
+	data := utils.ReadBody(r.Body)
+	fmt.Println(data)
+	err := services.SetAssetAttributesService(token, assetId, "ASSET", data)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, "Error setting attributes")
+		return
+	}
+	utils.RespondWithJSON(w, http.StatusOK, "Attributes setted")
 }
