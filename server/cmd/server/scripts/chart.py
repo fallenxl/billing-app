@@ -46,7 +46,7 @@ def generar_grafica(color, unit, data, start_date, end_date, chart_name, resolut
             current_dt += resolution_td
 
         # Rellenar días faltantes desde el último dato hacia end_date
-        current_dt = last_data_date + resolution_td
+        current_dt = last_data_date
         while current_dt <= end_dt:
             if current_dt not in data_dates:
                 date_str = current_dt.strftime("%d/%m")
