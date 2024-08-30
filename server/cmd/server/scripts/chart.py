@@ -65,7 +65,7 @@ def generar_grafica(color, unit, data, start_date, end_date, chart_name, resolut
         # Configuración de etiquetas y títulos
         plt.ylabel(f'Total {unit}', fontsize=20)
         num_labels = len(x)
-        step = 2
+        step = 1
         if len(x) < 7:
             step = 1
         plt.xticks(range(0, num_labels, step), x[::step], fontsize=18)
