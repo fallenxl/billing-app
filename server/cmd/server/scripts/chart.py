@@ -40,7 +40,6 @@ def generar_grafica(color, unit, data, start_date, end_date, chart_name, resolut
         current_dt = start_dt
         while current_dt <= first_data_date:
             if current_dt not in data_dates:
-                date_str = current_dt.strftime("%d/%m")
                 x.insert(0, date_str)  # Insertar al principio
                 y.insert(0, 0)  # Insertar un 0 al principio
             current_dt += resolution_td
@@ -65,9 +64,12 @@ def generar_grafica(color, unit, data, start_date, end_date, chart_name, resolut
         # Configuración de etiquetas y títulos
         plt.ylabel(f'Total {unit}', fontsize=20)
         num_labels = len(x)
-        step = 3
+        step = 1
         if len(x) < 7:
             step = 1
+        # if resolution are in hours
+        if resolution_ms <= 3600000:
+            step = 6
         plt.xticks(range(0, num_labels, step), x[::step], fontsize=18)
         plt.yticks(fontsize=18)
         plt.grid(True, which='both', axis='both', linestyle='--', linewidth=0.7, color='lightgray', alpha=0.5)
