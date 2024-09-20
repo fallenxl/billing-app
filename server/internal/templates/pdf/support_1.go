@@ -98,7 +98,7 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 					// total energy charges
 					pdf.SetFont("Arial", "", 11)
 					pdf.SetTextColor(100, 100, 100)
-					pdf.SetXY(70, 80.5)
+					pdf.SetXY(70, 82)
 					pdf.CellFormat(0, 10, tr("Cargos por Energía"), "", 0, "L", false, 0, "")
 
 					pdf.SetXY(140, 80.5)
@@ -111,7 +111,7 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 					pdf.SetFont("Arial", "", 11)
 					// TEXT GRAY
 					pdf.SetTextColor(100, 100, 100)
-					pdf.SetXY(70, 103)
+					pdf.SetXY(70, 104.5)
 					pdf.CellFormat(0, 10, tr("Cargos por Agua"), "", 0, "L", false, 0, "")
 
 					pdf.SetXY(140, 103)
@@ -231,11 +231,19 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 		}
 		return "", <-errChan
 	}
+
+	if err := os.RemoveAll("./img"); err != nil {
+		fmt.Println("Error removing images directory: ", err)
+	}
 	return filename, nil
 
 }
 
 func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.ExportedData, rate float64, unit string) string {
+	// crear la carpeta img si no existe
+	if _, err := os.Stat("img"); os.IsNotExist(err) {
+		os.Mkdir("img", os.ModePerm)
+	}
 	var chartName string = fmt.Sprintf("./img/grafica-%s.png", strings.ToLower(strings.ReplaceAll(device.Label, " ", "-")))
 	parseStartDate := time.UnixMilli(data.StartDateTs).Format("02/01/2006")
 	parseEndDate := time.UnixMilli(data.EndDateTs).Format("02/01/2006")
@@ -264,7 +272,6 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 	lastReading := ""
 	if strings.Contains(strings.ToLower(device.Type), "water meter") {
 		dataMap := *device.Telemetry
-		fmt.Println("Data map: ", dataMap)
 		waterData, ok := dataMap["deltaPulseCount"]
 		if ok {
 			deviceTelemetry = waterData

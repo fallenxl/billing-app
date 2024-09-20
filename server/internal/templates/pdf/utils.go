@@ -59,7 +59,7 @@ func AddHeaderSupport(pdf *gofpdf.Fpdf, data models.ExportedData, support string
 
 	// Configurar el estilo de fuente para el nombre del cliente (grande y en la izquierda)
 	pdf.SetXY(10, 12) // Establecer posición para el texto
-	AddImageByUrl(pdf, data.Img, 15, 8, 20, 20)
+	AddImageByUrl(pdf, data.Img, 15, 5, 20, 20)
 
 	// Posicionar el nombre de la sucursal en la parte derecha (encima del cliente)
 	pdf.SetXY(170, 8)
@@ -137,16 +137,20 @@ func AddImageByUrl(pdf *gofpdf.Fpdf, url string, x, y, width, height float64) {
 	mux.Lock()
 	defer mux.Unlock()
 	urlParts := strings.Split(url, "/")
-	imageFileName := urlParts[len(urlParts)-1]
+	imageFileName := fmt.Sprintf("./assets/%s.png", urlParts[len(urlParts)-1])
 
 	// Verificar si la imagen ya está descargada
 	if _, err := os.Stat(imageFileName); os.IsNotExist(err) {
 		// Descargar la imagen
-		err := utils.DownloadImage(url, imageFileName)
+		err := utils.DownloadImage(url, fmt.Sprintf("./assets/%s.png", imageFileName))
+
+		// Verificar si hubo un error al descargar la imagen
 		if err != nil {
 			fmt.Println("Error downloading image:", err)
 			return
 		}
+
+		// guardar la imagen en el directorio de
 	}
 
 	// Abrir el archivo de imagen descargado
