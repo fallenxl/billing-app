@@ -92,10 +92,12 @@ func GetAssetByIdService(token string, assetId string) (models.Asset, error) {
 	rate := FindAttributeByKey(assetAttributes, "rate").(map[string]models.Rate)
 	currency := FindAttributeByKey(assetAttributes, "currency").(string)
 	rateType := FindAttributeByKey(assetAttributes, "rateType").(string)
-
+	eneeTariff := FindAttributeByKey(assetAttributes, "eneeTariff").(string)
+	fmt.Println(eneeTariff)
 	asset.Settings.RateType = &rateType
 	asset.Settings.Rate = &rate
 	asset.Settings.Currency = &currency
+	asset.Settings.EneeTariff = &eneeTariff
 
 	return asset, nil
 

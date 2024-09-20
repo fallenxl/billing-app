@@ -15,9 +15,10 @@ type Rate struct {
 }
 
 type Settings struct {
-	Currency *string          `json:"currency"`
-	Rate     *map[string]Rate `json:"rate"`
-	RateType *string          `json:"rateType"`
+	Currency   *string          `json:"currency"`
+	Rate       *map[string]Rate `json:"rate"`
+	RateType   *string          `json:"rateType"`
+	EneeTariff *string          `json:"eneeTariff"`
 }
 type Asset struct {
 	Id struct {

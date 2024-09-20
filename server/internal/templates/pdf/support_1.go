@@ -65,7 +65,7 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 
 					AddHeaderSupport(pdf, data, asset.Label)
 
-				}, false)
+				}, true)
 
 				pdf.SetFooterFunc(func() {
 					AddFooter(pdf)
@@ -264,7 +264,8 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 	lastReading := ""
 	if strings.Contains(strings.ToLower(device.Type), "water meter") {
 		dataMap := *device.Telemetry
-		waterData, ok := dataMap["pulseCount"]
+		fmt.Println("Data map: ", dataMap)
+		waterData, ok := dataMap["deltaPulseCount"]
 		if ok {
 			deviceTelemetry = waterData
 			firstReading = time.UnixMilli(deviceTelemetry[0].Ts).Format("02/01/2006")
@@ -280,6 +281,7 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 		}
 
 	}
+
 	pdf.Cell(0, 10, fmt.Sprintf("%s Total %s", utils.FormatNumber(*device.PreviousMonth), unit))
 	pdf.Ln(5)
 	pdf.SetFont("Arial", "", 8)
@@ -327,6 +329,7 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 	pdf.SetTextColor(150, 150, 150)
 	pdf.Cell(0, 10, tr("Uso Promedio"))
 	pdf.SetXY(20, 143)
+
 	if strings.Contains("Energía", "Energ") {
 		pdf.SetFillColor(255, 247, 232) // R, G, B
 		pdf.SetDrawColor(255, 196, 90)  // Color de borde igual al de fondo
@@ -382,7 +385,11 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 		if err != nil {
 			fmt.Println("Error marshalling device telemetry: ", err)
 		}
-		cmd := exec.Command("python", "./scripts/chart.py", "#ffc45a", unit, string(deviceTelemetryJson), parseStartDate, parseEndDate, chartName, strconv.FormatInt(resolution, 10))
+		colorChart := "#ffc45a"
+		if strings.Contains(strings.ToLower(device.Type), "water meter") {
+			colorChart = "#56b4e9"
+		}
+		cmd := exec.Command("python", "./scripts/chart.py", colorChart, unit, string(deviceTelemetryJson), parseStartDate, parseEndDate, chartName, strconv.FormatInt(resolution, 10))
 		_, err = cmd.Output()
 		if err != nil {
 			fmt.Println("Error running python script: ", err)

@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { Modal } from '../modal/Modal';
 import { SetAssetAttributesService } from '../../services/assets/asset.services';
 import { setBranch } from '../../store/slices/branch.slice';
+import { GetEnergyRateENEEService } from '../../services/data/data.services';
 
 
 interface SidebarProps {
@@ -54,7 +55,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
     "currency": branch?.settings.currency ?? 'LPS',
     "rate": branch?.settings.rate,
     "units": branch?.settings.units,
-    "eneeTariff": branch?.settings.eneeTariff
+    "eneeTariff": branch?.settings.eneeTariff ==="on"  ? true : false
   });
 
   useEffect(() => {
@@ -63,8 +64,22 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
         "currency": branch.settings.currency,
         "rate": branch.settings.rate,
         "units": branch.settings.units,
-        "eneeTariff": branch.settings.eneeTariff
+        "eneeTariff": branch.settings.eneeTariff ==="on"  ? true : false
       })
+
+      if (branch.settings.eneeTariff) {
+          GetEnergyRateENEEService().then((response) => {
+            setSettings((prev: any) => ({
+              ...prev,
+              rate: {
+                ...prev.rate,
+                energy: response.energyPrice
+              }
+            }))
+          })
+      }
+
+      console.log(branch.settings)
     }
   }, [branch])
 
@@ -82,7 +97,8 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
     } else if (ariaChecked) {
       setSettings((prev: any) => ({
         ...prev,
-        [key]: !prev[key]
+        // @ts-ignore
+        [key]: e.target.checked
       }))
     } else {
       setSettings((prev: any) => ({
@@ -167,7 +183,9 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                     name='rate.energy'
                     onChange={handleSettingsChange}
                     value={settings.rate?.energy ?? 0}
-                    type="number" placeholder="Energy Rate" className="w-full p-2 border rounded-md" />
+                    type="number" placeholder="Energy Rate" className="w-full p-2 border rounded-md"
+                    disabled={settings.eneeTariff}
+                    />
                   <div className='flex items-center gap-2 mt-2'>
                     <input type='checkbox' className='' checked={settings.eneeTariff} name='eneeTariff' onChange={handleSettingsChange} aria-checked={settings.eneeTariff} />
                     <small className='text-xs text-gray-500'>ENEE Tariff <span className='font-bold text-[0.6rem]'>(beta)</span></small>

@@ -25,7 +25,7 @@ export interface IBranch {
             hotWater: number | null,
         },
         rateType: string,
-        eneeTariff: boolean,
+        eneeTariff: string,
         
     }
     

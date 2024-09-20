@@ -9,12 +9,21 @@ import (
 	"sync"
 )
 
-func getKeysByDeviceType(deviceType string) string {
-	if strings.Contains(strings.ToLower(deviceType), "water meter") {
-		return "pulseCount"
-	}
-	if strings.Contains(strings.ToLower(deviceType), "energy meter") {
-		return "deltaEnergyCount"
+func getKeysByDeviceType(deviceType string, agg string) string {
+	if agg == "MAX" || agg == "MIN" || agg == "AVG" {
+		if strings.Contains(strings.ToLower(deviceType), "water meter") {
+			return "pulseCount"
+		}
+		if strings.Contains(strings.ToLower(deviceType), "energy meter") {
+			return "energyCount"
+		}
+	} else {
+		if strings.Contains(strings.ToLower(deviceType), "water meter") {
+			return "deltaPulseCount"
+		}
+		if strings.Contains(strings.ToLower(deviceType), "energy meter") {
+			return "deltaEnergyCount"
+		}
 	}
 	return ""
 }
@@ -44,7 +53,7 @@ func GetDeviceTelemetryById(id string, entityType string, deviceType string, sta
 		agg = "NONE"
 	}
 	if key == "" {
-		key = getKeysByDeviceType(deviceType)
+		key = getKeysByDeviceType(deviceType, agg)
 	}
 	telemetryPath := fmt.Sprintf("plugins/telemetry/%s/%s/values/timeseries?keys=%s&startTs=%d&endTs=%d&limit=50000&interval=%d&agg=%s&orderBy=ASC&useStrictDataTypes=false", entityType, id, key, startDate, endDate, resolution, agg)
 	response, err := utils.Request(config.ThingsboardApiURL+telemetryPath, "GET", "", token)

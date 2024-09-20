@@ -162,39 +162,108 @@ func GetResolution(startDate int64, endDate int64) int64 {
 
 func GetRateByDeviceType(deviceType string, rate map[string]interface{}) float64 {
 	if strings.Contains(strings.ToLower(deviceType), "water meter") {
-		return rate["water"].(float64)
+		if value, ok := rate["water"].(float64); ok {
+			return value
+		}
+		return 0
 	}
 	if strings.Contains(strings.ToLower(deviceType), "energy meter") {
-		return rate["energy"].(float64)
+		if value, ok := rate["energy"].(float64); ok {
+			return value
+		}
+		return 0
 	}
 	if strings.Contains(strings.ToLower(deviceType), "hot water meter") {
-		return rate["hotWater"].(float64)
+		if value, ok := rate["hotWater"].(float64); ok {
+			return value
+		}
+		return 0
 	}
 	if strings.Contains(strings.ToLower(deviceType), "air meter") {
-		return rate["air"].(float64)
+		if value, ok := rate["air"].(float64); ok {
+			return value
+		}
+		return 0
 	}
 	if strings.Contains(strings.ToLower(deviceType), "gas meter") {
-		return rate["gas"].(float64)
+		if value, ok := rate["gas"].(float64); ok {
+			return value
+		}
+		return 0
 	}
+
+	// Retornar 0 si no se encuentra el valor
 	return 0
 }
 
 func GetUnitByDeviceType(deviceType string, units map[string]interface{}) string {
+	fmt.Println(deviceType, units)
+
+	// Verificación para water meter
 	if strings.Contains(strings.ToLower(deviceType), "water meter") {
-		return units["water"].(string)
+		unit, ok := units["water"]
+		if !ok || unit == nil {
+			return "m³"
+		}
+		unitStr, ok := unit.(string)
+		if !ok {
+			return "m³" // Valor por defecto si no es string
+		}
+		return unitStr
 	}
+
+	// Verificación para energy meter
 	if strings.Contains(strings.ToLower(deviceType), "energy meter") {
-		return units["energy"].(string)
+		unit, ok := units["energy"]
+		if !ok || unit == nil {
+			return "kWh" // Puedes ajustar el valor por defecto
+		}
+		unitStr, ok := unit.(string)
+		if !ok {
+			return "kWh"
+		}
+		return unitStr
 	}
+
+	// Verificación para hot water meter
 	if strings.Contains(strings.ToLower(deviceType), "hot water meter") {
-		return units["hotWater"].(string)
+		unit, ok := units["hotWater"]
+		if !ok || unit == nil {
+			return "m³"
+		}
+		unitStr, ok := unit.(string)
+		if !ok {
+			return "m³"
+		}
+		return unitStr
 	}
+
+	// Verificación para air meter
 	if strings.Contains(strings.ToLower(deviceType), "air meter") {
-		return units["air"].(string)
+		unit, ok := units["air"]
+		if !ok || unit == nil {
+			return "m³"
+		}
+		unitStr, ok := unit.(string)
+		if !ok {
+			return "m³"
+		}
+		return unitStr
 	}
+
+	// Verificación para gas meter
 	if strings.Contains(strings.ToLower(deviceType), "gas meter") {
-		return units["gas"].(string)
+		unit, ok := units["gas"]
+		if !ok || unit == nil {
+			return "m³"
+		}
+		unitStr, ok := unit.(string)
+		if !ok {
+			return "m³"
+		}
+		return unitStr
 	}
+
 	return ""
 }
 
@@ -208,6 +277,11 @@ func ParseUTF8(input string) string {
 func FormatNumber(num float64) string {
 	// Formatea el número con dos decimales
 	parts := strings.Split(fmt.Sprintf("%.2f", num), ".")
+
+	// Verificar si hay parte decimal
+	if len(parts) < 2 {
+		return fmt.Sprintf("%.2f", num) // Retornar el número con dos decimales
+	}
 
 	// Parte entera con comas
 	intPart := parts[0]

@@ -59,7 +59,7 @@ func AddHeaderSupport(pdf *gofpdf.Fpdf, data models.ExportedData, support string
 
 	// Configurar el estilo de fuente para el nombre del cliente (grande y en la izquierda)
 	pdf.SetXY(10, 12) // Establecer posición para el texto
-	AddImageByUrl(pdf, data.Img, 15, 8, 30, 30)
+	AddImageByUrl(pdf, data.Img, 15, 8, 20, 20)
 
 	// Posicionar el nombre de la sucursal en la parte derecha (encima del cliente)
 	pdf.SetXY(170, 8)
@@ -137,33 +137,38 @@ func AddImageByUrl(pdf *gofpdf.Fpdf, url string, x, y, width, height float64) {
 	mux.Lock()
 	defer mux.Unlock()
 	urlParts := strings.Split(url, "/")
-	tempImageFile := fmt.Sprintf("./img/%s.png", urlParts[len(urlParts)-1])
+	imageFileName := urlParts[len(urlParts)-1]
 
-	// verificar si la imagen ya está descargada
-	if _, err := os.Stat(tempImageFile); os.IsNotExist(err) {
-		// Realizar la solicitud HTTP para obtener la imagen
-		err := utils.DownloadImage(url, tempImageFile)
+	// Verificar si la imagen ya está descargada
+	if _, err := os.Stat(imageFileName); os.IsNotExist(err) {
+		// Descargar la imagen
+		err := utils.DownloadImage(url, imageFileName)
 		if err != nil {
 			fmt.Println("Error downloading image:", err)
 			return
 		}
 	}
 
-	// Obtener dimensiones originales de la imagen
-	file, err := os.Open(tempImageFile)
+	// Abrir el archivo de imagen descargado
+	file, err := os.Open(imageFileName)
 	if err != nil {
 		fmt.Println("Error opening image file:", err)
+		return
 	}
 	defer file.Close()
 
-	img, _, err := image.Decode(file)
+	// Decodificar la imagen automáticamente
+	img, imgFormat, err := image.Decode(file)
 	if err != nil {
 		fmt.Println("Error decoding image:", err)
+		return
 	}
+
+	// Obtener las dimensiones originales de la imagen
 	origWidth := float64(img.Bounds().Dx())
 	origHeight := float64(img.Bounds().Dy())
 
-	// Calcular escala proporcional
+	// Calcular la escala proporcional
 	widthScale := width / origWidth
 	heightScale := height / origHeight
 	scale := math.Min(widthScale, heightScale)
@@ -172,6 +177,6 @@ func AddImageByUrl(pdf *gofpdf.Fpdf, url string, x, y, width, height float64) {
 	finalWidth := origWidth * scale
 	finalHeight := origHeight * scale
 
-	// Añadir imagen en el header, ajustada proporcionalmente
-	pdf.Image(tempImageFile, x, y, finalWidth, finalHeight, false, "", 0, "")
+	// Añadir la imagen al PDF ajustada proporcionalmente
+	pdf.ImageOptions(imageFileName, x, y, finalWidth, finalHeight, false, gofpdf.ImageOptions{ImageType: imgFormat}, 0, "")
 }

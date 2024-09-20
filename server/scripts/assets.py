@@ -4,19 +4,12 @@ HEADERS = {}
 
 CREDENTIALS = {
     "username": "axl.santos@lumenenergysolutions.com",
-    "password": "Asantos_10",
+    "password": "password",
 }
 
 
-def login():
-    response = requests.post(
-        "https://dashboard.lumenenergysolutions.com/api/auth/login", json=CREDENTIALS
-    )
-    HEADERS["Authorization"] = f"Bearer {response.json()['token']}"
-
-
-login()
-
+PROFILE_ID = "bd05c690-5c0c-11ef-bddc-35cbd8dc8d8e" #Local Profile
+FROM_ASSET_ID = "dd68fc20-5a60-11ef-aa15-a127638e3a77" # CUSTOMER ID
 ASSETS_NAME = [
     "Pollos el Hondureño",
     "Mayday",
@@ -36,7 +29,16 @@ ASSETS_NAME = [
     "Pollos el Exito",
 ]
 
-PROFILE_ID = "bd05c690-5c0c-11ef-bddc-35cbd8dc8d8e" #Local Profile
+
+def login():
+    response = requests.post(
+        "https://dashboard.lumenenergysolutions.com/api/auth/login", json=CREDENTIALS
+    )
+    HEADERS["Authorization"] = f"Bearer {response.json()['token']}"
+
+
+login()
+
 
 
 def create_assets():
@@ -52,7 +54,7 @@ def create_assets():
             json=payload,
             headers=HEADERS,
         )
-        create_relations("dd68fc20-5a60-11ef-aa15-a127638e3a77", response.json()["id"]["id"])
+        create_relations(FROM_ASSET_ID, response.json()["id"]["id"])
 
 
 

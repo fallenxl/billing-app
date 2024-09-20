@@ -8,6 +8,8 @@ import (
 	"server/internal/utils"
 	"strconv"
 	"strings"
+
+	"github.com/gocolly/colly"
 )
 
 func ParseDataService(firstTelemetry models.Telemetry, lastTelemetry models.Telemetry, rate map[string]interface{}, deviceType string) models.ParseTelemetry {
@@ -80,8 +82,8 @@ func HandleDataService(data models.DataDTO, token string) (models.ExportedData, 
 			}
 			// telemetry := GetDeviceTelemetryById(entity.Id, entity.EntityType, deviceInfo.Type, data.StartDateTs, data.EndDateTs, 0, "", token)
 			diff := data.EndDateTs - data.StartDateTs
-			firstTelemetry := GetDeviceTelemetryById(entity.Id, entity.EntityType, deviceInfo.Type, data.StartDateTs, data.EndDateTs, diff, "energyCount", "MIN", token)
-			lastTelemetry := GetDeviceTelemetryById(entity.Id, entity.EntityType, deviceInfo.Type, data.StartDateTs, data.EndDateTs, diff, "energyCount", "MAX", token)
+			firstTelemetry := GetDeviceTelemetryById(entity.Id, entity.EntityType, deviceInfo.Type, data.StartDateTs, data.EndDateTs, diff, "", "MIN", token)
+			lastTelemetry := GetDeviceTelemetryById(entity.Id, entity.EntityType, deviceInfo.Type, data.StartDateTs, data.EndDateTs, diff, "", "MAX", token)
 			parseTelemetry := ParseDataService(firstTelemetry, lastTelemetry, data.Rate, deviceInfo.Type)
 			telemetry := GetDeviceTelemetryById(entity.Id, entity.EntityType, deviceInfo.Type, data.StartDateTs, data.EndDateTs, resolution, "", "SUM", token)
 			deviceData.Name = deviceInfo.Name
@@ -113,8 +115,8 @@ func HandleDataService(data models.DataDTO, token string) (models.ExportedData, 
 				for _, device := range relation {
 					if device.EntityType == "DEVICE" {
 						diff := data.EndDateTs - data.StartDateTs
-						firstTelemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, diff, "energyCount", "MIN", token)
-						lastTelemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, diff, "energyCount", "MAX", token)
+						firstTelemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, diff, "", "MIN", token)
+						lastTelemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, diff, "", "MAX", token)
 						// telemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, 0, "", token)
 						parseTelemetry := ParseDataService(firstTelemetry, lastTelemetry, data.Rate, device.Type)
 						telemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, resolution, "", "SUM", token)
@@ -147,7 +149,10 @@ func HandleDataService(data models.DataDTO, token string) (models.ExportedData, 
 func GroupRelationsByName(relations []models.AssetRelationResponse) map[string][]models.DeviceData {
 	relationsAgrouped := map[string][]models.DeviceData{}
 	for _, relation := range relations {
-		prefix := strings.Split(relation.ToName, "-")[1]
+		prefix := strings.Split(relation.ToName, "-")[0]
+		if len(strings.Split(relation.ToName, "-")) > 1 {
+			prefix = strings.Split(relation.ToName, "-")[1]
+		}
 		if _, ok := relationsAgrouped[prefix]; ok {
 			relationsAgrouped[relation.ToName] = append(relationsAgrouped[prefix], models.DeviceData{
 				Label:      relation.Label,
@@ -199,4 +204,34 @@ func HandleFormatExportData(data models.ExportedData, format string) (string, er
 		filename := fmt.Sprintf("%s-%s.pdf", data.Customer, data.Branch)
 		return filename, nil
 	}
+}
+
+func GetEnergyRateENEE() (string, error) {
+	c := colly.NewCollector()
+
+	var energyPrice string
+
+	c.OnHTML("table", func(e *colly.HTMLElement) {
+		e.ForEach("tr", func(_ int, row *colly.HTMLElement) {
+			if row.Text == "" {
+				return
+			}
+			// fmt.Println(row.Text)
+			if strings.Contains(row.Text, "Servicio General en Baja Tensión") {
+				energyPrice = row.ChildText("td:nth-of-type(4)")
+				fmt.Println(energyPrice)
+			}
+		})
+	})
+
+	err := c.Visit("https://www.cree.gob.hn/tarifas-vigentes-enee/")
+	if err != nil {
+		return "", err
+	}
+
+	if energyPrice == "" {
+		return "", err
+	}
+
+	return energyPrice, nil
 }

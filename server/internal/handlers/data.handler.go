@@ -6,6 +6,7 @@ import (
 	"server/internal/models"
 	"server/internal/services"
 	"server/internal/utils"
+	"strconv"
 	"sync"
 )
 
@@ -43,4 +44,18 @@ func HandleDataExport(w http.ResponseWriter, r *http.Request) {
 	// serve file
 	http.ServeFile(w, r, filename)
 
+}
+
+func HandleEneeEnergyRate(w http.ResponseWriter, r *http.Request) {
+	energyPrice, err := services.GetEnergyRateENEE()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	parseEnergyPrice, err := strconv.ParseFloat(energyPrice, 64)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	utils.RespondWithJSON(w, http.StatusOK, map[string]float64{"energyPrice": parseEnergyPrice})
 }

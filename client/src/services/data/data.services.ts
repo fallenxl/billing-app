@@ -40,3 +40,17 @@ export async function ExportDataService(data: IExportData){
         }
     }
 }
+
+export async function GetEnergyRateENEEService(){
+    try {
+        
+        const response = await axios.get(`${config.API}/enee`)
+        return response.data
+    } catch (error: any | AxiosError) {
+        const message = error.response.data.split(': ')[1]
+        if (message) {
+            return JSON.parse(message)
+
+        }
+    }
+}
