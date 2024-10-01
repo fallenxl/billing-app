@@ -69,7 +69,7 @@ def generar_grafica(color, unit, data, start_date, end_date, chart_name, resolut
         if len(x) < 7:
             step = 1
         if resolution_ms <= 3600000:
-            step = 6
+            step = 7
         plt.xticks(range(0, num_labels, step), x[::step], fontsize=18)
         plt.yticks(fontsize=18)
         plt.grid(True, which='both', axis='both', linestyle='--', linewidth=0.7, color='lightgray', alpha=0.5)
