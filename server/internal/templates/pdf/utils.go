@@ -138,7 +138,7 @@ func AddImageByUrl(pdf *gofpdf.Fpdf, url string, x, y, width, height float64) {
 	defer mux.Unlock()
 	urlParts := strings.Split(url, "/")
 	fmt.Println(urlParts)
-	imageFileName := fmt.Sprintf("./img/%s.png", urlParts[len(urlParts)-1])
+	imageFileName := fmt.Sprintf("./assets/%s.png", urlParts[len(urlParts)-1])
 
 	// Verificar si la imagen ya está descargada
 	if _, err := os.Stat(imageFileName); os.IsNotExist(err) {
