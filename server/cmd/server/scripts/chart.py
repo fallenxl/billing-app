@@ -35,16 +35,6 @@ def generar_grafica(color, unit, data, start_date, end_date, chart_name, resolut
         first_data_date = datetime.fromtimestamp(parsed_data[0]["ts"] / 1000)
         last_data_date = datetime.fromtimestamp(parsed_data[-1]["ts"] / 1000)
 
-        # Asegurarse de que se complete exactamente en los límites
-        # Rellenar días faltantes desde el primer dato hacia start_date
-        current_dt = start_dt
-        while current_dt <= first_data_date:
-            if current_dt not in data_dates:
-                date_str = current_dt.strftime("%d/%m")
-                x.insert(0, date_str)  # Insertar al principio
-                y.insert(0, 0)  # Insertar un 0 al principio
-            current_dt += resolution_td
-
         # Rellenar días faltantes desde el último dato hacia end_date
         current_dt = last_data_date
         while current_dt <= end_dt:
