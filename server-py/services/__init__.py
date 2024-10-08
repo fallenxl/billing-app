@@ -1,6 +1,0 @@
-from .auth_services import loginService, getCurrentUserService
-from .user_services import getUserInfoService
-from .asset_services import getAssetsGroupService, getCustomerByIdService
-from .attributes_services import getAttributesService
-from .relation_services import getRelationInfoByFromId
-from .device_services import getDeviceByIdService
