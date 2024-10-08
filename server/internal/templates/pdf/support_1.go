@@ -396,7 +396,7 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 		if strings.Contains(strings.ToLower(device.Type), "water meter") {
 			colorChart = "#56b4e9"
 		}
-		cmd := exec.Command("python", "./scripts/chart.py", colorChart, unit, string(deviceTelemetryJson), parseStartDate, parseEndDate, chartName, strconv.FormatInt(resolution, 10))
+		cmd := exec.Command("python", "./scripts/chart.py", colorChart, unit, string(deviceTelemetryJson), parseEndDate, chartName, strconv.FormatInt(resolution, 10))
 		_, err = cmd.Output()
 		if err != nil {
 			fmt.Println("Error running python script: ", err)
