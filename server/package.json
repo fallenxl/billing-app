@@ -1,8 +1,12 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
+  "author": {
+    "name": "Axl Santos",
+    "email": "axlsntz.dev@gmail.com"
+  },
+  "description": "Server-side application",
   "scripts": {
     "dev": "cd ./cmd/server && air"
   }
