@@ -41,8 +41,8 @@ import { setIsLoading } from "../../store/slices/is-loading.slice"
 import Calendar from "react-calendar"
 import 'react-calendar/dist/Calendar.css';
 import { Skeleton } from "../ui/skeleton"
-import { DEFAULT_RATE } from "../../const/rate"
-import { DEFAULT_UNITS } from "../../const/units"
+import { DEFAULT_RATE } from "../../constants/rate"
+import { DEFAULT_UNITS } from "../../constants/units"
 interface DataTableProps {
   data: any[] | null
   columns: ColumnDef<any>[]
