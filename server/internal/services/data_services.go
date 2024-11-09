@@ -14,16 +14,6 @@ import (
 
 func ParseDataService(firstTelemetry models.Telemetry, lastTelemetry models.Telemetry, rate map[string]interface{}, deviceType string) models.ParseTelemetry {
 	var parseTelemetry models.ParseTelemetry
-	// for _, data := range telemetry.Data {
-	// 	parseCurrentMonth, _ := strconv.ParseFloat(data[len(data)-1].Value, 64)
-	// 	parsePrevMonth, _ := strconv.ParseFloat(data[0].Value, 64)
-	// 	parseTelemetry.CurrentMonth = float64(parseCurrentMonth)
-	// 	parseTelemetry.PreviousMonth = float64(parsePrevMonth)
-	// 	rate := utils.GetRateByDeviceType(deviceType, rate)
-	// 	parseTelemetry.TotalConsumed = float64(parseCurrentMonth - parsePrevMonth)
-	// 	parseTelemetry.TotalToPay = float64(parseTelemetry.TotalConsumed * rate)
-
-	// }
 	var previousMonth float64
 	var currentMonth float64
 	if strings.Contains(strings.ToLower(deviceType), "water meter") {
@@ -117,7 +107,6 @@ func HandleDataService(data models.DataDTO, token string) (models.ExportedData, 
 						diff := data.EndDateTs - data.StartDateTs
 						firstTelemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, diff, "", "MIN", token)
 						lastTelemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, diff, "", "MAX", token)
-						// telemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, 0, "", token)
 						parseTelemetry := ParseDataService(firstTelemetry, lastTelemetry, data.Rate, device.Type)
 						telemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, resolution, "", "SUM", token)
 						deviceData := models.DeviceData{

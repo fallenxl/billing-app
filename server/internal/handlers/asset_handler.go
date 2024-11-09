@@ -38,6 +38,7 @@ func GetAssetsByGroupID(w http.ResponseWriter, r *http.Request) {
 func GetAssetById(w http.ResponseWriter, r *http.Request) {
 	//Get token from request
 	token := r.Context().Value("token").(string)
+
 	//Get asset id from request
 	assetId := mux.Vars(r)["assetId"]
 	//Get asset by id

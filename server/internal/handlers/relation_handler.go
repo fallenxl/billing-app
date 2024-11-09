@@ -11,6 +11,7 @@ import (
 func GetCustomerRelationById(w http.ResponseWriter, r *http.Request) {
 	//Get token from request
 	token := r.Context().Value("token").(string)
+
 	//Get asset id from request
 	customerId := mux.Vars(r)["customerId"]
 	//Get asset by id

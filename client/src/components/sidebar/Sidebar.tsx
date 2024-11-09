@@ -55,7 +55,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
     "currency": branch?.settings.currency ?? 'LPS',
     "rate": branch?.settings.rate,
     "units": branch?.settings.units,
-    "eneeTariff": branch?.settings.eneeTariff ==="on"  ? true : false
+    "eneeTariff": branch?.settings.eneeTariff === "on" ? true : false
   });
 
   useEffect(() => {
@@ -64,19 +64,19 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
         "currency": branch.settings.currency,
         "rate": branch.settings.rate,
         "units": branch.settings.units,
-        "eneeTariff": branch.settings.eneeTariff ==="on"  ? true : false
+        "eneeTariff": branch.settings.eneeTariff === "on" ? true : false
       })
 
       if (branch.settings.eneeTariff) {
-          GetEnergyRateENEEService().then((response) => {
-            setSettings((prev: any) => ({
-              ...prev,
-              rate: {
-                ...prev.rate,
-                energy: response.energyPrice
-              }
-            }))
-          })
+        GetEnergyRateENEEService().then((response) => {
+          setSettings((prev: any) => ({
+            ...prev,
+            rate: {
+              ...prev.rate,
+              energy: response.energyPrice
+            }
+          }))
+        })
       }
 
       console.log(branch.settings)
@@ -120,7 +120,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
             type: 'error',
             message: 'Error saving settings'
           })
-          return 
+          return
         }
         const payload = {
           ...branch,
@@ -185,7 +185,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                     value={settings.rate?.energy ?? 0}
                     type="number" placeholder="Energy Rate" className="w-full p-2 border rounded-md"
                     disabled={settings.eneeTariff}
-                    />
+                  />
                   <div className='flex items-center gap-2 mt-2'>
                     <input type='checkbox' className='' checked={settings.eneeTariff} name='eneeTariff' onChange={handleSettingsChange} aria-checked={settings.eneeTariff} />
                     <small className='text-xs text-gray-500'>ENEE Tariff <span className='font-bold text-[0.6rem]'>(beta)</span></small>
@@ -256,10 +256,10 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
 
               <div className='flex gap-4 mt-4'>
                 <span
-                onClick={() => 
-                  setIsOpenSettings(false)
+                  onClick={() =>
+                    setIsOpenSettings(false)
                   }
-                className='flex-grow bg-gray-400 text-white p-2 rounded-md text-center cursor-pointer'>Cancel</span>
+                  className='flex-grow bg-gray-400 text-white p-2 rounded-md text-center cursor-pointer'>Cancel</span>
                 <button className='flex-grow bg-blue-500 text-white p-2 rounded-md'>Save</button>
               </div>
             </form>
@@ -288,36 +288,28 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
             {links.map((link, index) => {
               const Icon = link.icon;
               return (
-                <li key={index} className="flex items-center space-x-4 py-2 text-nowrap cursor-pointer hover:bg-gray-50 px-2 rounded-md">
+                <li key={index} className="flex items-center space-x-4 py-4 text-nowrap cursor-pointer hover:bg-gray-50 px-2  border-b">
                   <Link to={link.path} className="flex items-center gap-2 w-full h-full">
-                    <Icon className='w-5 h-5 text-gray-400 ' />
-                    <span className={`text-sm duration-200 text-gray-500 ${!isOpen && 'scale-0 absolute'}`}>
+                    <Icon className='w-6 h-6 text-gray-400 ' />
+                    <span className={` duration-200 text-gray-500 ${!isOpen && 'scale-0 absolute'}`}>
                       {link.title}</span>
                   </Link>
                 </li>
               );
             })}
-            {branch && <li className="flex space-x-4 py-2 text-nowrap cursor-pointer hover:bg-gray-50 px-2 rounded-md">
-              <button
-                onClick={() => setIsOpenSettings(true)}
-                className="flex items-center gap-2 w-full h-full">
-                <Settings className='w-5 h-5 text-gray-400 ' />
-                <span className={`text-sm duration-200 text-gray-500 ${!isOpen && 'scale-0 absolute'}`}>
-                  Settings</span>
-              </button>
-            </li>}
+
           </ul>
           {/* logout */}
           <ul className='p-4'>
-            <li className="flex space-x-4 py-2 text-nowrap cursor-pointer hover:bg-gray-50 px-2 rounded-md">
+            {branch && <li className="flex space-x-4 py-4 text-nowrap cursor-pointer hover:bg-gray-50 px-2  border-t">
               <button
-                onClick={logout}
+                onClick={() => setIsOpenSettings(true)}
                 className="flex items-center gap-2 w-full h-full">
-                <LogOut className='w-5 h-5 text-red-400 ' />
-                <span className={`text-sm duration-200 text-red-500 font-medium ${!isOpen && 'scale-0 absolute'}`}>
-                  Logout</span>
+                <Settings className='w-6 h-6 text-gray-400 ' />
+                <span className={` duration-200 text-gray-500 ${!isOpen && 'scale-0 absolute'}`}>
+                  Settings</span>
               </button>
-            </li>
+            </li>}
           </ul>
         </nav>
       </div>

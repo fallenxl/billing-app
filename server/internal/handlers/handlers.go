@@ -12,8 +12,14 @@ func NewRouter() http.Handler {
 	r := mux.NewRouter()
 	//set prefix api/billing/v1
 	r = r.PathPrefix("/api/billing/v1").Subrouter()
+
+	// Public routes
 	r.HandleFunc("/auth/login", Login).Methods("POST")
 	r.HandleFunc("/enee", HandleEneeEnergyRate).Methods("GET")
+
+	// WebSocket routes
+	r.HandleFunc("/ws/export-status", WebSocketHandler).Methods("GET")
+
 	// Protected routes
 	protectedRoutes := r.PathPrefix("/").Subrouter()
 	protectedRoutes.Use(md.BearerTokenMiddleware)

@@ -15,6 +15,8 @@ var mu sync.Mutex
 func HandleDataExport(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	defer mu.Unlock()
+
+	// Parsear el cuerpo de la solicitud
 	var body models.DataDTO
 	err := utils.ParseBody(r, &body)
 	if err != nil {
@@ -22,26 +24,29 @@ func HandleDataExport(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Obtener el token y manejar la exportación de datos
 	token := r.Context().Value("token").(string)
 	exportedData, err := services.HandleDataService(body, token)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// Llamar a la función que maneja la creación del archivo y envía mensajes de progreso por WebSocket
 	filename, err := services.HandleFormatExportData(exportedData, body.Format)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer os.Remove(filename)
-	// set header to download file
+
+	defer os.Remove(filename) // Asegúrate de eliminar el archivo al final
+
+	// Ahora que el archivo está listo, proceder con la respuesta HTTP para la descarga
 	w.Header().Set("Content-Disposition", "attachment; filename="+filename)
 	w.Header().Set("Content-Description", "File Transfer")
-
-	// octet-stream: binary file
 	w.Header().Set("Content-Type", "application/octet-stream")
 
-	// serve file
+	// Servir el archivo
 	http.ServeFile(w, r, filename)
 
 }
