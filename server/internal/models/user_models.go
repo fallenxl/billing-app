@@ -14,6 +14,16 @@ type User struct {
 	Email      string `json:"email"`
 	CustomerId UserID `json:"customerId"`
 }
+
+type UserInfo struct {
+	Id         string `json:"id"`
+	Authority  string `json:"authority"`
+	FirstName  string `json:"firstName"`
+	LastName   string `json:"lastName"`
+	Name       string `json:"name"`
+	Email      string `json:"email"`
+	CustomerId string `json:"customerId"`
+}
 type UserResponse struct {
 	Data []User `json:"data"`
 }

@@ -85,8 +85,8 @@ export function DataTable({ data, columns, exportData }: DataTableProps) {
     const firsDateOfTheMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).setHours(0, 0, 0, 0)
     // get hours, minutes, seconds, and milliseconds
     
-   const startDateTs = startDate ? new Date(dateRange[0]).getTime() : firsDateOfTheMonth
-    let endDateTs = endDate ? new Date(dateRange[1]).getTime() : new Date().getTime()
+   const startDateTs = startDate ? new Date(dateRange[0]).setHours(0, 0, 0, 0) : firsDateOfTheMonth
+    let endDateTs = endDate ? new Date(dateRange[1]).setHours(0, 0, 0, 0) : new Date().setHours(0, 0, 0, 0)
     // set endDate to start of the day
     endDateTs = new Date(endDateTs).setHours(0, 0, 0, 0)
     const data: IExportData = {
