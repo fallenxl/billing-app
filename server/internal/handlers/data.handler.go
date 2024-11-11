@@ -7,10 +7,7 @@ import (
 	"server/internal/services"
 	"server/internal/utils"
 	"strconv"
-	"sync"
 )
-
-var mu sync.Mutex
 
 func HandleDataExport(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
@@ -26,6 +23,7 @@ func HandleDataExport(w http.ResponseWriter, r *http.Request) {
 
 	// Obtener el token y manejar la exportación de datos
 	token := r.Context().Value("token").(string)
+	// SendMessageToClient(token, "Datos exportados con éxito")
 	exportedData, err := services.HandleDataService(body, token)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -42,9 +42,9 @@ export function TenantHome() {
                     />
                 </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mt-5 ">
+            <div className="grid grid-cols-1 sm:grid-cols-2  lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-5 ">
             {isLoading && [1, 2, 3, 4,5,6,7,8].map((n) => (
-                <Skeleton key={n} className="h-36 w-[300px]"/>
+                <Skeleton key={n} className="h-36 w-full md:w-[300px]"/>
             ))
             }
                 {(filteredCustomers.length > 0 && !isLoading) ? filteredCustomers.map((customer: any, index: number) => (

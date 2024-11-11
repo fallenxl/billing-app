@@ -37,9 +37,9 @@ export function CustomerBranchList({ customer, relations, isLoading }: { custome
                     />
                 </div>
             </div>
-            <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-                {isLoading && [1, 2, 3, 4].map((n) => (
-                    <Skeleton key={n} className="h-36 w-[300px]" />
+            <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {isLoading && [...Array(8)].map((n) => (
+                    <Skeleton key={n} className="h-36 md:w-[300px]" />
                 ))}
                 {!isLoading && filteredRelations && filteredRelations.length > 0 && filteredRelations.map((relation, index) => (
                     <Card key={index} className="py-5 flex items-center justify-center gap-5 cursor-pointer hover:scale-105 duration-300"

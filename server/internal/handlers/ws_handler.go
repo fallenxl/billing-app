@@ -3,32 +3,41 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/gorilla/websocket"
 )
 
-// Configuración para el WebSocket
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true // Esto permite conexiones desde cualquier origen. Asegúrate de modificarlo según tu necesidad de seguridad.
-	},
+var (
+	upgrader = websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool {
+			return true // Esto permite conexiones desde cualquier origen. Asegúrate de modificarlo según tu necesidad de seguridad.
+		},
+	}
+	clients = make(map[string]*websocket.Conn)
+	mu      sync.Mutex
+)
+
+func AddClient(clientID string, conn *websocket.Conn) {
+	mu.Lock()
+	clients[clientID] = conn
+	mu.Unlock()
 }
 
-func reader(conn *websocket.Conn) {
-	for {
-		// read in a message
-		messageType, p, err := conn.ReadMessage()
+func RemoveClient(clientID string) {
+	mu.Lock()
+	delete(clients, clientID)
+	mu.Unlock()
+}
+
+func SendMessageToClient(clientID, message string) {
+	mu.Lock()
+	conn, ok := clients[clientID]
+	mu.Unlock()
+	if ok {
+		err := conn.WriteMessage(websocket.TextMessage, []byte(message))
 		if err != nil {
-			log.Println(err)
-			return
-		}
-		// print out that message for clarity
-		log.Println(string(p))
-		if err := conn.WriteMessage(messageType, p); err != nil {
-			log.Println(err)
-			return
+			RemoveClient(clientID)
 		}
 	}
 }
@@ -43,12 +52,25 @@ func WriteMessage(conn *websocket.Conn, message string) {
 // WebSocketHandler maneja la conexión WebSocket
 func WebSocketHandler(w http.ResponseWriter, r *http.Request) {
 	// Actualiza la conexión HTTP a WebSocket
+	var err error
+
+	clientToken := r.URL.Query().Get("token")
+	if clientToken == "" {
+		log.Println("No se proporcionó un ID de cliente")
+		return
+	}
+
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("Error al actualizar la conexión:", err)
 		return
 	}
 
-	conn.WriteMessage(websocket.TextMessage, []byte("Conexión establecida"))
-	reader(conn)
+	AddClient(clientToken, conn)
+
+	// defer conn.Close()
+	defer func() {
+		RemoveClient(clientToken)
+		conn.Close()
+	}()
 }

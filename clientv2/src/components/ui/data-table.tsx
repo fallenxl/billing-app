@@ -87,21 +87,21 @@ export function DataTable<T>({ data, columns, searchPlaceholder, showColumns = t
     return (
         <div className="w-full">
             <div className="flex flex-col lg:flex-row  lg:items-end py-4 gap-4 w-full">
-                <div className="flex items-center space-x-2 md:max-w-md w-full">
+                <div className="flex items-center gap-2 md:max-w-md w-full">
                     <Input
                         placeholder={searchPlaceholder ?? "Search..."}
                         value={globalFilter!}
                         onChange={(event) =>
                             setGlobalFilter(event.target.value)
                         }
-                        className="w-full min-w-[200px]"
+                        className="w-full md:min-w-[200px]"
                         
                     />
                     <Select
                         value={rowLimit.toString()}
                         onValueChange={(value) => setRowLimit(Number(value))}
                     >
-                        <SelectTrigger className="max-w-[130px]">
+                        <SelectTrigger className="w-[170px]">
                             <SelectValue placeholder="Select rows per page" />
                         </SelectTrigger>
                         <SelectContent>

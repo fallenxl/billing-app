@@ -167,6 +167,7 @@ func GroupRelationsByName(relations []models.AssetRelationResponse) map[string][
 }
 
 func HandleFormatExportData(data models.ExportedData, format string) (string, error) {
+
 	switch format {
 	case "pdf":
 		filename := fmt.Sprintf("%s-%s.pdf", data.Customer, data.Branch)
