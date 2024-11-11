@@ -4,7 +4,6 @@ import * as React from "react";
 import { addDays, format } from "date-fns";
 import { Calendar as CalendarIcon, Eraser } from "lucide-react";
 import { DateRange } from "react-day-picker";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -26,8 +25,21 @@ export default function DatePickerWithRange({
     from: undefined,
     to: undefined,
   });
+  
+  // Estado para determinar el número de meses que se muestra
+  const [numberOfMonths, setNumberOfMonths] = React.useState(2);
 
-  // Actualiza las fechas y llama a la función de callback con las nuevas fechas
+  React.useEffect(() => {
+    const updateMonths = () => {
+      setNumberOfMonths(window.innerWidth < 768 ? 1 : 2);
+    };
+
+    updateMonths();
+    window.addEventListener("resize", updateMonths);
+
+    return () => window.removeEventListener("resize", updateMonths);
+  }, []);
+
   const handleDateChange = (newDate: DateRange | undefined) => {
     setDate(newDate);
     if (onDateChange) {
@@ -61,27 +73,30 @@ export default function DatePickerWithRange({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-            {/* clear */}
-
-        <div className="flex justify-end p-2 w-full">
-            <Button
+        <PopoverContent className="w-auto p-0 overflow-auto" align="start">
+          <div className="overflow-auto">
+            <div className="flex justify-end p-2 w-full">
+              <Button
                 className="w-full"
                 variant="outline"
                 onClick={() => handleDateChange(undefined)}
-            >
+              >
                 <Eraser className="mr-2 h-4 w-4" />
                 Clear
-            </Button>
-        </div>
-          <Calendar
-            initialFocus
-            mode="range"
-            defaultMonth={date?.from}
-            selected={date}
-            onSelect={handleDateChange}
-            numberOfMonths={2}
-          />
+              </Button>
+            </div>
+            <Calendar
+              initialFocus
+              mode="range"
+              defaultMonth={date?.from}
+              selected={date}
+              onSelect={handleDateChange}
+              numberOfMonths={numberOfMonths}
+              classNames={{
+                months: "flex flex-col md:flex-row gap-2",
+              }}
+            />
+          </div>
         </PopoverContent>
       </Popover>
     </div>
