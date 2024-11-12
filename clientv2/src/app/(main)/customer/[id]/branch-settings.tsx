@@ -344,21 +344,21 @@ export function BranchSettings({ }) {
                     </DialogHeader>
                     <div className="flex flex-col md:flex-row md:border-t">
                         <div>
-                            <ul className="flex md:flex-col items-center md:items-start">
+                            <ul className="flex md:flex-col items-center h-full md:h-auto jus md:items-start">
                                 <li
                                     onClick={() => setActiveOption('general')}
-                                    className={`flex gap-2 border-r md:border-r-0 py-4 w-full px-2 pr-14 cursor-pointer duration-300 md:border-b ${activeOption == 'general' && "bg-neutral-100 dark:bg-neutral-700 "}`}>
+                                    className={`flex items-center gap-2 border-r md:border-r-0 py-4 w-full px-2 h-full pr-14 cursor-pointer duration-300 md:border-b ${activeOption == 'general' && "bg-neutral-100 dark:bg-neutral-700 "}`}>
                                     <p className="text-neutral-900 dark:text-white text-sm">General settings</p>
                                 </li>
                                 <li
                                     onClick={() => setActiveOption('export')}
-                                    className={`flex gap-2  py-4 w-full cursor-pointer px-2 pr-14 duration-300 ${activeOption == 'export' && "bg-neutral-100 dark:bg-neutral-700 "}`}>
+                                    className={`flex items-center  gap-2  py-4 w-full cursor-pointer h-full px-2 pr-14 duration-300 ${activeOption == 'export' && "bg-neutral-100 dark:bg-neutral-700 "}`}>
                                     <p className="text-neutral-900 dark:text-white text-sm">Export settings</p>
                                 </li>
                             </ul>
 
                         </div>
-                        <ScrollArea className="w-full md:w-3/4 h-[500px] border-t md:border-t-0 md:border-l p-2 md:p-10 py-10 overflow-y-auto">
+                        <ScrollArea className="w-full md:w-3/4 h-[300px] md:h-[500px] border-t md:border-t-0 md:border-l p-2 md:p-10 py-10 overflow-y-auto">
                             {activeOption == 'general' && <GeneralSettings branchSettings={branchSettings} handleSettingsChange={handleSettingsChange} setBranchSettings={setBranchSettings} />}
                             {activeOption == 'export' && <ExportSettings branchSettings={branchSettings} handleSettingsChange={handleSettingsChange} setBranchSettings={setBranchSettings} />}
                         </ScrollArea>
