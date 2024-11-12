@@ -12,7 +12,7 @@ import { updateBranchNameService, updateBranchSettingsService } from "@/services
 import { useBranchStore } from "@/stores";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { Settings } from "lucide-react";
-import {  useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface GeneralSettingsProps {
@@ -324,16 +324,14 @@ export function BranchSettings({ }) {
             email: branchSettings?.email!,
             settings: branchSettings!
         })
-     
+
     }
 
     return (
         <>
             <Dialog>
-                <DialogTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                        <Settings />
-                    </Button>
+                <DialogTrigger asChild className="hover:bg-gray-100 rounded-full">
+                    <Settings className="cursor-pointer h-10 w-10 p-2"/>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[925px]" onCloseAction={handleClose}>
                     <DialogHeader>

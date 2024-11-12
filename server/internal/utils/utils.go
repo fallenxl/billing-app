@@ -128,10 +128,10 @@ func GetCurrencySymbol(currency string) string {
 		return "$"
 	case "EUR":
 		return "€"
-	case "LPS":
+	case "HNL":
 		return "L."
 	default:
-		return ""
+		return "L."
 	}
 }
 

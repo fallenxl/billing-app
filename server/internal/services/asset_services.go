@@ -89,21 +89,47 @@ func GetAssetByIdService(token string, assetId string) (models.Asset, error) {
 		return models.Asset{}, err
 	}
 
-	address := FindAttributeByKey(assetAttributes, "address").(string)
-	email := FindAttributeByKey(assetAttributes, "email").(string)
-	phone := FindAttributeByKey(assetAttributes, "phone").(string)
-	rate := FindAttributeByKey(assetAttributes, "rate").(map[string]models.Rate)
-	currency := FindAttributeByKey(assetAttributes, "currency").(string)
-	rateType := FindAttributeByKey(assetAttributes, "rateType").(string)
-	eneeTariff := FindAttributeByKey(assetAttributes, "eneeTariff").(string)
-	fmt.Println(eneeTariff)
-	asset.Settings.RateType = &rateType
-	asset.Settings.Rate = &rate
-	asset.Settings.Currency = &currency
-	asset.Settings.EneeTariff = &eneeTariff
-	asset.Address = &address
-	asset.Email = &email
-	asset.Phone = &phone
+	addressAttr := FindAttributeByKey(assetAttributes, "address")
+	if addressAttr != nil {
+		address := addressAttr.(string)
+		asset.Address = &address
+	}
+
+	emailAttr := FindAttributeByKey(assetAttributes, "email")
+	if emailAttr != nil {
+		email := emailAttr.(string)
+		asset.Email = &email
+	}
+
+	phoneAttr := FindAttributeByKey(assetAttributes, "phone")
+	if phoneAttr != nil {
+		phone := phoneAttr.(string)
+		asset.Phone = &phone
+	}
+
+	rateAttr := FindAttributeByKey(assetAttributes, "rate")
+	if rateAttr != nil {
+		rate := rateAttr.(map[string]models.Rate)
+		asset.Settings.Rate = &rate
+	}
+
+	currencyAttr := FindAttributeByKey(assetAttributes, "currency")
+	if currencyAttr != nil {
+		currency := currencyAttr.(string)
+		asset.Settings.Currency = &currency
+	}
+
+	rateTypeAttr := FindAttributeByKey(assetAttributes, "rateType")
+	if rateTypeAttr != nil {
+		rateType := rateTypeAttr.(string)
+		asset.Settings.RateType = &rateType
+	}
+
+	eneeTariffAttr := FindAttributeByKey(assetAttributes, "eneeTariff")
+	if eneeTariffAttr != nil {
+		eneeTariff := eneeTariffAttr.(string)
+		asset.Settings.EneeTariff = &eneeTariff
+	}
 
 	return asset, nil
 
@@ -133,6 +159,31 @@ func GetCustomerByIdService(token string, assetId string) (models.Customer, erro
 
 	return asset, nil
 
+}
+
+func GetSiteByIdService(token string, assetId string) (models.Asset, error) {
+	response, err := utils.Request(config.ThingsboardApiURL+"asset/info/"+assetId, "GET", "", token)
+	if err != nil {
+		return models.Asset{}, err
+	}
+	var asset models.Asset
+	err = utils.ParseResponse(response, &asset)
+	if err != nil {
+		fmt.Println(err)
+		return models.Asset{}, err
+	}
+
+	var assetAttributes []models.AssetAttributes
+	assetAttributes, err = GetAssetAttributesService(token, assetId, "ASSET")
+	if err != nil {
+		fmt.Println(err)
+		return models.Asset{}, err
+	}
+
+	// address := FindAttributeByKey(assetAttributes, "address").(string)
+	// asset.Address = &address
+	fmt.Println(assetAttributes)
+	return asset, nil
 }
 
 func GetAssetAttributesService(token string, assetId string, entityType string) ([]models.AssetAttributes, error) {
