@@ -329,13 +329,13 @@ export function BranchSettings({ }) {
 
     return (
         <>
-            <Dialog >
+            <Dialog>
                 <DialogTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">
                         <Settings />
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[925px]" onCloseAction={handleClose}>
+                <DialogContent className="h-screen md:h-auto sm:max-w-[925px]" onCloseAction={handleClose}>
                     <DialogHeader>
                         <DialogTitle>Edit branch settings</DialogTitle>
                         <DialogDescription>
@@ -358,7 +358,7 @@ export function BranchSettings({ }) {
                             </ul>
 
                         </div>
-                        <ScrollArea className="w-full md:w-3/4 h-[300px] md:h-[500px] border-t md:border-t-0 md:border-l p-2 md:p-10 py-10 overflow-y-auto">
+                        <ScrollArea className="w-full md:w-3/4 h-full md:h-[500px] border-t md:border-t-0 md:border-l p-2 md:p-10 py-10 overflow-y-auto">
                             {activeOption == 'general' && <GeneralSettings branchSettings={branchSettings} handleSettingsChange={handleSettingsChange} setBranchSettings={setBranchSettings} />}
                             {activeOption == 'export' && <ExportSettings branchSettings={branchSettings} handleSettingsChange={handleSettingsChange} setBranchSettings={setBranchSettings} />}
                         </ScrollArea>
