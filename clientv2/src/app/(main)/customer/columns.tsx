@@ -1,12 +1,15 @@
+"use client"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
-import { ICustomerRelations } from "@/interfaces"
+import { IBranch } from "@/interfaces"
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu"
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
+import { MoreHorizontal } from "lucide-react"
+import { useRouter } from "next/navigation"
 
-export function Columns():ColumnDef<ICustomerRelations>[] {
+export function Columns():ColumnDef<IBranch>[] {
+    const router = useRouter()
     return [
         {
           id: "select",
@@ -29,20 +32,27 @@ export function Columns():ColumnDef<ICustomerRelations>[] {
           ),
           enableSorting: false,
           enableHiding: false,
-        },
+        }
+        ,
         {
           accessorKey: "toName",
-          header: "Name",
+          header: "Site",
           cell: ({ row }) => (
-            <div className="capitalize">{row.getValue("toName")}</div>
-          ),
+            <div className="capitalize">{row.getValue("label")??row.getValue("toName")}</div>          ),
+        },
+        {
+          accessorKey:"label",
+          header: "Label",
+          cell: ({ row }) => (
+            <div className="capitalize">{row.getValue("label")??row.getValue("toName")}</div>          ),
+
         },
         {
           id: "actions",
           header: "Actions",
           enableHiding: false,
           cell: ({ row }) => {
-            const payment = row.original
+            const site = row.original as IBranch
       
             return (
               <DropdownMenu>
@@ -55,12 +65,14 @@ export function Columns():ColumnDef<ICustomerRelations>[] {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
                   <DropdownMenuItem
-                    onClick={() => navigator.clipboard.writeText(payment.id)}
+                    onClick={() => navigator.clipboard.writeText(site.toName)}
                   >
-                    Copy payment ID
+                    Copy site name
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>View customer</DropdownMenuItem>
+                  <DropdownMenuItem
+                  onClick={() => router.push(`/site/${site.to.id}`)}
+                  >View site</DropdownMenuItem>
                   <DropdownMenuItem>View payment details</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

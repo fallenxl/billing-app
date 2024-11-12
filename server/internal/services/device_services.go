@@ -33,7 +33,6 @@ func GetDeviceById(id string, entityType string, token string) (models.Device, e
 	if err != nil {
 		return models.Device{}, err
 	}
-
 	var device models.Device
 	err = utils.ParseResponse(response, &device)
 	if err != nil {

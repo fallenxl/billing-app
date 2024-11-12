@@ -27,6 +27,9 @@ type Asset struct {
 	} `json:"id"`
 	Name     string    `json:"name"`
 	Label    string    `json:"label"`
+	Address  *string   `json:"address"`
+	Email    *string   `json:"email"`
+	Phone    *string   `json:"phone"`
 	Settings *Settings `json:"settings"`
 }
 

@@ -47,7 +47,7 @@ export async function exportDataService(data: IExportData){
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', `export.${getExtension(data.format)}`);
+        link.setAttribute('download', `export-${data.format}.${getExtension(data.format)}`);
         document.body.appendChild(link);
         link.click();
 

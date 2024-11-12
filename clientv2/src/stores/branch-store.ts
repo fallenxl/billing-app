@@ -1,16 +1,27 @@
-import { ICustomerRelations } from "@/interfaces";
-import { IUser } from "@/interfaces/user.interface";
+import { IBranch } from "@/interfaces";
 import { create } from "zustand";
 export interface branchState {
-    branch: ICustomerRelations | null;
-    setBranch: (branch: ICustomerRelations | null) => void;
+    branch: IBranch | null;
+    setBranch: (branch: IBranch | null) => void;
     branchRelations: any[];
     setBranchRelations: (branchRelations: any[]) => void;
+    updateBranch: (branch: IBranch) => void;
 }
 
 export const useBranchStore = create<branchState>((set, get) => ({
     branch: null,
-    setBranch: (branch: ICustomerRelations | null) => set({ branch }),
+    setBranch: (branch: IBranch | null) => set({ branch }),
     branchRelations: [],
     setBranchRelations: (branchRelations: any[]) => set({ branchRelations }),
+    updateBranch: (branch: IBranch) => {
+        const branchState = get().branch;
+        if (branchState) {
+            set({
+                branch: {
+                    ...branchState,
+                    ...branch,
+                },
+            });
+        }
+    }
 }));

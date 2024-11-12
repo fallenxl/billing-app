@@ -1,5 +1,5 @@
 "use client"
-import { ICustomer, ICustomerRelations } from "@/interfaces"
+import { ICustomer, IBranch } from "@/interfaces"
 import { getCustomerByIdService, getCustomerRelationsById } from "@/services/customer.service"
 import { useParams, useSearchParams } from "next/navigation"
 import {  useEffect, useState } from "react"
@@ -9,8 +9,6 @@ import { useBranchStore } from "@/stores/branch-store"
 import { Branch } from "./branch"
 import Link from "next/link"
 import { useUserStore } from "@/stores"
-import { set } from "date-fns"
-import { Skeleton } from "@/components/ui/skeleton"
 
 export default function CustomerPage() {
 
@@ -19,7 +17,7 @@ export default function CustomerPage() {
     const {user} = useUserStore(state => state)
     const queryParams = useSearchParams()
     const [customer, setCustomer] = useState<ICustomer | null>(null)
-    const [relations, setRelations] = useState<ICustomerRelations[] | null>(null)
+    const [relations, setRelations] = useState<IBranch[] | null>(null)
     const [isLoading, setIsLoading] = useState(false)
 
     const { branch, setBranch, setBranchRelations } = useBranchStore(state => state)

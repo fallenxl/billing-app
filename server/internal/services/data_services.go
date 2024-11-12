@@ -206,10 +206,10 @@ func GetEnergyRateENEE() (string, error) {
 			if row.Text == "" {
 				return
 			}
-			// fmt.Println(row.Text)
+
 			if strings.Contains(row.Text, "Servicio General en Baja Tensión") {
 				energyPrice = row.ChildText("td:nth-of-type(4)")
-				fmt.Println(energyPrice)
+
 			}
 		})
 	})

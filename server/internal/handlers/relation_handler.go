@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"server/internal/models"
 	"server/internal/services"
 	"server/internal/utils"
 
@@ -37,4 +38,18 @@ func GetAssetRelationById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	utils.RespondWithJSON(w, http.StatusOK, customer)
+}
+
+func UpdateBranchName(w http.ResponseWriter, r *http.Request) {
+	//Get token from request
+	token := r.Context().Value("token").(string)
+	//Get asset by id
+	var body models.NameUpdate
+	err := utils.ParseBody(r, &body)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, "Server error")
+		return
+	}
+	branch := services.UpdateBranchName(token, body)
+	utils.RespondWithJSON(w, http.StatusOK, branch)
 }

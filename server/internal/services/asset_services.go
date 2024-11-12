@@ -89,6 +89,9 @@ func GetAssetByIdService(token string, assetId string) (models.Asset, error) {
 		return models.Asset{}, err
 	}
 
+	address := FindAttributeByKey(assetAttributes, "address").(string)
+	email := FindAttributeByKey(assetAttributes, "email").(string)
+	phone := FindAttributeByKey(assetAttributes, "phone").(string)
 	rate := FindAttributeByKey(assetAttributes, "rate").(map[string]models.Rate)
 	currency := FindAttributeByKey(assetAttributes, "currency").(string)
 	rateType := FindAttributeByKey(assetAttributes, "rateType").(string)
@@ -98,6 +101,9 @@ func GetAssetByIdService(token string, assetId string) (models.Asset, error) {
 	asset.Settings.Rate = &rate
 	asset.Settings.Currency = &currency
 	asset.Settings.EneeTariff = &eneeTariff
+	asset.Address = &address
+	asset.Email = &email
+	asset.Phone = &phone
 
 	return asset, nil
 
@@ -143,13 +149,11 @@ func GetAssetAttributesService(token string, assetId string, entityType string) 
 	return assetAttributes, nil
 }
 
-// url example: https://dashboard.lumenenergysolutions.com/api/plugins/telemetry/ASSET/311f1240-5f35-11ef-b270-6d27b0c9502e/SERVER_SCOPE POST METHOD
 func SetAssetAttributesService(token string, assetId string, entityType string, attributes string) error {
-	response, err := utils.Request(config.ThingsboardApiURL+"plugins/telemetry/"+entityType+"/"+assetId+"/SERVER_SCOPE", "POST", attributes, token)
+	_, err := utils.Request(config.ThingsboardApiURL+"plugins/telemetry/"+entityType+"/"+assetId+"/SERVER_SCOPE", "POST", attributes, token)
 	if err != nil {
 		return err
 	}
-	fmt.Println(response)
 	return nil
 }
 

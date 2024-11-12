@@ -3,7 +3,7 @@ import "../globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navigation } from "@/components/navigation/navigation";
 import { AuthGuard } from "@/guards/auth.guard";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Lumen Billing",

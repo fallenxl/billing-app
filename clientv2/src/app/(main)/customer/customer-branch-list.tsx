@@ -2,21 +2,21 @@
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import IconInput from "@/components/ui/icon-input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ICustomer, ICustomerRelations } from "@/interfaces";
+import { ICustomer, IBranch } from "@/interfaces";
 import { useBranchStore } from "@/stores/branch-store";
 import { Search } from "lucide-react";
 import { useState } from "react";
 
-export function CustomerBranchList({ customer, relations, isLoading }: { customer: ICustomer, relations: ICustomerRelations[], isLoading: boolean }) {
+export function CustomerBranchList({ customer, relations, isLoading }: { customer: ICustomer, relations: IBranch[], isLoading: boolean }) {
     const [searchTerm, setSearchTerm] = useState("") // Estado para el término de búsqueda
 
-    const filteredRelations = relations?.filter((relation: ICustomerRelations) =>
+    const filteredRelations = relations?.filter((relation: IBranch) =>
         relation.toName.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
     const { setBranch } = useBranchStore(state => state)
 
-    function handleBranchClick(branchId: ICustomerRelations) {
+    function handleBranchClick(branchId: IBranch) {
         setBranch(branchId)
         const urlSearchParams = new URLSearchParams(window.location.search)
         urlSearchParams.set('branch', branchId.id)

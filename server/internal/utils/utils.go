@@ -196,8 +196,6 @@ func GetRateByDeviceType(deviceType string, rate map[string]interface{}) float64
 }
 
 func GetUnitByDeviceType(deviceType string, units map[string]interface{}) string {
-	fmt.Println(deviceType, units)
-
 	// Verificación para water meter
 	if strings.Contains(strings.ToLower(deviceType), "water meter") {
 		unit, ok := units["water"]

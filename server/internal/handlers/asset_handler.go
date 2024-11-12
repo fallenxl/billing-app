@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"server/internal/services"
 	"server/internal/utils"
@@ -72,7 +71,6 @@ func SetAssetAttributes(w http.ResponseWriter, r *http.Request) {
 	//Get asset by id
 	// r.body to string
 	data := utils.ReadBody(r.Body)
-	fmt.Println(data)
 	err := services.SetAssetAttributesService(token, assetId, "ASSET", data)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusBadRequest, "Error setting attributes")

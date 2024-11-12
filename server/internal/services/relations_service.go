@@ -1,6 +1,8 @@
 package services
 
 import (
+	"encoding/json"
+	"fmt"
 	"server/internal/config"
 	"server/internal/models"
 	"server/internal/utils"
@@ -12,7 +14,6 @@ func GetAssetRelationsByID(id string, entityType string, token string) ([]models
 	if err != nil {
 		return nil, err
 	}
-
 	var relations []models.AssetRelationResponse
 	err = utils.ParseResponse(response, &relations)
 	if err != nil {
@@ -21,16 +22,19 @@ func GetAssetRelationsByID(id string, entityType string, token string) ([]models
 
 	var aggregatedRelations []models.AssetRelationResponse
 	for i := range relations {
+
 		if entityType == "ASSET" {
 
 			deviceInfo, err := GetDeviceById(relations[i].To.Id, relations[i].To.EntityType, token)
+
 			if err != nil {
 				return nil, err
 			}
 			relations[i].EntityType = relations[i].To.EntityType
 			relations[i].Id = relations[i].To.Id
-			relations[i].Label = relations[i].ToName
 			relations[i].Type = deviceInfo.Type
+			relations[i].Label = deviceInfo.Label
+
 			if relations[i].EntityType == "DEVICE" {
 				device, err := GetDeviceById(relations[i].Id, relations[i].EntityType, token)
 				if err != nil {
@@ -69,8 +73,29 @@ func GetCustomerRelationsByID(id string, entityType string, token string) ([]mod
 			relations[i].Label = relations[i].ToName
 			relations[i].Type = "SITE"
 			attributes, err := GetAssetAttributesService(token, relations[i].Id, relations[i].EntityType)
+
 			if err != nil {
 				continue
+			}
+			address := FindAttributeByKey(attributes, "address")
+			if address != nil {
+				address := address.(string)
+				relations[i].Address = &address
+			}
+			phone := FindAttributeByKey(attributes, "phone")
+			if phone != nil {
+				phone := phone.(string)
+				relations[i].Phone = &phone
+			}
+			email := FindAttributeByKey(attributes, "email")
+			if email != nil {
+				email := email.(string)
+				relations[i].Email = &email
+			}
+			templates := FindAttributeByKey(attributes, "templates")
+			if templates != nil {
+				templates := templates.(map[string]interface{})
+				relations[i].Settings.Templates = &templates
 			}
 			rate := FindAttributeByKey(attributes, "rate")
 			if rate != nil {
@@ -97,4 +122,17 @@ func GetCustomerRelationsByID(id string, entityType string, token string) ([]mod
 
 	}
 	return payload, nil
+}
+
+func UpdateBranchName(token string, body models.NameUpdate) error {
+	bodyJSON, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(bodyJSON), fmt.Sprintf(config.ThingsboardApiURL+"asset"))
+	res, err := utils.Request(config.ThingsboardApiURL+"asset", "POST", string(bodyJSON), token)
+	if err != nil {
+		return err
+	}
+	return utils.ParseResponse(res, nil)
 }
