@@ -1,6 +1,7 @@
 
 import config from "@/config";
-import { ICustomer, ICustomerRelations } from "@/interfaces/customer.interface";
+import { IBranch } from "@/interfaces";
+import { ICustomer} from "@/interfaces/customer.interface";
 import axios, { AxiosError } from "axios";
 
 export async function getCustomersService() {
@@ -25,7 +26,7 @@ export async function getCustomerByIdService(id: string) {
 export async function getCustomerRelationsById(id: string) {
     try {
         const response = await axios.get(`${config.API}/customer/${id}/relation`);
-        return { success: true, data: response.data as ICustomerRelations[], message: "Customer relations fetched successfully" };    
+        return { success: true, data: response.data as IBranch[], message: "Customer relations fetched successfully" };    
     } catch (error: any | AxiosError) {
         return { success: false, data: null, message: "Error fetching customer relations", error: error };
     }

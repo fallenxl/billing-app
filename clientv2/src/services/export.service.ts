@@ -1,5 +1,5 @@
 import config from "@/config";
-import { ICustomerRelations } from "@/interfaces";
+import { IBranch } from "@/interfaces";
 import axios, { AxiosError } from "axios";
 
 export interface IExportData {
@@ -23,7 +23,7 @@ export interface IExportData {
         hotWater?: number | null;
     }
     currency: string;
-    selectedDevices: ICustomerRelations[]
+    selectedDevices: IBranch[]
 }
 
 
