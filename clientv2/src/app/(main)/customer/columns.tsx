@@ -36,13 +36,12 @@ export function Columns():ColumnDef<IBranch>[] {
         ,
         {
           accessorKey: "toName",
-          header: "Site",
-          cell: ({ row }) => (
-            <div className="capitalize">{row.getValue("label")??row.getValue("toName")}</div>          ),
+          header: () => <></>,
+          cell: () => <></>,
         },
         {
           accessorKey:"label",
-          header: "Label",
+          header: "Site",
           cell: ({ row }) => (
             <div className="capitalize">{row.getValue("label")??row.getValue("toName")}</div>          ),
 
