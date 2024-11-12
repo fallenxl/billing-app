@@ -335,7 +335,7 @@ export function BranchSettings({ }) {
                         <Settings />
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[925px]" >
+                <DialogContent className="sm:max-w-[925px]" onCloseAction={handleClose}>
                     <DialogHeader>
                         <DialogTitle>Edit branch settings</DialogTitle>
                         <DialogDescription>
