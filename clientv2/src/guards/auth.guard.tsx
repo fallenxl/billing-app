@@ -22,5 +22,5 @@ export function AuthGuard({ children }: Readonly<{ children: React.ReactNode }>)
     })();
   }, []);
   if (isAuthenticated === null) return <LoadingPage />;
-  return <> {children} </>;
+  return isAuthenticated ? <>{children}</> : <LoadingPage />;
 }
