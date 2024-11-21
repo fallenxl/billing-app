@@ -36,7 +36,7 @@ type DeviceData struct {
 	Id            string             `json:"id"`
 	EntityType    string             `json:"entityType"`
 	Name          string             `json:"name"`  // Nombre
-	Label         string             `json:"label"` // Etiqueta
+	Label         *string            `json:"label"` // Etiqueta
 	Type          string             `json:"type"`
 	Relations     *[]DeviceData      `json:"relations"`     // Relaciones
 	Telemetry     *map[string][]Data `json:"telemetry"`     // Telemetria

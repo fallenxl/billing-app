@@ -5,22 +5,25 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ICustomer, IBranch } from "@/interfaces";
 import { useBranchStore } from "@/stores/branch-store";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 export function CustomerBranchList({ customer, relations, isLoading }: { customer: ICustomer, relations: IBranch[], isLoading: boolean }) {
-    const [searchTerm, setSearchTerm] = useState("") // Estado para el término de búsqueda
+    const [searchTerm, setSearchTerm] = useState("");
 
-    const filteredRelations = relations?.filter((relation: IBranch) =>
-        relation.toName.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    // Memoriza el resultado del filtro de relaciones
+    const filteredRelations = useMemo(() => {
+        return relations?.filter((relation: IBranch) =>
+            relation.toName.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [relations, searchTerm]);
 
-    const { setBranch } = useBranchStore(state => state)
+    const { setBranch } = useBranchStore(state => state);
 
     function handleBranchClick(branchId: IBranch) {
-        setBranch(branchId)
-        const urlSearchParams = new URLSearchParams(window.location.search)
-        urlSearchParams.set('branch', branchId.id)
-        window.history.pushState({}, '', `${window.location.pathname}?${urlSearchParams.toString()}`)
+        setBranch(branchId);
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        urlSearchParams.set('branch', branchId.id);
+        window.history.pushState({}, '', `${window.location.pathname}?${urlSearchParams.toString()}`);
     }
 
     return (
@@ -32,13 +35,13 @@ export function CustomerBranchList({ customer, relations, isLoading }: { custome
                     <IconInput
                         icon={<Search className="h-4 w-4" />}
                         placeholder="Search branches and sites..."
-                        value={searchTerm} // Asigna el valor del estado al input
-                        onChange={(e: any) => setSearchTerm(e.target.value)} // Actualiza el término de búsqueda
+                        value={searchTerm}
+                        onChange={(e: any) => setSearchTerm(e.target.value)}
                     />
                 </div>
             </div>
             <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {isLoading && [...Array(8)].map((n) => (
+                {isLoading && [...Array(4)].map((_, n) => (
                     <Skeleton key={n} className="h-36 md:w-[300px]" />
                 ))}
                 {!isLoading && filteredRelations && filteredRelations.length > 0 && filteredRelations.map((relation, index) => (
@@ -49,16 +52,17 @@ export function CustomerBranchList({ customer, relations, isLoading }: { custome
                             <img src={customer?.img} alt="" className="w-20 h-20 object-contain" />
                         </CardContent>
                         <CardFooter className="p-0 flex flex-col items-start">
-                            <CardTitle>{relation.toName}</CardTitle>
-                            <small className="text-neutral-400">{customer?.name}</small>
+                            <CardTitle>{relation.label || relation.toName}</CardTitle>
+                            <small className="text-neutral-400">{customer.label || customer.name}</small>
                         </CardFooter>
                     </Card>
                 ))}
-                {!isLoading && filteredRelations?.length === 0 && <div className="text-center col-span-4 flex items-center justify-center py-20">
-                    <p className="text-neutral-400 dark:text-neutral-500">No branches or sites found</p>
-                </div>}
-
+                {!isLoading && filteredRelations?.length === 0 && (
+                    <div className="text-center col-span-4 flex items-center justify-center py-20">
+                        <p className="text-neutral-400 dark:text-neutral-500">No branches or sites found</p>
+                    </div>
+                )}
             </div>
         </div>
-    )
+    );
 }

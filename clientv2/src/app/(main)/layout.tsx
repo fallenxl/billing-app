@@ -24,7 +24,7 @@ export default function RootLayout({
         <link rel="icon" href="/icon.png" />
       </head>
       <body
-        style={{ display: "grid", gridTemplateRows: "auto 1fr auto", minHeight: "100vh" }}>
+     >
         <ThemeProvider
           defaultTheme="system"
           attribute="class"
@@ -34,7 +34,7 @@ export default function RootLayout({
         >
           <AuthGuard>
             <Navigation />
-            <div className="md:max-w-screen-xl mx-auto py-5 pb-10 w-full px-5 md:px-10 xl:px-0">
+            <div className="md:max-w-screen-xl mx-auto py-5 pb-10 w-full px-5 md:px-10 xl:px-0 min-h-[calc(100vh-190px)]">
               {children}
             </div>
 

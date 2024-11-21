@@ -44,7 +44,7 @@ func AddFooter(pdf *gofpdf.Fpdf) {
 	pdf.CellFormat(0, 10, pdf.UnicodeTranslatorFromDescriptor("cp1252")(pageStr), "", 0, "C", false, 0, "")
 }
 
-func AddHeaderSupport(pdf *gofpdf.Fpdf, data models.ExportedData, support string) {
+func AddHeaderSupport(pdf *gofpdf.Fpdf, data models.ExportedData, support *string) {
 	// Definir el color de fondo (sin opacidad directa en gofpdf, pero elige un color claro para simular)
 	// color azul de fondo claro
 	pdf.SetFillColor(240, 244, 255) // R, G, B
@@ -71,8 +71,9 @@ func AddHeaderSupport(pdf *gofpdf.Fpdf, data models.ExportedData, support string
 	pdf.SetFont("Arial", "", 10) // Fuente más pequeña
 	// color gris claro
 	pdf.SetTextColor(128, 128, 128) // R, G, B
-	pdf.Cell(0, 10, support)
-
+	if support != nil {
+		pdf.Cell(0, 10, *support)
+	}
 	// Avanzar la línea
 	pdf.Ln(10)
 }

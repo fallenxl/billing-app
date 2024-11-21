@@ -16,6 +16,9 @@ export async function getBranchRelationsById(id: string) {
 export async function updateBranchSettingsService({ id, data }: { id: string, data: IBranchSettings }) {
     try {
         const response = await axios.post(`${config.API}/assets/${id}/attributes`, data);
+        if(data.label) {
+            await updateBranchNameService({ data })
+        }
         return { success: true, data: response.data, message: "Branch settings updated successfully" };
     } catch (error: any | AxiosError) {
         return { success: false, data: null, message: "Error updating branch settings", error: error };
@@ -27,6 +30,7 @@ export async function updateBranchNameService({ data }: {  data: IBranchSettings
         const response = await axios.post(`${config.API}/assets`, 
         { 
             id: data.id,
+            customerId: data.customerId,
             name: data.name,
             label: data.label,
         });

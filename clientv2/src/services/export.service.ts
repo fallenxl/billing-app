@@ -1,5 +1,5 @@
 import config from "@/config";
-import { IBranch } from "@/interfaces";
+import { ILocal } from "@/interfaces/local.interface";
 import axios, { AxiosError } from "axios";
 
 export interface IExportData {
@@ -23,7 +23,7 @@ export interface IExportData {
         hotWater?: number | null;
     }
     currency: string;
-    selectedDevices: IBranch[]
+    selectedDevices: ILocal[]
 }
 
 

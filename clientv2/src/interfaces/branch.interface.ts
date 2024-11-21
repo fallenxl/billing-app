@@ -43,6 +43,10 @@ export interface IBranchSettings {
         entityType: string,
         id: string,
     },
+    customerId: {
+        entityType: string,
+        id: string,
+    },
     name: string,
     label: string,
     address: string,

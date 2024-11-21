@@ -12,6 +12,5 @@ func GetUserService(username string, token string) ([]byte, error) {
 		fmt.Println(err)
 		return nil, err
 	}
-
 	return response, nil
 }

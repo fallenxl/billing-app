@@ -50,6 +50,10 @@ func UpdateBranchName(w http.ResponseWriter, r *http.Request) {
 		utils.RespondWithError(w, http.StatusInternalServerError, "Server error")
 		return
 	}
-	branch := services.UpdateBranchName(token, body)
+	branch, err := services.UpdateBranchName(token, body)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, "Server error")
+		return
+	}
 	utils.RespondWithJSON(w, http.StatusOK, branch)
 }

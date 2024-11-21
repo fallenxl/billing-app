@@ -2,13 +2,25 @@ package services
 
 import (
 	"encoding/json"
-	"fmt"
 	"server/internal/config"
 	"server/internal/models"
 	"server/internal/utils"
 	"strings"
 )
 
+func GetRelations(token string, entityType string, id string) ([]models.AssetRelationResponse, error) {
+	response, err := utils.Request(config.ThingsboardApiURL+"relations/info?fromId="+id+"&fromType="+entityType, "GET", "", token)
+	if err != nil {
+		return nil, err
+	}
+	var relations []models.AssetRelationResponse
+	err = utils.ParseResponse(response, &relations)
+	if err != nil {
+		return []models.AssetRelationResponse{}, err
+	}
+
+	return relations, nil
+}
 func GetAssetRelationsByID(id string, entityType string, token string) ([]models.AssetRelationResponse, error) {
 	response, err := utils.Request(config.ThingsboardApiURL+"relations/info?fromId="+id+"&fromType="+entityType, "GET", "", token)
 	if err != nil {
@@ -24,28 +36,31 @@ func GetAssetRelationsByID(id string, entityType string, token string) ([]models
 	for i := range relations {
 
 		if entityType == "ASSET" {
-
 			deviceInfo, err := GetDeviceById(relations[i].To.Id, relations[i].To.EntityType, token)
-
 			if err != nil {
 				return nil, err
 			}
+			assetAttributes, _ := GetAssetAttributesService(token, relations[i].To.Id, relations[i].To.EntityType)
 			relations[i].EntityType = relations[i].To.EntityType
 			relations[i].Id = relations[i].To.Id
-			relations[i].Type = deviceInfo.Type
-			relations[i].Label = deviceInfo.Label
-
+			relations[i].Label = &deviceInfo.Label
+			attributeMap := map[string]func(interface{}){
+				"address": func(value interface{}) { address := value.(string); relations[i].Address = &address },
+				"phone":   func(value interface{}) { phone := value.(string); relations[i].Phone = &phone },
+				"email":   func(value interface{}) { email := value.(string); relations[i].Email = &email },
+				
+			}
+			for key, assignFunc := range attributeMap {
+				utils.AssignAttributeIfExists(assetAttributes, key, assignFunc)
+			}
 			if relations[i].EntityType == "DEVICE" {
-				device, err := GetDeviceById(relations[i].Id, relations[i].EntityType, token)
-				if err != nil {
-					return nil, err
-				}
-				if device.Label == "" {
-					relations[i].Label = device.Name
+
+				if deviceInfo.Label == "" {
+					relations[i].Label = &deviceInfo.Name
 				} else {
-					relations[i].Label = device.Label
+					relations[i].Label = &deviceInfo.Label
 				}
-				relations[i].Type = device.Type
+				relations[i].Type = deviceInfo.Type
 			}
 			aggregatedRelations = append(aggregatedRelations, relations[i])
 		}
@@ -67,72 +82,47 @@ func GetCustomerRelationsByID(id string, entityType string, token string) ([]mod
 
 	var payload []models.CustomerRelationResponse
 	for i := range relations {
-		if !strings.Contains(relations[i].ToName, "EMS") {
-			relations[i].EntityType = relations[i].To.EntityType
-			relations[i].Id = relations[i].To.Id
-			relations[i].Label = relations[i].ToName
-			relations[i].Type = "SITE"
-			attributes, err := GetAssetAttributesService(token, relations[i].Id, relations[i].EntityType)
-
-			if err != nil {
-				continue
-			}
-			address := FindAttributeByKey(attributes, "address")
-			if address != nil {
-				address := address.(string)
-				relations[i].Address = &address
-			}
-			phone := FindAttributeByKey(attributes, "phone")
-			if phone != nil {
-				phone := phone.(string)
-				relations[i].Phone = &phone
-			}
-			email := FindAttributeByKey(attributes, "email")
-			if email != nil {
-				email := email.(string)
-				relations[i].Email = &email
-			}
-			templates := FindAttributeByKey(attributes, "templates")
-			if templates != nil {
-				templates := templates.(map[string]interface{})
-				relations[i].Settings.Templates = &templates
-			}
-			rate := FindAttributeByKey(attributes, "rate")
-			if rate != nil {
-				rate := rate.(map[string]interface{})
-				relations[i].Settings.Rate = &rate
-			}
-			currency := FindAttributeByKey(attributes, "currency")
-			if currency != nil {
-				currency := currency.(string)
-				relations[i].Settings.Currency = &currency
-			}
-			rateType := FindAttributeByKey(attributes, "rateType")
-			if rateType != nil {
-				rateType := rateType.(string)
-				relations[i].Settings.RateType = &rateType
-			}
-			units := FindAttributeByKey(attributes, "units")
-			if units != nil {
-				units := units.(map[string]interface{})
-				relations[i].Settings.Units = &units
-			}
-			payload = append(payload, relations[i])
+		if strings.Contains(relations[i].ToName, "EMS") {
+			continue
 		}
+		relations[i].EntityType = relations[i].To.EntityType
+		relations[i].Id = relations[i].To.Id
+		relations[i].Type = "SITE"
+		attributes, _ := GetAssetAttributesService(token, relations[i].Id, relations[i].EntityType)
+
+		attributeMap := map[string]func(interface{}){
+			"address": func(value interface{}) { address := value.(string); relations[i].Address = &address },
+			"label":   func(value interface{}) { label := value.(string); relations[i].Label = &label },
+			"phone":   func(value interface{}) { phone := value.(string); relations[i].Phone = &phone },
+			"email":   func(value interface{}) { email := value.(string); relations[i].Email = &email },
+			"templates": func(value interface{}) {
+				templates := value.(map[string]interface{})
+				relations[i].Settings.Templates = &templates
+			},
+			"rate":     func(value interface{}) { rate := value.(map[string]interface{}); relations[i].Settings.Rate = &rate },
+			"currency": func(value interface{}) { currency := value.(string); relations[i].Settings.Currency = &currency },
+			"rateType": func(value interface{}) { rateType := value.(string); relations[i].Settings.RateType = &rateType },
+			"units":    func(value interface{}) { units := value.(map[string]interface{}); relations[i].Settings.Units = &units },
+		}
+		for key, assignFunc := range attributeMap {
+			utils.AssignAttributeIfExists(attributes, key, assignFunc)
+		}
+		payload = append(payload, relations[i])
 
 	}
 	return payload, nil
 }
 
-func UpdateBranchName(token string, body models.NameUpdate) error {
+func UpdateBranchName(token string, body models.NameUpdate) (string, error) {
+
 	bodyJSON, err := json.Marshal(body)
 	if err != nil {
-		return err
+		return "", err
 	}
-	fmt.Println(string(bodyJSON), fmt.Sprintf(config.ThingsboardApiURL+"asset"))
-	res, err := utils.Request(config.ThingsboardApiURL+"asset", "POST", string(bodyJSON), token)
+	_, err = utils.Request(config.ThingsboardApiURL+"asset", "POST", string(bodyJSON), token)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return utils.ParseResponse(res, nil)
+
+	return string(bodyJSON), nil
 }

@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { IBranchSettings } from "@/interfaces";
 import { updateBranchNameService, updateBranchSettingsService } from "@/services/branch.service";
 import { useBranchStore } from "@/stores";
+import { useCustomerStore } from "@/stores/customer-store";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { Settings } from "lucide-react";
 import { useState } from "react";
@@ -50,7 +51,8 @@ function GeneralSettings({ branchSettings, handleSettingsChange, setBranchSettin
             </div>
             <div className="flex flex-col gap-4 w-full">
                 <Label htmlFor="branch-name">Name</Label>
-                <Input className="w-full" placeholder="ex. Plaza Uno" value={branchSettings?.label} name="label" disabled />
+                <Input className="w-full" placeholder={`ex. ${branchSettings?.name!}`}
+                 value={branchSettings?.label} name="label" onChange={handleSettingsChange}   />
             </div>
             <div className="flex flex-col gap-4">
                 <Label htmlFor="branch-address">Address</Label>
@@ -245,10 +247,18 @@ function ExportSettings({ branchSettings, handleSettingsChange, setBranchSetting
         </div>
     )
 }
+
+function AdditionalChargesSettings() {
+    return (
+        <div>
+            <h2>Additional Charges</h2>
+        </div>
+    )
+}
 export function BranchSettings({ }) {
     const [activeOption, setActiveOption] = useState('general');
     const { branch, updateBranch } = useBranchStore(state => state)
-
+    const { customer } = useCustomerStore(state => state)
     const [branchSettings, setBranchSettings] = useState<IBranchSettings | null>(branch ? {
         id: branch.to,
         name: branch.toName ?? "",
@@ -259,7 +269,8 @@ export function BranchSettings({ }) {
         currency: branch.settings.currency ?? "",
         rate: branch.settings.rate ?? { energy: 0, water: 0, gas: 0, air: 0 },
         units: branch.settings.units ?? { energy: "", water: "", gas: "", air: "" },
-        templates: branch.settings.templates ?? { pdf: "", excel: "", support: "" }
+        templates: branch.settings.templates ?? { pdf: "", excel: "", support: "" },
+        customerId: customer?.id!
     } : null)
 
     const handleSettingsChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -291,7 +302,8 @@ export function BranchSettings({ }) {
                 currency: branch.settings.currency ?? "",
                 rate: branch.settings.rate ?? { energy: 0, water: 0, gas: 0, air: 0 },
                 units: branch.settings.units ?? { energy: "", water: "", gas: "", air: "" },
-                templates: branch.settings.templates ?? { pdf: "", excel: "", support: "" }
+                templates: branch.settings.templates ?? { pdf: "", excel: "", support: "" },
+                customerId: customer?.id!
             })
         } else {
             setBranchSettings(null)
@@ -299,14 +311,6 @@ export function BranchSettings({ }) {
     }
 
     async function handleSaveChanges() {
-        if (branchSettings?.label !== branch?.label) {
-            const response = await updateBranchNameService({ data: branchSettings! });
-            if (!response.success) {
-                console.error(response.message)
-                toast.error(response.message)
-                return
-            }
-        }
 
         const response = await updateBranchSettingsService({ id: branchSettings!.id.id, data: branchSettings! });
         if (!response.success) {
@@ -330,7 +334,7 @@ export function BranchSettings({ }) {
     return (
         <>
             <Dialog>
-                <DialogTrigger asChild className="hover:bg-gray-100 rounded-full">
+                <DialogTrigger asChild className="hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-full">
                     <Settings className="cursor-pointer h-10 w-10 p-2"/>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[925px]" onCloseAction={handleClose}>
@@ -353,12 +357,18 @@ export function BranchSettings({ }) {
                                     className={`flex items-center  gap-2  py-4 w-full cursor-pointer h-full px-2 pr-14 duration-300 ${activeOption == 'export' && "bg-neutral-100 dark:bg-neutral-700 "}`}>
                                     <p className="text-neutral-900 dark:text-white text-sm">Export settings</p>
                                 </li>
+                                <li
+                                    onClick={() => setActiveOption('additional')}
+                                    className={`flex items-center  gap-2  py-4 w-full cursor-pointer h-full px-2 pr-14 duration-300 ${activeOption == 'additional' && "bg-neutral-100 dark:bg-neutral-700 "}`}>
+                                    <p className="text-neutral-900 dark:text-white text-sm">Additional charges</p>
+                                </li>
                             </ul>
 
                         </div>
                         <ScrollArea className="w-full md:w-3/4 h-[400px] md:h-[500px] border-t md:border-t-0 md:border-l p-2 md:p-10 py-10 overflow-y-auto">
                             {activeOption == 'general' && <GeneralSettings branchSettings={branchSettings} handleSettingsChange={handleSettingsChange} setBranchSettings={setBranchSettings} />}
                             {activeOption == 'export' && <ExportSettings branchSettings={branchSettings} handleSettingsChange={handleSettingsChange} setBranchSettings={setBranchSettings} />}
+                            {activeOption == 'additional' && <AdditionalChargesSettings />}
                         </ScrollArea>
                     </div>
                     <DialogFooter className="border-t py-2">

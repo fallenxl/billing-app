@@ -107,154 +107,6 @@ func CreateExcel(filename string, exportedData models.ExportedData) (string, err
 	row += 2
 
 	everyAssetsLocal := true
-	for _, entity := range exportedData.Relations {
-		if !strings.Contains(strings.ToLower(entity.Type), "local") {
-			everyAssetsLocal = false
-			break
-		}
-	}
-	// Procesar entidades y relaciones
-	for entityIndex, entity := range exportedData.Relations {
-		if strings.Contains(strings.ToLower(entity.Type), "nivel") {
-			if entityIndex != 0 {
-				row += 5 // Separación entre secciones
-			}
-
-			// Título del grupo de relaciones (Niveles)
-			f.SetCellValue(sheet, fmt.Sprintf("A%d", row), entity.Name)
-			style, _ := f.NewStyle(&excelize.Style{
-				Font: &excelize.Font{
-					Bold: true,
-					Size: 12,
-				},
-				Alignment: &excelize.Alignment{
-					Horizontal: "left",
-				},
-			})
-			f.SetCellStyle(sheet, fmt.Sprintf("A%d", row), fmt.Sprintf("A%d", row), style)
-			row++
-
-			// Energy Meters
-			hasEnergyMeter := false
-			for _, relation := range *entity.Relations {
-				if strings.Contains(strings.ToLower(relation.Type), "energy meter") {
-					hasEnergyMeter = true
-					break
-				}
-			}
-
-			if hasEnergyMeter {
-				f.SetCellValue(sheet, fmt.Sprintf("A%d", row), "Energy Meters")
-				style, _ := f.NewStyle(&excelize.Style{
-					Font: &excelize.Font{
-						Bold: true,
-						Size: 11,
-					},
-					Alignment: &excelize.Alignment{
-						Horizontal: "left",
-					},
-				})
-				f.SetCellStyle(sheet, fmt.Sprintf("A%d", row), fmt.Sprintf("A%d", row), style)
-				row++
-
-				// Crear encabezados
-				createHeaders(f, sheet, row, unitEnergy)
-				row++
-
-				// Agregar datos de Energy Meters
-				for _, relation := range *entity.Relations {
-					if strings.Contains(strings.ToLower(relation.Type), "energy meter") {
-						f.SetCellValue(sheet, fmt.Sprintf("A%d", row), relation.Label)
-						f.SetCellValue(sheet, fmt.Sprintf("B%d", row), *relation.PreviousMonth)
-						f.SetCellValue(sheet, fmt.Sprintf("C%d", row), *relation.CurrentMonth)
-						f.SetCellValue(sheet, fmt.Sprintf("D%d", row), *relation.TotalConsumed)
-						f.SetCellValue(sheet, fmt.Sprintf("E%d", row), fmt.Sprintf("%.2f %s", exportedData.Rate["energy"], utils.GetCurrencySymbol(exportedData.Currency)))
-						f.SetCellValue(sheet, fmt.Sprintf("F%d", row), fmt.Sprintf("%.2f %s", *relation.TotalToPay, utils.GetCurrencySymbol(exportedData.Currency)))
-						row++
-					}
-				}
-			}
-
-			row += 2
-			// Water Meters
-			hasWaterMeter := false
-			for _, relation := range *entity.Relations {
-				if strings.Contains(strings.ToLower(relation.Type), "water meter") {
-					hasWaterMeter = true
-					break
-				}
-			}
-
-			if hasWaterMeter {
-				f.SetCellValue(sheet, fmt.Sprintf("A%d", row), "Water Meters")
-				style, _ := f.NewStyle(&excelize.Style{
-					Font: &excelize.Font{
-						Bold: true,
-						Size: 11,
-					},
-					Alignment: &excelize.Alignment{
-						Horizontal: "left",
-					},
-				})
-				f.SetCellStyle(sheet, fmt.Sprintf("A%d", row), fmt.Sprintf("A%d", row), style)
-				row++
-
-				// Crear encabezados
-				createHeaders(f, sheet, row, unitWater)
-				row++
-
-				// Agregar datos de Water Meters
-				for _, relation := range *entity.Relations {
-					if strings.Contains(strings.ToLower(relation.Type), "water meter") {
-						f.SetCellValue(sheet, fmt.Sprintf("A%d", row), relation.Label)
-						f.SetCellValue(sheet, fmt.Sprintf("B%d", row), *relation.PreviousMonth)
-						f.SetCellValue(sheet, fmt.Sprintf("C%d", row), *relation.CurrentMonth)
-						f.SetCellValue(sheet, fmt.Sprintf("D%d", row), *relation.TotalConsumed)
-						f.SetCellValue(sheet, fmt.Sprintf("E%d", row), fmt.Sprintf("%.2f %s", exportedData.Rate["water"], utils.GetCurrencySymbol(exportedData.Currency)))
-						f.SetCellValue(sheet, fmt.Sprintf("F%d", row), fmt.Sprintf("%.2f %s", *relation.TotalToPay, utils.GetCurrencySymbol(exportedData.Currency)))
-						row++
-					}
-				}
-			}
-		} else if strings.Contains(strings.ToLower(entity.Type), "local") && !everyAssetsLocal {
-			if entityIndex != 0 {
-				row += 5 // Separación entre secciones
-			}
-
-			// Título del grupo de relaciones (Locales)
-			f.SetCellValue(sheet, fmt.Sprintf("A%d", row), entity.Name)
-			style, _ := f.NewStyle(&excelize.Style{
-				Font: &excelize.Font{
-					Bold: true,
-					Size: 12,
-				},
-				Alignment: &excelize.Alignment{
-					Horizontal: "left",
-				},
-			})
-			f.SetCellStyle(sheet, fmt.Sprintf("A%d", row), fmt.Sprintf("A%d", row), style)
-			row++
-
-			// Agregar datos de Energy Meters y Water Meters en una sola lista
-			for _, relation := range *entity.Relations {
-				if strings.Contains(strings.ToLower(relation.Type), "energy meter") || strings.Contains(strings.ToLower(relation.Type), "water meter") {
-					f.SetCellValue(sheet, fmt.Sprintf("A%d", row), relation.Label)
-					f.SetCellValue(sheet, fmt.Sprintf("B%d", row), *relation.PreviousMonth)
-					f.SetCellValue(sheet, fmt.Sprintf("C%d", row), *relation.CurrentMonth)
-					f.SetCellValue(sheet, fmt.Sprintf("D%d", row), *relation.TotalConsumed)
-					// unit := unitEnergy
-					rate := exportedData.Rate["energy"]
-					if strings.Contains(strings.ToLower(relation.Type), "water meter") {
-						// unit = unitWater
-						rate = exportedData.Rate["water"]
-					}
-					f.SetCellValue(sheet, fmt.Sprintf("E%d", row), fmt.Sprintf("%s%.2f", utils.GetCurrencySymbol(exportedData.Currency), rate))
-					f.SetCellValue(sheet, fmt.Sprintf("F%d", row), fmt.Sprintf("%s%.2f", utils.GetCurrencySymbol(exportedData.Currency), *relation.TotalToPay))
-					row++
-				}
-			}
-		}
-	}
 
 	if everyAssetsLocal {
 		// Crear encabezados
@@ -303,7 +155,7 @@ func CreateExcel(filename string, exportedData models.ExportedData) (string, err
 			for _, entity := range exportedData.Relations {
 				for _, relation := range *entity.Relations {
 					if strings.Contains(strings.ToLower(relation.Type), "energy meter") {
-						f.SetCellValue(sheet, fmt.Sprintf("A%d", row), relation.Label)
+						f.SetCellValue(sheet, fmt.Sprintf("A%d", row), *relation.Label)
 						f.SetCellStyle(sheet, fmt.Sprintf("A%d", row), fmt.Sprintf("F%d", row), rowStyle)
 						f.SetCellValue(sheet, fmt.Sprintf("B%d", row), *relation.PreviousMonth)
 						f.SetCellValue(sheet, fmt.Sprintf("C%d", row), *relation.CurrentMonth)
@@ -337,7 +189,7 @@ func CreateExcel(filename string, exportedData models.ExportedData) (string, err
 			for _, entity := range exportedData.Relations {
 				for _, relation := range *entity.Relations {
 					if strings.Contains(strings.ToLower(relation.Type), "water meter") {
-						f.SetCellValue(sheet, fmt.Sprintf("A%d", row), relation.Label)
+						f.SetCellValue(sheet, fmt.Sprintf("A%d", row), *relation.Label)
 						f.SetCellStyle(sheet, fmt.Sprintf("A%d", row), fmt.Sprintf("F%d", row), rowStyle)
 						f.SetCellValue(sheet, fmt.Sprintf("B%d", row), *relation.PreviousMonth)
 						f.SetCellValue(sheet, fmt.Sprintf("C%d", row), *relation.CurrentMonth)

@@ -11,9 +11,10 @@ type to struct {
 }
 
 type NameUpdate struct {
-	Id    from   `json:"id"`
-	Name  string `json:"name"`
-	Label string `json:"label"`
+	Id         from   `json:"id"`
+	CustomerId to     `json:"customerId"`
+	Name       string `json:"name"`
+	Label      string `json:"label"`
 }
 type settings struct {
 	Currency  *string                 `json:"currency"`
@@ -23,15 +24,17 @@ type settings struct {
 	Templates *map[string]interface{} `json:"templates"`
 }
 type AssetRelationResponse struct {
-	From       from   `json:"from"`
-	To         to     `json:"to"`
-	ToName     string `json:"toName"`
-	EntityType string `json:"entityType"`
-	Id         string `json:"id"`
-	Label      string `json:"label"`
-	Type       string `json:"type"`
-
-	Meters []AssetRelationResponse `json:"meters"`
+	From       from                    `json:"from"`
+	To         to                      `json:"to"`
+	ToName     string                  `json:"toName"`
+	EntityType string                  `json:"entityType"`
+	Type       string                  `json:"type"`
+	Id         string                  `json:"id"`
+	Label      *string                 `json:"label"`
+	Address    *string                 `json:"address"`
+	Phone      *string                 `json:"phone"`
+	Email      *string                 `json:"email"`
+	Meters     []AssetRelationResponse `json:"meters"`
 }
 
 type CustomerRelationResponse struct {
@@ -43,7 +46,7 @@ type CustomerRelationResponse struct {
 	ToName     string   `json:"toName"`
 	EntityType string   `json:"entityType"`
 	Id         string   `json:"id"`
-	Label      string   `json:"label"`
+	Label      *string  `json:"label"`
 	Type       string   `json:"type"`
 	Settings   settings `json:"settings"`
 }

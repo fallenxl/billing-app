@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"server/internal/models"
 	"strings"
 	"time"
 
@@ -40,6 +41,7 @@ func Request(url string, method string, body string, token string) ([]byte, erro
 	// Enviar la solicitud HTTP
 	resp, err := client.Do(req)
 	if err != nil {
+
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -49,9 +51,9 @@ func Request(url string, method string, body string, token string) ([]byte, erro
 	if err != nil {
 		return nil, err
 	}
-
 	// Comprobar el estado de la respuesta
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+
 		return responseBody, fmt.Errorf("HTTP request failed with status %d: %s", resp.StatusCode, responseBody)
 	}
 	return responseBody, nil
@@ -328,4 +330,21 @@ func ReadBody(body io.ReadCloser) string {
 		return ""
 	}
 	return string(bodyBytes)
+}
+
+func FindAttributeByKey(assetAttributes []models.AssetAttributes, key string) interface{} {
+	for i := 0; i < len(assetAttributes); i++ {
+		if assetAttributes[i].Key == key {
+			return assetAttributes[i].Value
+		}
+	}
+
+	return nil
+}
+
+func AssignAttributeIfExists(attributes []models.AssetAttributes, key string, assignFunc func(interface{})) {
+	attr := FindAttributeByKey(attributes, key)
+	if attr != nil {
+		assignFunc(attr)
+	}
 }

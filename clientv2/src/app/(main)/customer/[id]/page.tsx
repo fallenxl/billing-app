@@ -2,29 +2,30 @@
 import { ICustomer, IBranch } from "@/interfaces"
 import { getCustomerByIdService, getCustomerRelationsById } from "@/services/customer.service"
 import { useParams, useSearchParams } from "next/navigation"
-import {  useEffect, useState } from "react"
-import { CustomerBranchList } from "../customer-branch-list"
+import {  useEffect, useMemo, useState } from "react"
+import { CustomerBranchList } from "../../../../components/branch/branch-list"
 import { getBranchRelationsById } from "@/services/branch.service"
 import { useBranchStore } from "@/stores/branch-store"
-import { Branch } from "./branch"
+import { Branch } from "../../../../components/branch/branch"
 import Link from "next/link"
 import { useUserStore } from "@/stores"
+import { useCustomerStore } from "@/stores/customer-store"
 
 export default function CustomerPage() {
 
     const { id } = useParams()
     const searchParams = useSearchParams()
     const {user} = useUserStore(state => state)
-    const queryParams = useSearchParams()
-    const [customer, setCustomer] = useState<ICustomer | null>(null)
+    const queryParams = useMemo(() => searchParams, [searchParams])
     const [relations, setRelations] = useState<IBranch[] | null>(null)
     const [isLoading, setIsLoading] = useState(false)
 
+    const  {customer, setCustomer} = useCustomerStore(state => state)
     const { branch, setBranch, setBranchRelations } = useBranchStore(state => state)
     const [hasError, setHasError] = useState(false)
 
     useEffect(() => {
-        (async () => {
+        (async () =>{
             setIsLoading(true)
             const customerID = user?.authority === 'CUSTOMER_USER' ? user?.customerId.id : id
             const [customer, relations] = await Promise.all([
@@ -38,7 +39,6 @@ export default function CustomerPage() {
             }
             setCustomer(customer.data)
             setRelations(relations.data)
-
             if (queryParams.has('branch')) {
                 const branchId = queryParams.get('branch')
                 const branch = relations.data?.find(relation => relation.to.id === branchId)
@@ -55,6 +55,7 @@ export default function CustomerPage() {
             getBranchRelationsById(branch.id).then((response) => {
                 setIsLoading(false)
                 if (response.success) {
+                    console.log(response.data)
                     setBranchRelations(response.data)
                 } else {
                     const urlSearchParams = new URLSearchParams(window.location.search)

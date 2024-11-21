@@ -40,6 +40,8 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 	var wg sync.WaitGroup
 	errChan := make(chan error, len(data.Relations))
 	var mu sync.Mutex
+	dataJson, _ := json.Marshal(data)
+	fmt.Println(string(dataJson))
 	for _, asset := range data.Relations {
 		wg.Add(1)
 
@@ -47,125 +49,123 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 			defer wg.Done()
 
 			pdf := gofpdf.New("P", "mm", "A4", "")
-			if strings.Contains(strings.ToLower(asset.Type), "local") {
-				waterDevice := models.DeviceData{}
-				energyDevice := models.DeviceData{}
-				for _, device := range *asset.Relations {
-					if strings.Contains(strings.ToLower(device.Type), "water meter") {
-						waterDevice = device
-					}
-					if strings.Contains(strings.ToLower(device.Type), "energy meter") {
-						energyDevice = device
-					}
+			waterDevice := models.DeviceData{}
+			energyDevice := models.DeviceData{}
+			for _, device := range *asset.Relations {
+				if strings.Contains(strings.ToLower(device.Type), "water meter") {
+					waterDevice = device
 				}
+				if strings.Contains(strings.ToLower(device.Type), "energy meter") {
+					energyDevice = device
+				}
+			}
 
-				pdf.SetMargins(20, 20, 20)
-				tr := pdf.UnicodeTranslatorFromDescriptor("")
-				pdf.SetHeaderFuncMode(func() {
+			pdf.SetMargins(20, 20, 20)
+			tr := pdf.UnicodeTranslatorFromDescriptor("")
+			pdf.SetHeaderFuncMode(func() {
 
-					AddHeaderSupport(pdf, data, asset.Label)
+				AddHeaderSupport(pdf, data, asset.Label)
 
-				}, true)
+			}, true)
 
-				pdf.SetFooterFunc(func() {
-					AddFooter(pdf)
-				})
-				// auto page break
-				pdf.SetAutoPageBreak(true, 40)
-				pdf.AliasNbPages("")
-				pdf.AddPage()
-				pdf.SetFont("Arial", "", 10)
-				topMargin := 30.0
-				pdf.SetY(pdf.GetY() + topMargin)
+			pdf.SetFooterFunc(func() {
+				AddFooter(pdf)
+			})
+			// auto page break
+			pdf.SetAutoPageBreak(true, 40)
+			pdf.AliasNbPages("")
+			pdf.AddPage()
+			pdf.SetFont("Arial", "", 10)
+			topMargin := 30.0
+			pdf.SetY(pdf.GetY() + topMargin)
 
-				// font medium
-				pdf.SetFont("Arial", "", 16)
-				pdf.CellFormat(0, 10, "Factura de Servicios", "", 0, "C", false, 0, "")
-				pdf.Ln(10)
-				pdf.SetFont("Arial", "B", 10)
-				pdf.SetTextColor(100, 100, 100)
-				pdf.CellFormat(0, 10, tr("Periodo de Facturación"), "", 0, "C", false, 0, "")
+			// font medium
+			pdf.SetFont("Arial", "", 16)
+			pdf.CellFormat(0, 10, "Factura de Servicios", "", 0, "C", false, 0, "")
+			pdf.Ln(10)
+			pdf.SetFont("Arial", "B", 10)
+			pdf.SetTextColor(100, 100, 100)
+			pdf.CellFormat(0, 10, tr("Periodo de Facturación"), "", 0, "C", false, 0, "")
 
-				pdf.Ln(7)
+			pdf.Ln(7)
+			pdf.SetFont("Arial", "", 11)
+			pdf.SetTextColor(80, 80, 80)
+			pdf.CellFormat(0, 10, fmt.Sprintf("%s - %s", parseStartDate, parseEndDate), "", 0, "C", false, 0, "")
+			pdf.Ln(15)
+			pdf.SetXY(pdf.GetX(), 100)
+
+			if energyDevice != (models.DeviceData{}) {
+				pdf.Image("./assets/icon-power.png", 51.5, 81, 13, 0, false, "", 0, "")
+				// total energy charges
 				pdf.SetFont("Arial", "", 11)
-				pdf.SetTextColor(80, 80, 80)
-				pdf.CellFormat(0, 10, fmt.Sprintf("%s - %s", parseStartDate, parseEndDate), "", 0, "C", false, 0, "")
-				pdf.Ln(15)
-				pdf.SetXY(pdf.GetX(), 100)
-
-				if energyDevice != (models.DeviceData{}) {
-					pdf.Image("./assets/icon-power.png", 51.5, 81, 13, 0, false, "", 0, "")
-					// total energy charges
-					pdf.SetFont("Arial", "", 11)
-					pdf.SetTextColor(100, 100, 100)
-					pdf.SetXY(70, 82)
-					pdf.CellFormat(0, 10, tr("Cargos por Energía"), "", 0, "L", false, 0, "")
-
-					pdf.SetXY(140, 80.5)
-					pdf.CellFormat(0, 10, fmt.Sprintf("%s %s", utils.GetCurrencySymbol(data.Currency), utils.FormatNumber(*energyDevice.TotalToPay)), "", 0, "L", false, 0, "")
-				}
-
-				if waterDevice != (models.DeviceData{}) {
-					// total WATER charges
-					pdf.Image("./assets/icon-water.png", 52.5, 103, 13, 0, false, "", 0, "")
-					pdf.SetFont("Arial", "", 11)
-					// TEXT GRAY
-					pdf.SetTextColor(100, 100, 100)
-					pdf.SetXY(70, 104.5)
-					pdf.CellFormat(0, 10, tr("Cargos por Agua"), "", 0, "L", false, 0, "")
-
-					pdf.SetXY(140, 103)
-					pdf.CellFormat(0, 10, fmt.Sprintf("%s %s", utils.GetCurrencySymbol(data.Currency), utils.FormatNumber(*waterDevice.TotalToPay)), "", 0, "L", false, 0, "")
-				}
-
-				// TOTAL CHARGES
-				pdf.SetFont("Arial", "", 13)
 				pdf.SetTextColor(100, 100, 100)
-				pdf.SetXY(51.5, 130)
-				pdf.SetFillColor(240, 240, 240)
-				pdf.Rect(50, 130, 120, 10, "F")
-				pdf.CellFormat(0, 10, tr("Cargos Totales"), "", 0, "L", false, 0, "")
-				pdf.SetXY(135, 130)
-				totalToPay := 0.0
-				if waterDevice != (models.DeviceData{}) {
-					totalToPay += float64(*waterDevice.TotalToPay)
-				}
-				if energyDevice != (models.DeviceData{}) {
-					totalToPay += float64(*energyDevice.TotalToPay)
-				}
-				pdf.CellFormat(0, 10, fmt.Sprintf("%s %s", utils.GetCurrencySymbol(data.Currency), utils.FormatNumber(totalToPay)), "", 0, "L", false, 0, "")
+				pdf.SetXY(70, 82)
+				pdf.CellFormat(0, 10, tr("Cargos por Energía"), "", 0, "L", false, 0, "")
 
-				// Como pagar su factura
+				pdf.SetXY(140, 80.5)
+				pdf.CellFormat(0, 10, fmt.Sprintf("%s %s", utils.GetCurrencySymbol(data.Currency), utils.FormatNumber(*energyDevice.TotalToPay)), "", 0, "L", false, 0, "")
+			}
 
-				pdf.SetFont("Arial", "B", 10)
+			if waterDevice != (models.DeviceData{}) {
+				// total WATER charges
+				pdf.Image("./assets/icon-water.png", 52.5, 103, 13, 0, false, "", 0, "")
+				pdf.SetFont("Arial", "", 11)
+				// TEXT GRAY
 				pdf.SetTextColor(100, 100, 100)
-				pdf.Ln(15)
-				pdf.SetXY(23, 160)
-				pdf.CellFormat(0, 10, tr("Cómo Pagar Su Factura"), "", 0, "L", false, 0, "")
-				pdf.SetLineWidth(0.5)
-				pdf.Line(23, 170, 180, 170)
-				// line width
-				pdf.SetFont("Arial", "", 10)
-				pdf.SetTextColor(80, 80, 80)
-				pdf.SetXY(23, 175)
-				pdf.MultiCell(0, 10, tr("Puede pagar su factura en línea o en persona o contacte a nuestro equipo de soporte para obtener ayuda."), "", "L", false)
-				pdf.SetXY(23, 210)
-				pdf.SetFont("Arial", "B", 10)
-				pdf.SetTextColor(100, 100, 100)
-				pdf.CellFormat(0, 10, tr("Soporte"), "", 0, "L", false, 0, "")
-				pdf.SetLineWidth(0.5)
-				pdf.Line(23, 220, 180, 220)
-				pdf.SetFont("Arial", "", 10)
-				pdf.SetTextColor(80, 80, 80)
-				pdf.SetXY(23, 220)
-				pdf.MultiCell(0, 10, tr("Si tiene alguna pregunta o necesita ayuda, no dude en ponerse en contacto con nuestro equipo de soporte."), "", "L", false)
+				pdf.SetXY(70, 104.5)
+				pdf.CellFormat(0, 10, tr("Cargos por Agua"), "", 0, "L", false, 0, "")
 
-				for _, device := range *asset.Relations {
-					pdf.AddPage()
-					unit := utils.GetUnitByDeviceType(device.Type, data.Units)
-					rate := utils.GetRateByDeviceType(device.Type, data.Rate)
-					chartName = DeviceTypePdf(pdf, device, data, rate, unit)
-				}
+				pdf.SetXY(140, 103)
+				pdf.CellFormat(0, 10, fmt.Sprintf("%s %s", utils.GetCurrencySymbol(data.Currency), utils.FormatNumber(*waterDevice.TotalToPay)), "", 0, "L", false, 0, "")
+			}
+
+			// TOTAL CHARGES
+			pdf.SetFont("Arial", "", 13)
+			pdf.SetTextColor(100, 100, 100)
+			pdf.SetXY(51.5, 130)
+			pdf.SetFillColor(240, 240, 240)
+			pdf.Rect(50, 130, 120, 10, "F")
+			pdf.CellFormat(0, 10, tr("Cargos Totales"), "", 0, "L", false, 0, "")
+			pdf.SetXY(135, 130)
+			totalToPay := 0.0
+			if waterDevice != (models.DeviceData{}) {
+				totalToPay += float64(*waterDevice.TotalToPay)
+			}
+			if energyDevice != (models.DeviceData{}) {
+				totalToPay += float64(*energyDevice.TotalToPay)
+			}
+			pdf.CellFormat(0, 10, fmt.Sprintf("%s %s", utils.GetCurrencySymbol(data.Currency), utils.FormatNumber(totalToPay)), "", 0, "L", false, 0, "")
+
+			// Como pagar su factura
+
+			pdf.SetFont("Arial", "B", 10)
+			pdf.SetTextColor(100, 100, 100)
+			pdf.Ln(15)
+			pdf.SetXY(23, 160)
+			pdf.CellFormat(0, 10, tr("Cómo Pagar Su Factura"), "", 0, "L", false, 0, "")
+			pdf.SetLineWidth(0.5)
+			pdf.Line(23, 170, 180, 170)
+			// line width
+			pdf.SetFont("Arial", "", 10)
+			pdf.SetTextColor(80, 80, 80)
+			pdf.SetXY(23, 175)
+			pdf.MultiCell(0, 10, tr("Puede pagar su factura en línea o en persona o contacte a nuestro equipo de soporte para obtener ayuda."), "", "L", false)
+			pdf.SetXY(23, 210)
+			pdf.SetFont("Arial", "B", 10)
+			pdf.SetTextColor(100, 100, 100)
+			pdf.CellFormat(0, 10, tr("Soporte"), "", 0, "L", false, 0, "")
+			pdf.SetLineWidth(0.5)
+			pdf.Line(23, 220, 180, 220)
+			pdf.SetFont("Arial", "", 10)
+			pdf.SetTextColor(80, 80, 80)
+			pdf.SetXY(23, 220)
+			pdf.MultiCell(0, 10, tr("Si tiene alguna pregunta o necesita ayuda, no dude en ponerse en contacto con nuestro equipo de soporte."), "", "L", false)
+
+			for _, device := range *asset.Relations {
+				pdf.AddPage()
+				unit := utils.GetUnitByDeviceType(device.Type, data.Units)
+				rate := utils.GetRateByDeviceType(device.Type, data.Rate)
+				chartName = DeviceTypePdf(pdf, device, data, rate, unit)
 			}
 
 			pdfFileName := fmt.Sprintf("%s-%s.pdf", uniqueID, strings.Join(strings.Split(asset.Name, " "), "-"))
@@ -244,7 +244,7 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 	if _, err := os.Stat("img"); os.IsNotExist(err) {
 		os.Mkdir("img", os.ModePerm)
 	}
-	var chartName string = fmt.Sprintf("./img/grafica-%s.png", strings.ToLower(strings.ReplaceAll(device.Label, " ", "-")))
+	var chartName string = fmt.Sprintf("./img/grafica-%s.png", strings.ToLower(strings.ReplaceAll(*device.Label, " ", "-")))
 	parseStartDate := time.UnixMilli(data.StartDateTs).Format("02/01/2006")
 	parseEndDate := time.UnixMilli(data.EndDateTs).Format("02/01/2006")
 	tr := pdf.UnicodeTranslatorFromDescriptor("")

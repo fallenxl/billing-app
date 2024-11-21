@@ -36,6 +36,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select"
+import { Skeleton } from "./skeleton"
 
 interface DataTableProps<T> {
     data: T[]
@@ -43,9 +44,10 @@ interface DataTableProps<T> {
     searchPlaceholder?: string,
     showColumns?: boolean,
     children?: React.ReactNode,
-    setSelectedRows?: (rows: T[]) => void
+    setSelectedRows?: (rows: T[]) => void,
+    isLoading?: boolean
 }
-export function DataTable<T>({ data, columns, searchPlaceholder, showColumns = true, children, setSelectedRows }: DataTableProps<T>) {
+export function DataTable<T>({ data, columns, searchPlaceholder, showColumns = true, children, setSelectedRows, isLoading }: DataTableProps<T>) {
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
         []
@@ -74,16 +76,20 @@ export function DataTable<T>({ data, columns, searchPlaceholder, showColumns = t
             rowSelection,
         },
     })
+
     const [rowLimit, setRowLimit] = React.useState(10)
+
     React.useEffect(() => {
         table.setPageSize(rowLimit)
     }, [rowLimit, table])
 
     React.useEffect(() => {
-        if(setSelectedRows){
+        if (setSelectedRows) {
             setSelectedRows(table.getSelectedRowModel().rows.map((row) => row.original) as T[])
         }
     }, [table.getSelectedRowModel().rows])
+
+
     return (
         <div className="w-full">
             <div className="flex flex-col lg:flex-row  lg:items-end py-4 gap-4 w-full">
@@ -95,7 +101,7 @@ export function DataTable<T>({ data, columns, searchPlaceholder, showColumns = t
                             setGlobalFilter(event.target.value)
                         }
                         className="w-full md:min-w-[200px]"
-                        
+
                     />
                     <Select
                         value={rowLimit.toString()}
@@ -165,7 +171,7 @@ export function DataTable<T>({ data, columns, searchPlaceholder, showColumns = t
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {table.getRowModel().rows?.length ? (
+                        {(!isLoading && table.getRowModel().rows?.length > 0)&& (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
                                     key={row.id}
@@ -181,7 +187,9 @@ export function DataTable<T>({ data, columns, searchPlaceholder, showColumns = t
                                     ))}
                                 </TableRow>
                             ))
-                        ) : (
+                        )}
+
+                        {(!isLoading && table.getRowModel().rows.length === 0) && (
                             <TableRow>
                                 <TableCell
                                     colSpan={columns.length}
@@ -190,6 +198,18 @@ export function DataTable<T>({ data, columns, searchPlaceholder, showColumns = t
                                     No results.
                                 </TableCell>
                             </TableRow>
+                        )}
+
+                        {isLoading && (
+                            <>
+                                {Array.from({ length: rowLimit }).map((_, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell colSpan={columns.length}>
+                                            <Skeleton className="h-8 w-full" />
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </>
                         )}
                     </TableBody>
                 </Table>

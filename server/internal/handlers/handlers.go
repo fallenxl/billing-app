@@ -31,12 +31,11 @@ func NewRouter() http.Handler {
 	protectedRoutes.HandleFunc("/customer/{customerId}/relation", GetCustomerRelationById).Methods("GET")
 	protectedRoutes.HandleFunc("/assets/{assetId}/relation", GetAssetRelationById).Methods("GET")
 	protectedRoutes.HandleFunc("/assets/{assetId}/attributes", SetAssetAttributes).Methods("POST")
-	protectedRoutes.HandleFunc("/assets", UpdateBranchName).Methods("POST")
-	protectedRoutes.HandleFunc("/assets", UpdateBranchName).Methods("POST")
+	protectedRoutes.HandleFunc("/assets/update-name", UpdateBranchName).Methods("PATCH")
 	protectedRoutes.HandleFunc("/data/export", HandleDataExport).Methods("POST")
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"}, // Permitir todos los orígenes
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type", "Authorization"},
 		AllowCredentials: true,
 	})

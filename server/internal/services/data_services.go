@@ -63,75 +63,47 @@ func HandleDataService(data models.DataDTO, token string) (models.ExportedData, 
 	exportedData.EndDateTs = data.EndDateTs
 
 	for _, entity := range data.SelectedDevices {
-		switch entity.EntityType {
-		case "DEVICE":
-			var deviceData models.DeviceData
-			deviceInfo, err := GetDeviceById(entity.Id, entity.EntityType, token)
-			if err != nil {
-				continue
-			}
-			// telemetry := GetDeviceTelemetryById(entity.Id, entity.EntityType, deviceInfo.Type, data.StartDateTs, data.EndDateTs, 0, "", token)
-			diff := data.EndDateTs - data.StartDateTs
-			firstTelemetry := GetDeviceTelemetryById(entity.Id, entity.EntityType, deviceInfo.Type, data.StartDateTs, data.EndDateTs, diff, "", "MIN", token)
-			lastTelemetry := GetDeviceTelemetryById(entity.Id, entity.EntityType, deviceInfo.Type, data.StartDateTs, data.EndDateTs, diff, "", "MAX", token)
-			parseTelemetry := ParseDataService(firstTelemetry, lastTelemetry, data.Rate, deviceInfo.Type)
-			telemetry := GetDeviceTelemetryById(entity.Id, entity.EntityType, deviceInfo.Type, data.StartDateTs, data.EndDateTs, resolution, "", "SUM", token)
-			deviceData.Name = deviceInfo.Name
-			deviceData.Label = deviceInfo.Label
-			deviceData.Type = deviceInfo.Type
-			deviceData.Id = deviceInfo.Id.Id
-			deviceData.EntityType = deviceInfo.Id.EntityType
-			deviceData.Telemetry = &telemetry.Data
-			deviceData.PreviousMonth = &parseTelemetry.PreviousMonth
-			deviceData.CurrentMonth = &parseTelemetry.CurrentMonth
-			deviceData.TotalConsumed = &parseTelemetry.TotalConsumed
-			deviceData.TotalToPay = &parseTelemetry.TotalToPay
-			exportedData.Relations = append(exportedData.Relations, deviceData)
-		case "ASSET":
-			var assetData models.DeviceData
-			assetData.Id = entity.Id
-			assetData.EntityType = entity.EntityType
-			assetData.Name = entity.ToName
-			assetData.Label = entity.Label
-			assetData.Type = entity.Type
-			assetData.Telemetry = &map[string][]models.Data{}
-			assetRelations, err := GetAssetRelationsByID(entity.Id, entity.EntityType, token)
-			assetData.Relations = &[]models.DeviceData{}
-			if err != nil {
-				continue
-			}
-			assetRelationsAgrouped := GroupRelationsByName(assetRelations)
-			for _, relation := range assetRelationsAgrouped {
-				for _, device := range relation {
-					if device.EntityType == "DEVICE" {
-						diff := data.EndDateTs - data.StartDateTs
-						firstTelemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, diff, "", "MIN", token)
-						lastTelemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, diff, "", "MAX", token)
-						parseTelemetry := ParseDataService(firstTelemetry, lastTelemetry, data.Rate, device.Type)
-						telemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, resolution, "", "SUM", token)
-						deviceData := models.DeviceData{
-							Id:            device.Id,
-							EntityType:    device.EntityType,
-							Name:          device.Name,
-							Label:         device.Label,
-							Type:          device.Type,
-							Telemetry:     &telemetry.Data,
-							PreviousMonth: &parseTelemetry.PreviousMonth,
-							CurrentMonth:  &parseTelemetry.CurrentMonth,
-							TotalConsumed: &parseTelemetry.TotalConsumed,
-							TotalToPay:    &parseTelemetry.TotalToPay,
-						}
-						*assetData.Relations = append(*assetData.Relations, deviceData)
-					}
+		var assetData models.DeviceData
+		assetData.Id = entity.Id
+		assetData.EntityType = entity.EntityType
+		assetData.Name = entity.ToName
+		assetData.Label = entity.Label
+		assetData.Type = entity.Type
+		assetData.Telemetry = &map[string][]models.Data{}
+		assetRelations, err := GetAssetRelationsByID(entity.Id, entity.EntityType, token)
+		assetData.Relations = &[]models.DeviceData{}
+		if err != nil {
+			continue
+		}
+		assetRelationsAgrouped := GroupRelationsByName(assetRelations)
+		for _, relation := range assetRelationsAgrouped {
+			for _, device := range relation {
+				diff := data.EndDateTs - data.StartDateTs
+				firstTelemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, diff, "", "MIN", token)
+				lastTelemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, diff, "", "MAX", token)
+				parseTelemetry := ParseDataService(firstTelemetry, lastTelemetry, data.Rate, device.Type)
+				telemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, resolution, "", "SUM", token)
 
+				deviceData := models.DeviceData{
+					Id:            device.Id,
+					EntityType:    device.EntityType,
+					Name:          device.Name,
+					Label:         device.Label,
+					Type:          device.Type,
+					Telemetry:     &telemetry.Data,
+					PreviousMonth: &parseTelemetry.PreviousMonth,
+					CurrentMonth:  &parseTelemetry.CurrentMonth,
+					TotalConsumed: &parseTelemetry.TotalConsumed,
+					TotalToPay:    &parseTelemetry.TotalToPay,
 				}
+				*assetData.Relations = append(*assetData.Relations, deviceData)
+
 			}
 
 			exportedData.Relations = append(exportedData.Relations, assetData)
 		}
 
 	}
-
 	return exportedData, nil
 }
 
@@ -145,10 +117,10 @@ func GroupRelationsByName(relations []models.AssetRelationResponse) map[string][
 		if _, ok := relationsAgrouped[prefix]; ok {
 			relationsAgrouped[relation.ToName] = append(relationsAgrouped[prefix], models.DeviceData{
 				Label:      relation.Label,
-				Type:       relation.Type,
 				Id:         relation.To.Id,
 				EntityType: relation.To.EntityType,
 				Name:       relation.ToName,
+				Type:       relation.Type,
 			})
 		} else {
 			relationsAgrouped[prefix] = []models.DeviceData{
@@ -156,9 +128,9 @@ func GroupRelationsByName(relations []models.AssetRelationResponse) map[string][
 
 					Name:       relation.ToName,
 					Label:      relation.Label,
-					Type:       relation.Type,
 					Id:         relation.To.Id,
 					EntityType: relation.To.EntityType,
+					Type:       relation.Type,
 				},
 			}
 		}

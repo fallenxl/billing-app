@@ -54,9 +54,10 @@ func GetDeviceTelemetryById(id string, entityType string, deviceType string, sta
 	if key == "" {
 		key = getKeysByDeviceType(deviceType, agg)
 	}
-	telemetryPath := fmt.Sprintf("plugins/telemetry/%s/%s/values/timeseries?keys=%s&startTs=%d&endTs=%d&limit=50000&interval=%d&agg=%s&orderBy=ASC&useStrictDataTypes=false", entityType, id, key, startDate, endDate, resolution, agg)
-	response, err := utils.Request(config.ThingsboardApiURL+telemetryPath, "GET", "", token)
+	telemetryPath := fmt.Sprintf("%splugins/telemetry/%s/%s/values/timeseries?keys=%s&startTs=%d&endTs=%d&limit=50000&interval=%d&agg=%s&orderBy=ASC&useStrictDataTypes=false", config.ThingsboardApiURL, entityType, id, key, startDate, endDate, resolution, agg)
+	response, err := utils.Request(telemetryPath, "GET", "", token)
 	if err != nil {
+
 		return models.Telemetry{}
 	}
 	var telemetry models.Telemetry
