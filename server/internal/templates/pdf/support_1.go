@@ -26,8 +26,12 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 	parseEndDate := time.UnixMilli(data.EndDateTs).Format("02/01/2006")
 	// generate a random number between 1000 and 9999
 	uniqueID := strconv.Itoa(utils.GenerateRandomNumber(1000, 9999))
+	// if not exist folder zips create
+	if _, err := os.Stat("zips"); os.IsNotExist(err) {
+		os.Mkdir("zips", os.ModePerm)
+	}
 
-	filename = fmt.Sprintf("%s-%s", uniqueID, filename)
+	filename = fmt.Sprintf("zips/%s-%s", uniqueID, filename)
 	zipFile, err := os.Create(filename)
 	if err != nil {
 		return "", err
@@ -40,8 +44,6 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 	var wg sync.WaitGroup
 	errChan := make(chan error, len(data.Relations))
 	var mu sync.Mutex
-	dataJson, _ := json.Marshal(data)
-	fmt.Println(string(dataJson))
 	for _, asset := range data.Relations {
 		wg.Add(1)
 
@@ -168,7 +170,8 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 				chartName = DeviceTypePdf(pdf, device, data, rate, unit)
 			}
 
-			pdfFileName := fmt.Sprintf("%s-%s.pdf", uniqueID, strings.Join(strings.Split(asset.Name, " "), "-"))
+			// Save the pdf file in the zips folder
+			pdfFileName := fmt.Sprintf("zips/%s-%s.pdf", uniqueID, strings.Join(strings.Split(asset.Name, " "), "-"))
 			err := pdf.OutputFileAndClose(pdfFileName)
 			if err != nil {
 				errChan <- err
@@ -211,13 +214,13 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 				}
 			}
 
-			// Verifica y elimina el archivo PDF
-			if _, err := os.Stat(pdfFileName); err == nil {
-				err = os.Remove(pdfFileName)
-				if err != nil {
-					fmt.Println("Error al eliminar el archivo PDF:", pdfFileName, err)
-				}
-			}
+			// // Verifica y elimina el archivo PDF
+			// if _, err := os.Stat(pdfFileName); err == nil {
+			// 	err = os.Remove(pdfFileName)
+			// 	if err != nil {
+			// 		fmt.Println("Error al eliminar el archivo PDF:", pdfFileName, err)
+			// 	}
+			// }
 		}(asset)
 
 	}

@@ -1,4 +1,6 @@
 tmp
-**/**/img
-**/**/assets/customers
+**/img
+**/assets/customers
 **/scripts
+
+**/zips

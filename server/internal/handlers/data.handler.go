@@ -37,7 +37,8 @@ func HandleDataExport(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	defer os.Remove(filename) // Asegúrate de eliminar el archivo al final
+	// remove zips folder
+	defer os.RemoveAll("zips")
 
 	// Ahora que el archivo está listo, proceder con la respuesta HTTP para la descarga
 	w.Header().Set("Content-Disposition", "attachment; filename="+filename)

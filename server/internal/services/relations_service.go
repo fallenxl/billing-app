@@ -2,7 +2,6 @@ package services
 
 import (
 	"encoding/json"
-	"fmt"
 	"server/internal/config"
 	"server/internal/models"
 	"server/internal/utils"
@@ -116,8 +115,6 @@ func UpdateBranchName(token string, body models.NameUpdate) (string, error) {
 		return "", err
 	}
 	_, err = utils.Request(config.ThingsboardApiURL+"asset", "POST", string(bodyJSON), token)
-	fmt.Println(err)
-	fmt.Println(string(bodyJSON))
 	if err != nil {
 		return "", err
 	}
