@@ -244,7 +244,8 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 	if _, err := os.Stat("img"); os.IsNotExist(err) {
 		os.Mkdir("img", os.ModePerm)
 	}
-	var chartName string = fmt.Sprintf("./img/grafica-%s.png", strings.ToLower(strings.ReplaceAll(*device.Label, " ", "-")))
+	var chartName string = fmt.Sprintf("./img/grafica-%s.png", strings.ToLower(device.Name))
+
 	parseStartDate := time.UnixMilli(data.StartDateTs).Format("02/01/2006")
 	parseEndDate := time.UnixMilli(data.EndDateTs).Format("02/01/2006")
 	tr := pdf.UnicodeTranslatorFromDescriptor("")
@@ -289,7 +290,7 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 
 	}
 
-	pdf.Cell(0, 10, fmt.Sprintf("%s Total %s", utils.FormatNumber(*device.PreviousMonth), unit))
+	pdf.Cell(0, 10, fmt.Sprintf("%s Total %s", utils.FormatNumber(*device.PreviousMonth), tr(unit)))
 	pdf.Ln(5)
 	pdf.SetFont("Arial", "", 8)
 	pdf.Cell(0, 10, fmt.Sprintf("( %s )", firstReading))
@@ -299,7 +300,7 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 	pdf.Cell(0, 10, tr("Fin de Lectura"))
 	pdf.Ln(5)
 	pdf.SetTextColor(80, 80, 80)
-	pdf.Cell(0, 10, fmt.Sprintf("%s Total %s", utils.FormatNumber(*device.CurrentMonth), unit))
+	pdf.Cell(0, 10, fmt.Sprintf("%s Total %s", utils.FormatNumber(*device.CurrentMonth), tr(unit)))
 	pdf.Ln(5)
 	pdf.SetFont("Arial", "", 8)
 	pdf.Cell(0, 10, fmt.Sprintf("( %s )", lastReading))
@@ -311,9 +312,9 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 	pdf.Cell(0, 10, "Costo de Uso Total")
 	pdf.SetXY(120, 60)
 
-	pdf.Cell(0, 10, fmt.Sprintf("@ %s%.3f / Total %s", utils.GetCurrencySymbol(data.Currency), rate, unit))
+	pdf.Cell(0, 10, fmt.Sprintf("@ %s%.3f / Total %s", utils.GetCurrencySymbol(data.Currency), rate, tr(unit)))
 	pdf.SetXY(120, 70)
-	pdf.MultiCell(0, 10, fmt.Sprintf("%s Total %s X", utils.FormatNumber(*device.TotalConsumed), unit), "", "L", false)
+	pdf.MultiCell(0, 10, fmt.Sprintf("%s Total %s X", utils.FormatNumber(*device.TotalConsumed), tr(unit)), "", "L", false)
 	pdf.SetXY(120, 75)
 	pdf.Cell(0, 10, fmt.Sprintf("%s %.2f", utils.GetCurrencySymbol(data.Currency), rate))
 	pdf.SetXY(170, 70)
@@ -359,7 +360,7 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 	pdf.SetXY(20, 155)
 	pdf.SetFont("Arial", "", 10)
 	pdf.SetTextColor(80, 80, 80)
-	pdf.Cell(0, 10, fmt.Sprintf("Total %s", unit))
+	pdf.Cell(0, 10, fmt.Sprintf("Total %s", tr(unit)))
 	pdf.SetTextColor(150, 150, 150)
 	pdf.SetFont("Arial", "", 9)
 	pdf.SetXY(90, 155)
@@ -374,6 +375,9 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 		days := time.UnixMilli(deviceTelemetry[len(deviceTelemetry)-1].Ts).Sub(time.UnixMilli(deviceTelemetry[0].Ts).AddDate(0, 0, 0)).Hours() / 24
 		weeks := days / 7
 		months := days / 30
+		if days < 1 {
+			days = 1
+		}
 		if days < 7 {
 			weeks = 1
 		}

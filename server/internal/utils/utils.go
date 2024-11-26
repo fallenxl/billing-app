@@ -205,9 +205,11 @@ func GetUnitByDeviceType(deviceType string, units map[string]interface{}) string
 			return "m³"
 		}
 		unitStr, ok := unit.(string)
+
 		if !ok {
-			return "m³" // Valor por defecto si no es string
+			return "m\u00B3" // Valor por defecto si no es string
 		}
+
 		return unitStr
 	}
 

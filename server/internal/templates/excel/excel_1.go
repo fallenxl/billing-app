@@ -155,7 +155,12 @@ func CreateExcel(filename string, exportedData models.ExportedData) (string, err
 			for _, entity := range exportedData.Relations {
 				for _, relation := range *entity.Relations {
 					if strings.Contains(strings.ToLower(relation.Type), "energy meter") {
-						f.SetCellValue(sheet, fmt.Sprintf("A%d", row), *relation.Label)
+						// f.SetCellValue(sheet, fmt.Sprintf("A%d", row), *relation.Label)
+						if entity.Label != nil {
+							f.SetCellValue(sheet, fmt.Sprintf("A%d", row), *entity.Label)
+						} else {
+							f.SetCellValue(sheet, fmt.Sprintf("A%d", row), entity.Name)
+						}
 						f.SetCellStyle(sheet, fmt.Sprintf("A%d", row), fmt.Sprintf("F%d", row), rowStyle)
 						f.SetCellValue(sheet, fmt.Sprintf("B%d", row), *relation.PreviousMonth)
 						f.SetCellValue(sheet, fmt.Sprintf("C%d", row), *relation.CurrentMonth)
@@ -189,7 +194,13 @@ func CreateExcel(filename string, exportedData models.ExportedData) (string, err
 			for _, entity := range exportedData.Relations {
 				for _, relation := range *entity.Relations {
 					if strings.Contains(strings.ToLower(relation.Type), "water meter") {
-						f.SetCellValue(sheet, fmt.Sprintf("A%d", row), *relation.Label)
+						// f.SetCellValue(sheet, fmt.Sprintf("A%d", row), *relation.Label)
+						if entity.Label != nil {
+							f.SetCellValue(sheet, fmt.Sprintf("A%d", row), *entity.Label)
+						} else {
+							f.SetCellValue(sheet, fmt.Sprintf("A%d", row), entity.Name)
+						}
+
 						f.SetCellStyle(sheet, fmt.Sprintf("A%d", row), fmt.Sprintf("F%d", row), rowStyle)
 						f.SetCellValue(sheet, fmt.Sprintf("B%d", row), *relation.PreviousMonth)
 						f.SetCellValue(sheet, fmt.Sprintf("C%d", row), *relation.CurrentMonth)

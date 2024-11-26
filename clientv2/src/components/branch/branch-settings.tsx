@@ -281,6 +281,9 @@ export function BranchSettings({ }) {
                 if (!prevSettings) return prevSettings;
                 const subSettings = prevSettings[key as keyof IBranchSettings];
                 if (typeof subSettings === 'object' && subSettings !== null) {
+                    if(subKey === "energy" || subKey === "water" || subKey === "gas" || subKey === "air"){
+                        return { ...prevSettings, [key]: { ...subSettings, [subKey]: parseFloat(value) } };
+                    }
                     return { ...prevSettings, [key]: { ...subSettings, [subKey]: value } };
                 }
                 return prevSettings;

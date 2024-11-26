@@ -55,7 +55,7 @@ export default function CustomerPage() {
             getBranchRelationsById(branch.id).then((response) => {
                 setIsLoading(false)
                 if (response.success) {
-                    console.log(response.data)
+                    console.log(response.data??[])
                     setBranchRelations(response.data)
                 } else {
                     const urlSearchParams = new URLSearchParams(window.location.search)

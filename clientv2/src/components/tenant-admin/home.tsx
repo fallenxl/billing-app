@@ -49,7 +49,7 @@ export function TenantHome() {
                     <Skeleton key={n} className="h-36 w-full md:w-[300px]" />
                 ))}
                 {(filteredCustomers.length > 0 && !isLoading) ? filteredCustomers.map((customer: any, index: number) => (
-                    <Card key={index} className="py-5 flex items-center justify-center gap-5 cursor-pointer hover:scale-105 duration-300"
+                    <Card key={index} className="py-5 flex items-center justify-center gap-5 cursor-pointer hover:scale-105 duration-300 dark:bg-neutral-900"
                         onClick={() => router.push(`/customer/${customer.id.id}`)}
                     >
                         <CardContent className="p-0">

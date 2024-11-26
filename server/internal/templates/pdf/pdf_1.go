@@ -33,9 +33,9 @@ func CreatePDF(filename string, exportedData models.ExportedData) (string, error
 		pdf.SetFont("Arial", "B", 8) // Headers en bold
 		headers := []string{
 			"Name",
-			fmt.Sprintf("Last Measure (%s)", unit),
-			fmt.Sprintf("Current Measure (%s)", unit),
-			fmt.Sprintf("Total Consumed (%s)", unit),
+			fmt.Sprintf("Last Measure (%s)", tr(unit)),
+			fmt.Sprintf("Current Measure (%s)", tr(unit)),
+			fmt.Sprintf("Total Consumed (%s)", tr(unit)),
 			"Rate",
 			"Total to Pay",
 		}
@@ -80,15 +80,15 @@ func CreatePDF(filename string, exportedData models.ExportedData) (string, error
 			unit := utils.GetUnitByDeviceType("energy meter", exportedData.Units)
 			renderTableHeader(unit, nil)
 			pdf.SetFont("Arial", "", 8) // Restablecer fuente a normal después del header
+
 			for _, entity := range exportedData.Relations {
 				for _, relation := range *entity.Relations {
 					relationType := strings.ToLower(relation.Type)
 					if strings.Contains(relationType, "energy meter") {
-						if relation.Label == nil || *relation.Label == "" {
-							pdf.CellFormat(colWidths[0], 10, tr(relation.Name), "1", 0, "C", false, 0, "")
-						} else {
-							pdf.CellFormat(colWidths[0], 10, tr(*relation.Label), "1", 0, "C", false, 0, "")
-						}
+
+						// fmt.Println(*relation.Label, "relation.Label")
+						pdf.CellFormat(colWidths[0], 10, tr(*entity.Label), "1", 0, "C", false, 0, "")
+
 						pdf.CellFormat(colWidths[1], 10, utils.FormatNumber(*relation.PreviousMonth), "1", 0, "C", false, 0, "")
 						pdf.CellFormat(colWidths[2], 10, utils.FormatNumber(*relation.CurrentMonth), "1", 0, "C", false, 0, "")
 						pdf.CellFormat(colWidths[3], 10, utils.FormatNumber(*relation.TotalConsumed), "1", 0, "C", false, 0, "")
@@ -111,11 +111,7 @@ func CreatePDF(filename string, exportedData models.ExportedData) (string, error
 				for _, relation := range *entity.Relations {
 					relationType := strings.ToLower(relation.Type)
 					if strings.Contains(relationType, "water meter") {
-						if relation.Label == nil || *relation.Label == "" {
-							pdf.CellFormat(colWidths[0], 10, tr(relation.Name), "1", 0, "C", false, 0, "")
-						} else {
-							pdf.CellFormat(colWidths[0], 10, tr(*relation.Label), "1", 0, "C", false, 0, "")
-						}
+						pdf.CellFormat(colWidths[0], 10, tr(*entity.Label), "1", 0, "C", false, 0, "")
 						pdf.CellFormat(colWidths[1], 10, fmt.Sprintf("%.2f", *relation.PreviousMonth), "1", 0, "C", false, 0, "")
 						pdf.CellFormat(colWidths[2], 10, fmt.Sprintf("%.2f", *relation.CurrentMonth), "1", 0, "C", false, 0, "")
 						pdf.CellFormat(colWidths[3], 10, fmt.Sprintf("%.2f", *relation.TotalConsumed), "1", 0, "C", false, 0, "")

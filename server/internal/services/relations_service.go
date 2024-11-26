@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"fmt"
 	"server/internal/config"
 	"server/internal/models"
 	"server/internal/utils"
@@ -43,23 +44,18 @@ func GetAssetRelationsByID(id string, entityType string, token string) ([]models
 			assetAttributes, _ := GetAssetAttributesService(token, relations[i].To.Id, relations[i].To.EntityType)
 			relations[i].EntityType = relations[i].To.EntityType
 			relations[i].Id = relations[i].To.Id
-			relations[i].Label = &deviceInfo.Label
 			attributeMap := map[string]func(interface{}){
-				"address": func(value interface{}) { address := value.(string); relations[i].Address = &address },
-				"phone":   func(value interface{}) { phone := value.(string); relations[i].Phone = &phone },
-				"email":   func(value interface{}) { email := value.(string); relations[i].Email = &email },
-				
+				"address":       func(value interface{}) { address := value.(string); relations[i].Address = &address },
+				"phone":         func(value interface{}) { phone := value.(string); relations[i].Phone = &phone },
+				"email":         func(value interface{}) { email := value.(string); relations[i].Email = &email },
+				"buildingOwner": func(value interface{}) { buildingOwner := value.(string); relations[i].BuildingOwner = &buildingOwner },
+				"latitude":      func(value interface{}) { latitude := value.(float64); relations[i].Latitude = &latitude },
+				"longitude":     func(value interface{}) { longitude := value.(float64); relations[i].Longitude = &longitude },
 			}
 			for key, assignFunc := range attributeMap {
 				utils.AssignAttributeIfExists(assetAttributes, key, assignFunc)
 			}
 			if relations[i].EntityType == "DEVICE" {
-
-				if deviceInfo.Label == "" {
-					relations[i].Label = &deviceInfo.Name
-				} else {
-					relations[i].Label = &deviceInfo.Label
-				}
 				relations[i].Type = deviceInfo.Type
 			}
 			aggregatedRelations = append(aggregatedRelations, relations[i])
@@ -120,6 +116,8 @@ func UpdateBranchName(token string, body models.NameUpdate) (string, error) {
 		return "", err
 	}
 	_, err = utils.Request(config.ThingsboardApiURL+"asset", "POST", string(bodyJSON), token)
+	fmt.Println(err)
+	fmt.Println(string(bodyJSON))
 	if err != nil {
 		return "", err
 	}

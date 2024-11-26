@@ -34,7 +34,7 @@ export default function RootLayout({
         >
           <AuthGuard>
             <Navigation />
-            <div className="md:max-w-screen-xl mx-auto py-5 pb-10 w-full px-5 md:px-10 xl:px-0 min-h-[calc(100vh-190px)]">
+            <div className="md:max-w-screen-xl mx-auto py-5 pb-10 w-full px-5 md:px-10 xl:px-0 min-h-[calc(100vh-180.41px)]">
               {children}
             </div>
 

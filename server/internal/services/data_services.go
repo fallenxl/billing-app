@@ -75,67 +75,32 @@ func HandleDataService(data models.DataDTO, token string) (models.ExportedData, 
 		if err != nil {
 			continue
 		}
-		assetRelationsAgrouped := GroupRelationsByName(assetRelations)
-		for _, relation := range assetRelationsAgrouped {
-			for _, device := range relation {
-				diff := data.EndDateTs - data.StartDateTs
-				firstTelemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, diff, "", "MIN", token)
-				lastTelemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, diff, "", "MAX", token)
-				parseTelemetry := ParseDataService(firstTelemetry, lastTelemetry, data.Rate, device.Type)
-				telemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, resolution, "", "SUM", token)
 
-				deviceData := models.DeviceData{
-					Id:            device.Id,
-					EntityType:    device.EntityType,
-					Name:          device.Name,
-					Label:         device.Label,
-					Type:          device.Type,
-					Telemetry:     &telemetry.Data,
-					PreviousMonth: &parseTelemetry.PreviousMonth,
-					CurrentMonth:  &parseTelemetry.CurrentMonth,
-					TotalConsumed: &parseTelemetry.TotalConsumed,
-					TotalToPay:    &parseTelemetry.TotalToPay,
-				}
-				*assetData.Relations = append(*assetData.Relations, deviceData)
-
+		for _, device := range assetRelations {
+			diff := data.EndDateTs - data.StartDateTs
+			firstTelemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, diff, "", "MIN", token)
+			lastTelemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, diff, "", "MAX", token)
+			parseTelemetry := ParseDataService(firstTelemetry, lastTelemetry, data.Rate, device.Type)
+			telemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, resolution, "", "SUM", token)
+			deviceData := models.DeviceData{
+				Id:            device.Id,
+				EntityType:    device.EntityType,
+				Name:          device.ToName,
+				Label:         device.Label,
+				Type:          device.Type,
+				Telemetry:     &telemetry.Data,
+				PreviousMonth: &parseTelemetry.PreviousMonth,
+				CurrentMonth:  &parseTelemetry.CurrentMonth,
+				TotalConsumed: &parseTelemetry.TotalConsumed,
+				TotalToPay:    &parseTelemetry.TotalToPay,
 			}
-
-			exportedData.Relations = append(exportedData.Relations, assetData)
+			*assetData.Relations = append(*assetData.Relations, deviceData)
 		}
+
+		exportedData.Relations = append(exportedData.Relations, assetData)
 
 	}
 	return exportedData, nil
-}
-
-func GroupRelationsByName(relations []models.AssetRelationResponse) map[string][]models.DeviceData {
-	relationsAgrouped := map[string][]models.DeviceData{}
-	for _, relation := range relations {
-		prefix := strings.Split(relation.ToName, "-")[0]
-		if len(strings.Split(relation.ToName, "-")) > 1 {
-			prefix = strings.Split(relation.ToName, "-")[1]
-		}
-		if _, ok := relationsAgrouped[prefix]; ok {
-			relationsAgrouped[relation.ToName] = append(relationsAgrouped[prefix], models.DeviceData{
-				Label:      relation.Label,
-				Id:         relation.To.Id,
-				EntityType: relation.To.EntityType,
-				Name:       relation.ToName,
-				Type:       relation.Type,
-			})
-		} else {
-			relationsAgrouped[prefix] = []models.DeviceData{
-				{
-
-					Name:       relation.ToName,
-					Label:      relation.Label,
-					Id:         relation.To.Id,
-					EntityType: relation.To.EntityType,
-					Type:       relation.Type,
-				},
-			}
-		}
-	}
-	return relationsAgrouped
 }
 
 func HandleFormatExportData(data models.ExportedData, format string) (string, error) {

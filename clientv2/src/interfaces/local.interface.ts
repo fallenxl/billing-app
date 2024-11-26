@@ -14,6 +14,9 @@ export interface ILocal {
     address:string,
     phone: string,
     email: string,
+    buildingOwner: string,
+    latitude: number,
+    longitude: number,
     meters: string
 }
 
@@ -32,4 +35,7 @@ export interface ILocalUpdate {
     address: string,
     phone: string,
     email: string,
+    buildingOwner: string,
+    latitude: number,
+    longitude: number,
 }

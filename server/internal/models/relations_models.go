@@ -24,17 +24,20 @@ type settings struct {
 	Templates *map[string]interface{} `json:"templates"`
 }
 type AssetRelationResponse struct {
-	From       from                    `json:"from"`
-	To         to                      `json:"to"`
-	ToName     string                  `json:"toName"`
-	EntityType string                  `json:"entityType"`
-	Type       string                  `json:"type"`
-	Id         string                  `json:"id"`
-	Label      *string                 `json:"label"`
-	Address    *string                 `json:"address"`
-	Phone      *string                 `json:"phone"`
-	Email      *string                 `json:"email"`
-	Meters     []AssetRelationResponse `json:"meters"`
+	From          from                    `json:"from"`
+	To            to                      `json:"to"`
+	ToName        string                  `json:"toName"`
+	EntityType    string                  `json:"entityType"`
+	Type          string                  `json:"type"`
+	Id            string                  `json:"id"`
+	Label         *string                 `json:"label"`
+	Address       *string                 `json:"address"`
+	Phone         *string                 `json:"phone"`
+	Email         *string                 `json:"email"`
+	BuildingOwner *string                 `json:"buildingOwner"`
+	Latitude      *float64                `json:"latitude"`
+	Longitude     *float64                `json:"longitude"`
+	Meters        []AssetRelationResponse `json:"meters"`
 }
 
 type CustomerRelationResponse struct {
