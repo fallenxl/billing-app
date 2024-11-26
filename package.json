@@ -1,0 +1,12 @@
+{
+  "name": "billing-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/fallenxl/billing-app.git",
+  "author": "FallEn <axlsntz.dev@gmail.com>",
+  "license": "MIT",
+  "description": "Billing application for Lumen Energy Solutions",
+  "scripts": {
+    "deploy-server": "cd ./server && npm run deploy"
+  }
+}
