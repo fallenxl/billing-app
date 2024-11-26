@@ -8,6 +8,8 @@
   },
   "description": "Server-side application",
   "scripts": {
-    "dev": "cd ./cmd/server && air"
+    "dev": "cd ./cmd/server && air",
+    "build": "cd ./cmd/server && go build",
+    "deploy": "pm2 restart billing-server"
   }
 }

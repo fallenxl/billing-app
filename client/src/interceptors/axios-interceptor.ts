@@ -1,10 +1,9 @@
 import axios, { AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios'
-import { getLocalStorageToken } from '../utils/local-storage.utils'
 // import { errorAlertWithTimer } from '../component/alerts/Alerts'
 
 export const AxiosInterceptor = () => {
   const updateHeaders = (config: AxiosRequestConfig) => {
-    const token = getLocalStorageToken()
+    const token = localStorage.getItem('jwt')
     const newHeaders = {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json'
