@@ -45,6 +45,7 @@ func GetAssetRelationsByID(id string, entityType string, token string) ([]models
 			relations[i].Id = relations[i].To.Id
 			attributeMap := map[string]func(interface{}){
 				"address":       func(value interface{}) { address := value.(string); relations[i].Address = &address },
+				"label":         func(value interface{}) { label := value.(string); relations[i].Label = &label },
 				"phone":         func(value interface{}) { phone := value.(string); relations[i].Phone = &phone },
 				"email":         func(value interface{}) { email := value.(string); relations[i].Email = &email },
 				"buildingOwner": func(value interface{}) { buildingOwner := value.(string); relations[i].BuildingOwner = &buildingOwner },
