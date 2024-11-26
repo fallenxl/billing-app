@@ -1,4 +1,4 @@
-package pdf
+package supports
 
 import (
 	"archive/zip"

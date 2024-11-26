@@ -5,6 +5,7 @@ import (
 	"server/internal/models"
 	"server/internal/templates/excel"
 	"server/internal/templates/pdf"
+	"server/internal/templates/supports"
 	"server/internal/utils"
 	"strconv"
 	"strings"
@@ -122,7 +123,7 @@ func HandleFormatExportData(data models.ExportedData, format string) (string, er
 		return filename, nil
 	case "support":
 		filename := fmt.Sprintf("%s-%s.zip", data.Customer, data.Branch)
-		filename, err := pdf.CreateSupportPdf(filename, data)
+		filename, err := supports.CreateSupportPdf(filename, data)
 		if err != nil {
 			return "", err
 		}
