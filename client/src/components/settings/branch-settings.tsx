@@ -7,13 +7,15 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { IBranchSettings } from "@/interfaces";
+import { IBranchSettings, ILocal, ILocalCharges } from "@/interfaces";
+import { updateLocalService } from "@/services";
 import { updateBranchNameService, updateBranchSettingsService } from "@/services/branch.service";
 import { useBranchStore } from "@/stores";
 import { useCustomerStore } from "@/stores/customer-store";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { Settings } from "lucide-react";
-import { useState } from "react";
+import { PlusCircle, Settings, Trash } from "lucide-react";
+import React from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface GeneralSettingsProps {
@@ -248,13 +250,6 @@ function ExportSettings({ branchSettings, handleSettingsChange, setBranchSetting
     )
 }
 
-function AdditionalChargesSettings() {
-    return (
-        <div>
-            <h2>Additional Charges</h2>
-        </div>
-    )
-}
 export function BranchSettings({ }) {
     const [activeOption, setActiveOption] = useState('general');
     const { branch, updateBranch } = useBranchStore(state => state)
@@ -266,6 +261,7 @@ export function BranchSettings({ }) {
         address: branch.address ?? "",
         phone: branch.phone ?? "",
         email: branch.email ?? "",
+        charges: branch.settings.charges ?? [],
         currency: branch.settings.currency ?? "",
         rate: branch.settings.rate ?? { energy: 0, water: 0, gas: 0, air: 0 },
         units: branch.settings.units ?? { energy: "", water: "", gas: "", air: "" },
@@ -303,6 +299,7 @@ export function BranchSettings({ }) {
                 phone: branch.phone ?? "",
                 email: branch.email ?? "",
                 currency: branch.settings.currency ?? "",
+                charges: branch.settings.charges ?? [],
                 rate: branch.settings.rate ?? { energy: 0, water: 0, gas: 0, air: 0 },
                 units: branch.settings.units ?? { energy: "", water: "", gas: "", air: "" },
                 templates: branch.settings.templates ?? { pdf: "", excel: "", support: "" },
@@ -371,7 +368,7 @@ export function BranchSettings({ }) {
                         <ScrollArea className="w-full md:w-3/4 h-[400px] md:h-[500px] border-t md:border-t-0 md:border-l p-2 md:p-10 py-10 overflow-y-auto">
                             {activeOption == 'general' && <GeneralSettings branchSettings={branchSettings} handleSettingsChange={handleSettingsChange} setBranchSettings={setBranchSettings} />}
                             {activeOption == 'export' && <ExportSettings branchSettings={branchSettings} handleSettingsChange={handleSettingsChange} setBranchSettings={setBranchSettings} />}
-                            {activeOption == 'additional' && <AdditionalChargesSettings />}
+                            {/* {activeOption == 'additional' && <AdditionalChargesSettings local={branchSettings!} setBranchSettings={setBranchSettings}/>} */}
                         </ScrollArea>
                     </div>
                     <DialogFooter className="border-t py-2">

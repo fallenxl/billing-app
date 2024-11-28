@@ -1,3 +1,10 @@
+
+export interface ILocalCharges {
+    name: string,
+    description: string,
+    amount: number | string,
+    type?: "fixed" | "variable",
+}
 export interface ILocal {
     entityType: string,
     from: {
@@ -11,12 +18,13 @@ export interface ILocal {
     id: string,
     label: string,
     toName: string,
-    address:string,
+    address: string,
     phone: string,
     email: string,
     buildingOwner: string,
     latitude: number,
     longitude: number,
+    charges: ILocalCharges[],
     meters: string
 }
 
@@ -38,4 +46,5 @@ export interface ILocalUpdate {
     buildingOwner: string,
     latitude: number,
     longitude: number,
+    charges: ILocalCharges[],
 }

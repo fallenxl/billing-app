@@ -3,6 +3,7 @@ package supports
 import (
 	"fmt"
 	"image"
+	"log"
 	"math"
 	"os"
 	"server/internal/models"
@@ -12,7 +13,41 @@ import (
 	"time"
 
 	"github.com/jung-kurt/gofpdf/v2"
+	"gopkg.in/gomail.v2"
 )
+
+func SendEmailService(from string, to string, subject string, body string, pdfPath string) error {
+	// Configuración de la cuenta de Gmail
+	smtpHost := "smtp.gmail.com"
+	smtpPort := 587
+	senderEmail := "axl.santos@lumenenergysolutions.com"
+	senderPassword := "ylxw acpq hqov jmup" // Cambia esto por tu contraseña o App Password
+
+	// Crear el mensaje
+	m := gomail.NewMessage()
+	fmt.Println("From: ", from)
+	m.SetHeader("From", fmt.Sprintf("%s <%s>", from, "info@lumenenergysolutions.com"))
+	m.SetHeader("To", to)
+	m.SetHeader("Subject", subject)
+	m.SetBody("text/html", body)
+
+	// Adjuntar el archivo PDF
+	if pdfPath != "" {
+		m.Attach(pdfPath)
+	}
+
+	// Conexión al servidor SMTP
+	d := gomail.NewDialer(smtpHost, smtpPort, senderEmail, senderPassword)
+
+	// Enviar el correo
+	if err := d.DialAndSend(m); err != nil {
+		log.Printf("Error al enviar el correo: %v", err)
+		return err
+	}
+
+	log.Println("Correo enviado exitosamente")
+	return nil
+}
 
 func AddHeader(pdf *gofpdf.Fpdf, data models.ExportedData) {
 	const maxImgWidth = 20  // Ancho máximo de la imagen

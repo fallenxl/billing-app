@@ -10,6 +10,7 @@ type DataDTO struct {
 	Rate            map[string]interface{}  `json:"rate"`
 	Units           map[string]interface{}  `json:"units"`
 	Currency        string                  `json:"currency"`
+	SendEmail       bool                    `json:"sendEmail"`
 	SelectedDevices []AssetRelationResponse `json:"selectedDevices"`
 }
 
@@ -29,7 +30,14 @@ type ExportedData struct {
 	Currency    string                 `json:"currency"` // Moneda
 	StartDateTs int64                  `json:"startDate"`
 	EndDateTs   int64                  `json:"endDate"`
+	SendEmail   bool                   `json:"sendEmail"`
 	Relations   []DeviceData           `json:"relations"`
+}
+
+type Charges struct {
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Amount      float64 `json:"amount"`
 }
 
 type DeviceData struct {
@@ -38,6 +46,8 @@ type DeviceData struct {
 	Name          string             `json:"name"`  // Nombre
 	Label         *string            `json:"label"` // Etiqueta
 	Type          string             `json:"type"`
+	Email         *string            `json:"email"`
+	Charges       *[]interface{}     `json:"charges"`
 	Relations     *[]DeviceData      `json:"relations"`     // Relaciones
 	Telemetry     *map[string][]Data `json:"telemetry"`     // Telemetria
 	PreviousMonth *float64           `json:"previousMonth"` // Mes Anterior

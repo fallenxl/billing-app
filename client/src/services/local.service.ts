@@ -11,9 +11,8 @@ export async function getSiteService({ id }: { id: string }) {
     }
 }
 
-export async function updateLocalService({ id, data }: { id: string, data: ILocalUpdate }) {
+export async function updateLocalService({ id, data }: { id: string, data: Partial<ILocalUpdate> }) {
     try {
-        console.log(data)
         const response = await axios.post(`${config.API}/assets/${id}/attributes`, data);
  
         return { success: true, data: response.data, message: "Branch settings updated successfully" };

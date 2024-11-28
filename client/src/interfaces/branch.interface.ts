@@ -1,3 +1,5 @@
+import { ILocalCharges } from "./local.interface"
+
 export interface IBranch {
     entityType: string,
     from: {
@@ -15,7 +17,9 @@ export interface IBranch {
     address:string,
     phone: string,
     email: string,
+
     settings: {
+        charges?:ILocalCharges[],
         currency: string,
         rate: {
             energy: number,
@@ -53,6 +57,7 @@ export interface IBranchSettings {
     phone: string,
     email: string,
     currency: string,
+    charges: ILocalCharges[],
     rate: {
         energy: number,
         water: number,

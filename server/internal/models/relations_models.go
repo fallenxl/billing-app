@@ -37,6 +37,7 @@ type AssetRelationResponse struct {
 	BuildingOwner *string                 `json:"buildingOwner"`
 	Latitude      *float64                `json:"latitude"`
 	Longitude     *float64                `json:"longitude"`
+	Charges       *[]interface{}          `json:"charges"`
 	Meters        []AssetRelationResponse `json:"meters"`
 }
 

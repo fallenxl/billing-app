@@ -9,6 +9,7 @@ import (
 	"server/internal/utils"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gocolly/colly"
 )
@@ -55,6 +56,7 @@ func HandleDataService(data models.DataDTO, token string) (models.ExportedData, 
 	var exportedData models.ExportedData
 	resolution := utils.GetResolution(data.StartDateTs, data.EndDateTs)
 	exportedData.Img = data.Img
+	exportedData.SendEmail = data.SendEmail
 	exportedData.Customer = data.Customer
 	exportedData.Branch = data.Branch
 	exportedData.Rate = data.Rate
@@ -63,6 +65,10 @@ func HandleDataService(data models.DataDTO, token string) (models.ExportedData, 
 	exportedData.StartDateTs = data.StartDateTs
 	exportedData.EndDateTs = data.EndDateTs
 
+	// ver hora de inicio y fin ya parseada en formato de fecha
+	fmt.Println("Start Date: ", time.UnixMilli(data.StartDateTs).AddDate(0, 0, 0).Format("02/01/2006"))
+	fmt.Println("End Date: ", time.UnixMilli(data.EndDateTs).AddDate(0, 0, 0).Format("02/01/2006"))
+
 	for _, entity := range data.SelectedDevices {
 		var assetData models.DeviceData
 		assetData.Id = entity.Id
@@ -70,6 +76,8 @@ func HandleDataService(data models.DataDTO, token string) (models.ExportedData, 
 		assetData.Name = entity.ToName
 		assetData.Label = entity.Label
 		assetData.Type = entity.Type
+		assetData.Charges = entity.Charges
+		assetData.Email = entity.Email
 		assetData.Telemetry = &map[string][]models.Data{}
 		assetRelations, err := GetAssetRelationsByID(entity.Id, entity.EntityType, token)
 		assetData.Relations = &[]models.DeviceData{}
@@ -80,6 +88,7 @@ func HandleDataService(data models.DataDTO, token string) (models.ExportedData, 
 		for _, device := range assetRelations {
 			diff := data.EndDateTs - data.StartDateTs
 			firstTelemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, diff, "", "MIN", token)
+			fmt.Println("resolution: ", resolution)
 			lastTelemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, diff, "", "MAX", token)
 			parseTelemetry := ParseDataService(firstTelemetry, lastTelemetry, data.Rate, device.Type)
 			telemetry := GetDeviceTelemetryById(device.Id, device.EntityType, device.Type, data.StartDateTs, data.EndDateTs, resolution, "", "SUM", token)

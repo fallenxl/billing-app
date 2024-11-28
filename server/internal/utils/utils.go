@@ -143,12 +143,12 @@ func ParseDate(date int64) string {
 
 func GetResolution(startDate int64, endDate int64) int64 {
 	diff := endDate - startDate
-	// if the difference is less than 1 day
-	if diff <= 86400000 {
-		return 3600000
+	if diff <= 604800000 {
+		return 86400000
 	}
 	// if the difference is less than 1 month, RESOLUTION_PER_day
 	if diff <= 2764740000 {
+
 		return 86400000 * 7
 	}
 

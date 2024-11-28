@@ -1,5 +1,5 @@
 "use client"
-import { TenantHome } from "@/components/tenant-admin/home"
+import { TenantHome } from "@/components/homes/tenant-home"
 import { useUserStore } from "@/stores"
 import CustomerPage from "./customer/[id]/page"
 

@@ -97,38 +97,56 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 			pdf.SetXY(pdf.GetX(), 100)
 
 			if energyDevice != (models.DeviceData{}) {
-				pdf.Image("./assets/icon-power.png", 51.5, 81, 13, 0, false, "", 0, "")
-				// total energy charges
 				pdf.SetFont("Arial", "", 11)
 				pdf.SetTextColor(100, 100, 100)
-				pdf.SetXY(70, 82)
+				pdf.SetXY(50, 80)
 				pdf.CellFormat(0, 10, tr("Cargos por Energía"), "", 0, "L", false, 0, "")
-
-				pdf.SetXY(140, 80.5)
+				pdf.SetXY(140, 80)
 				pdf.CellFormat(0, 10, fmt.Sprintf("%s %s", utils.GetCurrencySymbol(data.Currency), utils.FormatNumber(*energyDevice.TotalToPay)), "", 0, "L", false, 0, "")
 			}
 
 			if waterDevice != (models.DeviceData{}) {
-				// total WATER charges
-				pdf.Image("./assets/icon-water.png", 52.5, 103, 13, 0, false, "", 0, "")
-				pdf.SetFont("Arial", "", 11)
-				// TEXT GRAY
 				pdf.SetTextColor(100, 100, 100)
-				pdf.SetXY(70, 104.5)
+				pdf.SetXY(50, 90)
 				pdf.CellFormat(0, 10, tr("Cargos por Agua"), "", 0, "L", false, 0, "")
-
-				pdf.SetXY(140, 103)
+				pdf.SetXY(140, 90)
 				pdf.CellFormat(0, 10, fmt.Sprintf("%s %s", utils.GetCurrencySymbol(data.Currency), utils.FormatNumber(*waterDevice.TotalToPay)), "", 0, "L", false, 0, "")
 			}
+			var totalCharges float64 = 0.0
+			if asset.Charges != nil {
+				// charges is a []interface{} but contains models.Charges
+				charges := []models.Charges{}
+				for _, charge := range *asset.Charges {
+					chargeMap := charge.(map[string]interface{})
+					chargeData := models.Charges{
+						Name:        chargeMap["name"].(string),
+						Description: chargeMap["description"].(string),
+						Amount:      chargeMap["amount"].(float64),
+					}
+					charges = append(charges, chargeData)
+				}
+				pdf.Ln(5)
+				for _, charge := range charges {
+					totalCharges += charge.Amount
+					pdf.SetFont("Arial", "", 11)
+					pdf.SetTextColor(100, 100, 100)
+					pdf.SetXY(50, pdf.GetY()+5)
+					pdf.CellFormat(0, 10, tr(charge.Name), "", 0, "L", false, 0, "")
+					pdf.SetXY(140, pdf.GetY())
+					pdf.CellFormat(0, 10, fmt.Sprintf("%s %s", utils.GetCurrencySymbol(data.Currency), utils.FormatNumber(charge.Amount)), "", 0, "L", false, 0, "")
+					pdf.Ln(5)
+				}
 
-			// TOTAL CHARGES
+			}
+
+			yAfterCharges := pdf.GetY() + 10 // Espaciado adicional
 			pdf.SetFont("Arial", "", 13)
 			pdf.SetTextColor(100, 100, 100)
-			pdf.SetXY(51.5, 130)
+			pdf.SetXY(51.5, yAfterCharges)
 			pdf.SetFillColor(240, 240, 240)
-			pdf.Rect(50, 130, 120, 10, "F")
+			pdf.Rect(50, yAfterCharges, 120, 10, "F")
 			pdf.CellFormat(0, 10, tr("Cargos Totales"), "", 0, "L", false, 0, "")
-			pdf.SetXY(135, 130)
+			pdf.SetXY(135, yAfterCharges)
 			totalToPay := 0.0
 			if waterDevice != (models.DeviceData{}) {
 				totalToPay += float64(*waterDevice.TotalToPay)
@@ -136,6 +154,7 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 			if energyDevice != (models.DeviceData{}) {
 				totalToPay += float64(*energyDevice.TotalToPay)
 			}
+			totalToPay += totalCharges
 			pdf.CellFormat(0, 10, fmt.Sprintf("%s %s", utils.GetCurrencySymbol(data.Currency), utils.FormatNumber(totalToPay)), "", 0, "L", false, 0, "")
 
 			// Como pagar su factura
@@ -221,6 +240,9 @@ func CreateSupportPdf(filename string, data models.ExportedData) (string, error)
 			// 		fmt.Println("Error al eliminar el archivo PDF:", pdfFileName, err)
 			// 	}
 			// }
+			if data.SendEmail && asset.Email != nil {
+				SendEmailService(fmt.Sprintf("%s / %s", data.Branch, *asset.Label), *asset.Email, "Factura de Servicios", "Estimado Cliente, adjunto encontrará su factura de servicios.", pdfFileName)
+			}
 		}(asset)
 
 	}
@@ -289,6 +311,7 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 			deviceTelemetry = energyData
 			firstReading = time.UnixMilli(deviceTelemetry[0].Ts).Format("02/01/2006")
 			lastReading = time.UnixMilli(deviceTelemetry[len(deviceTelemetry)-1].Ts).Format("02/01/2006")
+
 		}
 
 	}

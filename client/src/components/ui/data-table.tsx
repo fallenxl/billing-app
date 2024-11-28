@@ -111,7 +111,7 @@ export function DataTable<T>({ data, columns, searchPlaceholder, showColumns = t
                             <SelectValue placeholder="Select rows per page" />
                         </SelectTrigger>
                         <SelectContent>
-                            {[10, 20, 30, 40, 50].map((pageSize) => (
+                            {[10, 20, 50].map((pageSize) => (
                                 <SelectItem key={pageSize} value={`${pageSize}`}>
                                     Show {pageSize}
                                 </SelectItem>
