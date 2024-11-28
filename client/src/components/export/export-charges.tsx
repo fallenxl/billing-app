@@ -125,6 +125,7 @@ export function ExportAdditionalCharges({ local, setExportData, button }: Export
                                         min={0}
                                         placeholder="ex. 100"
                                         type="number"
+                                        step={0.01}
                                         value={newCharge.amount} onChange={(e) => setNewCharge((prev) => ({ ...prev, amount: parseFloat(e.target.value)}))} required />
                                 </div>
 
@@ -174,6 +175,7 @@ export function ExportAdditionalCharges({ local, setExportData, button }: Export
                                             value={charge.amount}
                                             type="number"
                                             min={0}
+                                            step={0.01}
                                             onChange={(e) => setCharges((prev) => {
                                                 const newCharges = [...prev];
                                                 newCharges[index].amount = parseFloat(e.target.value);
