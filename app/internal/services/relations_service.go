@@ -9,7 +9,7 @@ import (
 )
 
 func GetRelations(token string, entityType string, id string) ([]models.AssetRelationResponse, error) {
-	response, err := utils.Request(config.ThingsboardApiURL+"relations/info?fromId="+id+"&fromType="+entityType, "GET", "", token)
+	response, err := utils.Request(config.AppConfig.Thingsboard.Api+"relations/info?fromId="+id+"&fromType="+entityType, "GET", "", token)
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +22,7 @@ func GetRelations(token string, entityType string, id string) ([]models.AssetRel
 	return relations, nil
 }
 func GetAssetRelationsByID(id string, entityType string, token string) ([]models.AssetRelationResponse, error) {
-	response, err := utils.Request(config.ThingsboardApiURL+"relations/info?fromId="+id+"&fromType="+entityType, "GET", "", token)
+	response, err := utils.Request(config.AppConfig.Thingsboard.Api+"relations/info?fromId="+id+"&fromType="+entityType, "GET", "", token)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func GetAssetRelationsByID(id string, entityType string, token string) ([]models
 }
 
 func GetCustomerRelationsByID(id string, entityType string, token string) ([]models.CustomerRelationResponse, error) {
-	response, err := utils.Request(config.ThingsboardApiURL+"relations/info?fromId="+id+"&fromType="+entityType, "GET", "", token)
+	response, err := utils.Request(config.AppConfig.Thingsboard.Api+"relations/info?fromId="+id+"&fromType="+entityType, "GET", "", token)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func UpdateBranchName(token string, body models.NameUpdate) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	_, err = utils.Request(config.ThingsboardApiURL+"asset", "POST", string(bodyJSON), token)
+	_, err = utils.Request(config.AppConfig.Thingsboard.Api+"asset", "POST", string(bodyJSON), token)
 	if err != nil {
 		return "", err
 	}

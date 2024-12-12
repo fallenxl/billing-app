@@ -29,7 +29,7 @@ func getKeysByDeviceType(deviceType string, agg string) string {
 	return ""
 }
 func GetDeviceById(id string, entityType string, token string) (models.Device, error) {
-	url := fmt.Sprintf("%s%s/%s", config.ThingsboardApiURL, strings.ToLower(entityType), id)
+	url := fmt.Sprintf("%s%s/%s", config.AppConfig.Thingsboard.Api, strings.ToLower(entityType), id)
 	response, err := utils.Request(url, "GET", "", token)
 	if err != nil {
 		return models.Device{}, err
@@ -55,7 +55,7 @@ func GetDeviceTelemetryById(id string, entityType string, deviceType string, sta
 	if key == "" {
 		key = getKeysByDeviceType(deviceType, agg)
 	}
-	telemetryPath := fmt.Sprintf("%splugins/telemetry/%s/%s/values/timeseries?keys=%s&startTs=%d&endTs=%d&limit=50000&interval=%d&agg=%s&orderBy=ASC&useStrictDataTypes=false", config.ThingsboardApiURL, entityType, id, key, startDate, endDate, resolution, agg)
+	telemetryPath := fmt.Sprintf("%splugins/telemetry/%s/%s/values/timeseries?keys=%s&startTs=%d&endTs=%d&limit=50000&interval=%d&agg=%s&orderBy=ASC&useStrictDataTypes=false", config.AppConfig.Thingsboard.Api, entityType, id, key, startDate, endDate, resolution, agg)
 	response, err := utils.Request(telemetryPath, "GET", "", token)
 	if err != nil {
 

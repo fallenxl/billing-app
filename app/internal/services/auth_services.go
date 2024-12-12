@@ -11,7 +11,7 @@ import (
 
 func LoginService(username string, password string) (models.LoginResponse, error) {
 	//Api login URL
-	response, err := utils.Request(config.ThingsboardApiURL+"auth/login", "POST", "{\"username\":\""+username+"\",\"password\":\""+password+"\"}", "")
+	response, err := utils.Request(config.AppConfig.Thingsboard.Api+"auth/login", "POST", "{\"username\":\""+username+"\",\"password\":\""+password+"\"}", "")
 	if err != nil {
 		fmt.Println(err)
 		return models.LoginResponse{}, err
@@ -54,7 +54,7 @@ func LoginService(username string, password string) (models.LoginResponse, error
 }
 
 func GetCurrentUserService(token string) (models.User, error) {
-	response, err := utils.Request(config.ThingsboardApiURL+"auth/user", "GET", "", token)
+	response, err := utils.Request(config.AppConfig.Thingsboard.Api+"auth/user", "GET", "", token)
 	if err != nil {
 		return models.User{}, err
 	}

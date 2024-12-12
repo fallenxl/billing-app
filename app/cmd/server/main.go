@@ -1,29 +1,17 @@
 package main
 
 import (
-	"app/internal/handlers"
+	"app/api/handlers"
+	"app/internal/config"
 	"log"
 	"net/http"
 )
 
 func main() {
+	config.LoadConfig()
 	r := handlers.NewRouter()
+
 	log.Println("Server started on: http://localhost:4001")
-
-	//filename := "sample.pdf"
-	//err := pdf.CreatePDF(filename)
-	//if err != nil {
-	//	fmt.Println("Error creating PDF file: ", err)
-	//	return
-	//}
-	//
-	//err = pdf.OpenPDF(filename)
-	//if err != nil {
-	//	fmt.Println("Error opening PDF file: ", err)
-	//	return
-	//}
-	//fmt.Println("PDF file created and opened successfully")
-
 	if err := http.ListenAndServe(":4001", r); err != nil {
 		log.Fatal(err)
 	}

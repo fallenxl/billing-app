@@ -8,7 +8,7 @@ import (
 )
 
 func GetAssetsByGroupIDService(token string) (models.CustomerGroup, error) {
-	response, err := utils.Request(config.ThingsboardApiURL+"entityGroup/ce0482e0-5425-11ef-aa15-a127638e3a77/customers?pageSize=100&page=0", "GET", "", token)
+	response, err := utils.Request(config.AppConfig.Thingsboard.Api+"entityGroup/ce0482e0-5425-11ef-aa15-a127638e3a77/customers?pageSize=100&page=0", "GET", "", token)
 	if err != nil {
 		fmt.Println(err)
 		return models.CustomerGroup{}, err
@@ -39,7 +39,7 @@ func GetAssetsByGroupIDService(token string) (models.CustomerGroup, error) {
 
 func GetAssetsByGroupID(id string, token string) (models.Customer, error) {
 
-	url := fmt.Sprintf("%scustomer/%s", config.ThingsboardApiURL, id)
+	url := fmt.Sprintf("%scustomer/%s", config.AppConfig.Thingsboard.Api, id)
 	response, err := utils.Request(url, "GET", "", token)
 	if err != nil {
 		fmt.Println(err)
@@ -67,7 +67,7 @@ func GetAssetsByGroupID(id string, token string) (models.Customer, error) {
 }
 
 func GetAssetByIdService(token string, assetId string) (models.Asset, error) {
-	response, err := utils.Request(config.ThingsboardApiURL+"asset/info/"+assetId, "GET", "", token)
+	response, err := utils.Request(config.AppConfig.Thingsboard.Api+"asset/info/"+assetId, "GET", "", token)
 	if err != nil {
 		return models.Asset{}, err
 	}
@@ -99,7 +99,7 @@ func GetAssetByIdService(token string, assetId string) (models.Asset, error) {
 }
 
 func GetCustomerByIdService(token string, assetId string) (models.Customer, error) {
-	response, err := utils.Request(config.ThingsboardApiURL+"customer/info/"+assetId, "GET", "", token)
+	response, err := utils.Request(config.AppConfig.Thingsboard.Api+"customer/info/"+assetId, "GET", "", token)
 	if err != nil {
 		return models.Customer{}, err
 	}
@@ -125,7 +125,7 @@ func GetCustomerByIdService(token string, assetId string) (models.Customer, erro
 }
 
 func GetAssetAttributesService(token string, assetId string, entityType string) ([]models.AssetAttributes, error) {
-	response, err := utils.Request(config.ThingsboardApiURL+"plugins/telemetry/"+entityType+"/"+assetId+"/values/attributes", "GET", "", token)
+	response, err := utils.Request(config.AppConfig.Thingsboard.Api+"plugins/telemetry/"+entityType+"/"+assetId+"/values/attributes", "GET", "", token)
 	if err != nil {
 		return []models.AssetAttributes{}, err
 	}
@@ -139,7 +139,7 @@ func GetAssetAttributesService(token string, assetId string, entityType string) 
 }
 
 func SetAssetAttributesService(token string, assetId string, entityType string, attributes string) error {
-	_, err := utils.Request(config.ThingsboardApiURL+"plugins/telemetry/"+entityType+"/"+assetId+"/SERVER_SCOPE", "POST", attributes, token)
+	_, err := utils.Request(config.AppConfig.Thingsboard.Api+"plugins/telemetry/"+entityType+"/"+assetId+"/SERVER_SCOPE", "POST", attributes, token)
 	if err != nil {
 		return err
 	}
