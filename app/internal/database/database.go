@@ -2,11 +2,13 @@ package database
 
 import (
 	"app/internal/config"
+	"app/internal/models"
+	"log"
+	"time"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"log"
-	"time"
 )
 
 var DB *gorm.DB
@@ -30,7 +32,9 @@ func Connect() {
 	sqlDb.SetMaxIdleConns(10)
 	sqlDb.SetMaxOpenConns(100)
 	sqlDb.SetConnMaxLifetime(30 * time.Minute)
-	err = DB.AutoMigrate()
+	err = DB.AutoMigrate(
+		&models.AssetRelationDb{},
+	)
 	if err != nil {
 		log.Fatalf("Error migrating database: %v", err)
 	}

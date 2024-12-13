@@ -39,7 +39,6 @@ type AssetRelationResponse struct {
 	Longitude     *float64                `json:"longitude"`
 	Meters        []AssetRelationResponse `json:"meters"`
 }
-
 type CustomerRelationResponse struct {
 	From       from     `json:"from"`
 	Address    *string  `json:"address"`
@@ -52,4 +51,26 @@ type CustomerRelationResponse struct {
 	Label      *string  `json:"label"`
 	Type       string   `json:"type"`
 	Settings   settings `json:"settings"`
+}
+
+type AssetRelationDb struct {
+	FromID         string  `gorm:"type:varchar(255);not null;primary_key" json:"from_id"`
+	FromEntityType string  `gorm:"type:varchar(255);not null" json:"from_entity_type"`
+	ToID           string  `gorm:"type:varchar(255);not null;primary_key" json:"to_id"`
+	ToEntityType   string  `gorm:"type:varchar(255);not null" json:"to_entity_type"`
+	ToName         string  `gorm:"type:varchar(255);not null" json:"to_name"`
+	EntityType     string  `gorm:"type:varchar(255);not null" json:"entity_type"`
+	Type           string  `gorm:"type:varchar(255);not null" json:"type"`
+	Id             string  `gorm:"type:varchar(255);not null" json:"id"`
+	Label          string  `gorm:"type:varchar(255);not null" json:"label"`
+	Address        string  `gorm:"type:varchar(255);not null" json:"address"`
+	Phone          string  `gorm:"type:varchar(255);not null" json:"phone"`
+	Email          string  `gorm:"type:varchar(255);not null" json:"email"`
+	BuildingOwner  string  `gorm:"type:varchar(255);not null" json:"building_owner"`
+	Latitude       float64 `gorm:"type:float;not null" json:"latitude"`
+	Longitude      float64 `gorm:"type:float;not null" json:"longitude"`
+}
+
+func (AssetRelationDb) TableName() string {
+	return "asset_relations"
 }
