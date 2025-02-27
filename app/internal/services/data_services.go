@@ -32,11 +32,17 @@ func ParseDataService(firstTelemetry models.Telemetry, lastTelemetry models.Tele
 	} else if strings.Contains(strings.ToLower(deviceType), "energy meter") {
 		energyFirstTelemetry, ok := firstTelemetry.Data["energyCount"]
 		if !ok {
-			return parseTelemetry
+			energyFirstTelemetry, ok = firstTelemetry.Data["E"]
+			if !ok {
+				return parseTelemetry
+			}
 		}
 		energyLastTelemetry, ok := lastTelemetry.Data["energyCount"]
 		if !ok {
-			return parseTelemetry
+			energyLastTelemetry, ok = lastTelemetry.Data["E"]
+			if !ok {
+				return parseTelemetry
+			}
 		}
 		previousMonth, _ = strconv.ParseFloat(energyFirstTelemetry[0].Value, 64)
 		currentMonth, _ = strconv.ParseFloat(energyLastTelemetry[0].Value, 64)
@@ -101,6 +107,7 @@ func HandleDataService(data models.DataDTO, token string) (models.ExportedData, 
 		exportedData.Relations = append(exportedData.Relations, assetData)
 
 	}
+
 	return exportedData, nil
 }
 

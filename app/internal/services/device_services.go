@@ -16,14 +16,14 @@ func getKeysByDeviceType(deviceType string, agg string) string {
 			return "pulseCount"
 		}
 		if strings.Contains(strings.ToLower(deviceType), "energy meter") {
-			return "energyCount"
+			return "energyCount,E"
 		}
 	} else {
 		if strings.Contains(strings.ToLower(deviceType), "water meter") {
 			return "deltaPulseCount"
 		}
 		if strings.Contains(strings.ToLower(deviceType), "energy meter") {
-			return "deltaEnergyCount"
+			return "deltaEnergyCount,EDelta"
 		}
 	}
 	return ""

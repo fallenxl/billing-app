@@ -11,7 +11,11 @@ import (
 
 func LoginService(username string, password string) (models.LoginResponse, error) {
 	//Api login URL
-	response, err := utils.Request(config.AppConfig.Thingsboard.Api+"auth/login", "POST", "{\"username\":\""+username+"\",\"password\":\""+password+"\"}", "")
+	url := config.AppConfig.Thingsboard.Api + "auth/login"
+	fmt.Println(url)
+	payload := "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}"
+	fmt.Println(payload)
+	response, err := utils.Request(url, "POST", payload, "")
 	if err != nil {
 		fmt.Println(err)
 		return models.LoginResponse{}, err

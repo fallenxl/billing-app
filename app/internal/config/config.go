@@ -1,15 +1,16 @@
 package config
 
 import (
-	"github.com/spf13/viper"
 	"log"
+
+	"github.com/spf13/viper"
 )
 
 var AppConfig *Config
 
 type Config struct {
 	Thingsboard struct {
-		Api string `mapstructure:"TB_API"`
+		Api string `mapstructure:"TB_URI"`
 	} `mapstructure:",squash"`
 	Datasource struct {
 		URI string `mapstructure:"DATASOURCE_URI"`

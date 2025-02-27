@@ -87,6 +87,10 @@ func CreatePDF(filename string, exportedData models.ExportedData) (string, error
 					if strings.Contains(relationType, "energy meter") {
 
 						// fmt.Println(*relation.Label, "relation.Label")
+						if entity.Label == nil {
+							entity.Label = relation.Label
+						}
+
 						pdf.CellFormat(colWidths[0], 10, tr(*entity.Label), "1", 0, "C", false, 0, "")
 
 						pdf.CellFormat(colWidths[1], 10, utils.FormatNumber(*relation.PreviousMonth), "1", 0, "C", false, 0, "")

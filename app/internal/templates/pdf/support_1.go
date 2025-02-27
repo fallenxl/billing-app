@@ -285,6 +285,9 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 	} else if strings.Contains(strings.ToLower(device.Type), "energy meter") {
 		dataMap := *device.Telemetry
 		energyData, ok := dataMap["deltaEnergyCount"]
+		if !ok {
+			energyData, ok = dataMap["EDelta"]
+		}
 		if ok {
 			deviceTelemetry = energyData
 			firstReading = time.UnixMilli(deviceTelemetry[0].Ts).Format("02/01/2006")
