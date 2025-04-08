@@ -35,6 +35,7 @@ def generate_chart(color, unit, data, end_date, chart_name, resolution):
         for i in parsed_data:
             current_value = float(i['value'])
             dt = datetime.fromtimestamp(i["ts"] / 1000)  
+            # FORMAT DATE 02 MAR 2023 -> 002 
             date_str = dt.strftime("%d/%m")
             x.append(date_str)
             y.append(current_value)
@@ -60,12 +61,12 @@ def generate_chart(color, unit, data, end_date, chart_name, resolution):
         
         plt.ylabel(f'Total {unit}', fontsize=20)
         num_labels = len(x)
-        step = 1
-        if len(x) < 7:
-            step = 1
-        if resolution_ms <= 3600000:
-            step = 7
-        plt.xticks(range(0, num_labels, step), x[::step], fontsize=18)
+        step = 5
+        # if len(x) < 7:
+        #     step = 1
+        # if resolution_ms <= 3600000:
+        #     step = 7
+        plt.xticks(range(0, num_labels, step), x[::step], fontsize=18, rotation=45, ha='right')
         plt.yticks(fontsize=18)
         plt.grid(True, which='both', axis='both', linestyle='--', linewidth=0.7, color='lightgray', alpha=0.5)
 

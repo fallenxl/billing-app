@@ -16,6 +16,8 @@ type DataDTO struct {
 type ParseTelemetry struct {
 	PreviousMonth float64 `json:"previousMonth"`
 	CurrentMonth  float64 `json:"currentMonth"`
+	FirstDate     int64   `json:"firstDate"`
+	LastDate      int64   `json:"lastDate"`
 	TotalConsumed float64 `json:"totalConsumed"`
 	TotalToPay    float64 `json:"totalToPay"`
 }
@@ -44,4 +46,6 @@ type DeviceData struct {
 	CurrentMonth  *float64           `json:"currentMonth"`  // Mes Actual
 	TotalConsumed *float64           `json:"totalConsumed"` // Total Consumido
 	TotalToPay    *float64           `json:"totalToPay"`    // Total a Pagar
+	FirstDate     *int64             `json:"firstDate"`     // Fecha Inicial
+	LastDate      *int64             `json:"lastDate"`      // Fecha Final
 }

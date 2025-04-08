@@ -17,6 +17,8 @@ func ParseDataService(firstTelemetry models.Telemetry, lastTelemetry models.Tele
 	var parseTelemetry models.ParseTelemetry
 	var previousMonth float64
 	var currentMonth float64
+	var firstDate int64
+	var lastDate int64
 	if strings.Contains(strings.ToLower(deviceType), "water meter") {
 		waterFirstTelemetry, ok := firstTelemetry.Data["pulseCount"]
 		if !ok {
@@ -28,6 +30,8 @@ func ParseDataService(firstTelemetry models.Telemetry, lastTelemetry models.Tele
 		}
 		previousMonth, _ = strconv.ParseFloat(waterFirstTelemetry[0].Value, 64)
 		currentMonth, _ = strconv.ParseFloat(waterLastTelemetry[0].Value, 64)
+		firstDate = waterFirstTelemetry[0].Ts
+		lastDate = waterLastTelemetry[0].Ts
 
 	} else if strings.Contains(strings.ToLower(deviceType), "energy meter") {
 		energyFirstTelemetry, ok := firstTelemetry.Data["energyCount"]
@@ -46,8 +50,12 @@ func ParseDataService(firstTelemetry models.Telemetry, lastTelemetry models.Tele
 		}
 		previousMonth, _ = strconv.ParseFloat(energyFirstTelemetry[0].Value, 64)
 		currentMonth, _ = strconv.ParseFloat(energyLastTelemetry[0].Value, 64)
+		firstDate = energyFirstTelemetry[0].Ts
+		lastDate = energyLastTelemetry[0].Ts
 	}
 
+	parseTelemetry.FirstDate = firstDate
+	parseTelemetry.LastDate = lastDate
 	parseTelemetry.CurrentMonth = currentMonth
 	parseTelemetry.PreviousMonth = previousMonth
 	getRate := utils.GetRateByDeviceType(deviceType, rate)
@@ -99,6 +107,8 @@ func HandleDataService(data models.DataDTO, token string) (models.ExportedData, 
 				PreviousMonth: &parseTelemetry.PreviousMonth,
 				CurrentMonth:  &parseTelemetry.CurrentMonth,
 				TotalConsumed: &parseTelemetry.TotalConsumed,
+				FirstDate:     &parseTelemetry.FirstDate,
+				LastDate:      &parseTelemetry.LastDate,
 				TotalToPay:    &parseTelemetry.TotalToPay,
 			}
 			*assetData.Relations = append(*assetData.Relations, deviceData)

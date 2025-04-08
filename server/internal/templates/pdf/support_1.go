@@ -272,15 +272,15 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 	pdf.Ln(5)
 	pdf.SetTextColor(80, 80, 80)
 	deviceTelemetry := []models.Data{}
-	firstReading := ""
-	lastReading := ""
+	// firstReading := ""
+	// lastReading := ""
 	if strings.Contains(strings.ToLower(device.Type), "water meter") {
 		dataMap := *device.Telemetry
 		waterData, ok := dataMap["deltaPulseCount"]
 		if ok {
 			deviceTelemetry = waterData
-			firstReading = time.UnixMilli(deviceTelemetry[0].Ts).Format("02/01/2006")
-			lastReading = time.UnixMilli(deviceTelemetry[len(deviceTelemetry)-1].Ts).Format("02/01/2006")
+			// firstReading = time.UnixMilli(*device.FirstDate).Format("02/01/2006")
+			// lastReading = time.UnixMilli(*device.LastDate).Format("02/01/2006")
 		}
 	} else if strings.Contains(strings.ToLower(device.Type), "energy meter") {
 		dataMap := *device.Telemetry
@@ -290,11 +290,13 @@ func DeviceTypePdf(pdf *gofpdf.Fpdf, device models.DeviceData, data models.Expor
 		}
 		if ok {
 			deviceTelemetry = energyData
-			firstReading = time.UnixMilli(deviceTelemetry[0].Ts).Format("02/01/2006")
-			lastReading = time.UnixMilli(deviceTelemetry[len(deviceTelemetry)-1].Ts).Format("02/01/2006")
+			// firstReading = time.UnixMilli(*device.FirstDate).Format("02/01/2006")
+			// lastReading = time.UnixMilli(*device.LastDate).Format("02/01/2006")
 		}
 
 	}
+	firstReading := time.UnixMilli(*device.FirstDate).Format("02/01/2006")
+	lastReading := time.UnixMilli(*device.LastDate).Format("02/01/2006")
 
 	pdf.Cell(0, 10, fmt.Sprintf("%s Total %s", utils.FormatNumber(*device.PreviousMonth), tr(unit)))
 	pdf.Ln(5)

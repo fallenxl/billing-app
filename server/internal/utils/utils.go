@@ -149,12 +149,12 @@ func GetResolution(startDate int64, endDate int64) int64 {
 	}
 	// if the difference is less than 1 month, RESOLUTION_PER_day
 	if diff <= 2764740000 {
-		return 86400000 * 7
+		return 86400000 // 1 day
 	}
 
 	// if the difference is less than 6 month, RESOLUTION_PER_week
 	if diff <= 15778476000 {
-		return 86400000 * 7
+		return 86400000 * 1
 	}
 
 	return 2592000000
