@@ -1,5 +1,6 @@
 **/.vscode
 **/.DS_Store
 **/.idea
-**/.next
-.env
+
+ui-legacy
+server-legacy
