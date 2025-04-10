@@ -2,18 +2,19 @@ package utils
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/golang-jwt/jwt/v4"
 )
 
 type tokenClaims struct {
-	Sub        string `json:"sub"`
-	Id         string `json:"userId"`
-	FirstName  string `json:"firstName"`
-	LastName   string `json:"lastName"`
-	CustomerId string `json:"customerId"`
-	Enabled    bool   `json:"enabled"`
+	Sub        string   `json:"sub"`
+	Id         string   `json:"userId"`
+	FirstName  string   `json:"firstName"`
+	LastName   string   `json:"lastName"`
+	CustomerId string   `json:"customerId"`
+	Enabled    bool     `json:"enabled"`
+	Scopes     []string `json:"scopes"`
+	Exp        int64    `json:"exp"`
 }
 
 func DecodeToken(tokenString string) (*tokenClaims, error) {
@@ -21,7 +22,7 @@ func DecodeToken(tokenString string) (*tokenClaims, error) {
 	// Esto devuelve el encabezado y el cuerpo del token
 	parsedToken, _, err := jwt.NewParser().ParseUnverified(tokenString, jwt.MapClaims{})
 	if err != nil {
-		log.Fatalf("Error al decodificar el token: %v", err)
+		return nil, fmt.Errorf("error al analizar el token: %v", err)
 	}
 
 	claims, ok := parsedToken.Claims.(jwt.MapClaims)
@@ -57,6 +58,18 @@ func mapClaimsToTokenClaims(claims jwt.MapClaims, tokenData *tokenClaims) error 
 	}
 	if enabled, ok := claims["enabled"].(bool); ok {
 		tokenData.Enabled = enabled
+	}
+
+	if scopes, ok := claims["scopes"].([]interface{}); ok {
+		for _, scope := range scopes {
+			if scopeStr, ok := scope.(string); ok {
+				tokenData.Scopes = append(tokenData.Scopes, scopeStr)
+			}
+		}
+	}
+
+	if exp, ok := claims["exp"].(float64); ok {
+		tokenData.Exp = int64(exp)
 	}
 
 	return nil

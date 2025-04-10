@@ -25,9 +25,25 @@ func LoginHandler(c *gin.Context) {
 
 	data, err := utils.DecodeToken(loginResponse.Token)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Error decoding token"})
+		c.JSON(500, gin.H{"error": "Error decoding token", "success": false, "message": "Error decoding token"})
 		return
 	}
 
-	c.JSON(200, gin.H{"message": "Login successful", "data": data, "token": loginResponse.Token, "refreshToken": loginResponse.RefreshToken})
+	c.JSON(200, gin.H{"message": "Login successful", "data": data, "token": loginResponse.Token, "success": true})
+}
+
+func MeHandler(c *gin.Context) {
+	claims, exists := c.Get("claims")
+	if !exists {
+		c.JSON(401, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	tokenString, exists := c.Get("token")
+	if !exists {
+		c.JSON(401, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "User data", "data": claims, "success": true, "token": tokenString})
 }

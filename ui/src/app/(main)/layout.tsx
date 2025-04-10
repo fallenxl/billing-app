@@ -1,0 +1,38 @@
+import type React from "react"
+import "@/app/globals.css"
+import { Inter } from "next/font/google"
+import { AuthGuard } from "@/guards"
+import { Navigation } from "@/components/navigation"
+import { Footer } from "@/components/footer"
+
+const inter = Inter({ subsets: ["latin"] })
+
+export const metadata = {
+  title: "Lumen Billing",
+  description: "Modern billing software for businesses",
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body className={inter.className}>
+        <AuthGuard>
+          <div className="flex flex-col min-h-screen">
+            <Navigation />
+            <main className="flex-1 py-8">
+              <div className="container px-4 mx-auto">
+                {children}
+              </div>
+            </main>
+            <Footer />
+          </div>
+        </AuthGuard>
+
+      </body>
+    </html>
+  )
+}

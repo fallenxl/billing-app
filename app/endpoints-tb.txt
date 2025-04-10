@@ -1,0 +1,58 @@
+-- Upload image
+https://dashboard.lumenenergysolutions.com/api/image 
+- Method POST
+- Payload: 
+FormData
+file: (binary)
+title: icon.png
+imageSubType: IMAGE
+
+- Response: {
+    "id": {
+        "entityType": "TB_RESOURCE",
+        "id": "408c4490-1629-11f0-b4bd-8b00c50fcae5"
+    },
+    "createdTime": 1744302688089,
+    "tenantId": {
+        "entityType": "TENANT",
+        "id": "3c80ff80-d536-11ec-8118-a784c9b68ee1"
+    },
+    "customerId": {
+        "entityType": "CUSTOMER",
+        "id": "13814000-1dd2-11b2-8080-808080808080"
+    },
+    "title": "icon.png",
+    "resourceType": "IMAGE",
+    "resourceSubType": "IMAGE",
+    "resourceKey": "icon.png",
+    "publicResourceKey": "95RmtdsVXjPSgLqaqiCqmLoOQAEfxhHe",
+    "etag": "12c03d811e3b79729f112abaa4e4f213a8fbb48c5a06e3f7e695f61ac1a954f9",
+    "fileName": "icon.png",
+    "descriptor": {
+        "mediaType": "image/png",
+        "width": 200,
+        "height": 200,
+        "size": 32024,
+        "etag": "12c03d811e3b79729f112abaa4e4f213a8fbb48c5a06e3f7e695f61ac1a954f9",
+        "previewDescriptor": {
+            "mediaType": "image/png",
+            "width": 200,
+            "height": 200,
+            "size": 32024,
+            "etag": "12c03d811e3b79729f112abaa4e4f213a8fbb48c5a06e3f7e695f61ac1a954f9"
+        }
+    },
+    "externalId": null,
+    "name": "icon.png",
+    "public": true,
+    "link": "/api/images/tenant/icon.png",
+    "publicLink": "/api/images/public/95RmtdsVXjPSgLqaqiCqmLoOQAEfxhHe"
+}
+
+-- Delete image
+https://dashboard.lumenenergysolutions.com/api/images/tenant/icon.png?force=false
+- Response: {
+    "success": true,
+    "whiteLabelingList": null,
+    "references": null
+}

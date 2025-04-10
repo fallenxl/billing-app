@@ -1,5 +1,6 @@
 # .air.toml
-root = "../../../"
+root = "." # raíz del proyecto
+
 tmp_dir = "tmp"
 
 [build]
@@ -9,7 +10,11 @@ tmp_dir = "tmp"
   delay = 1000
   log = "build.log"
   include_ext = ["go"]
-  exclude_dir = ["tmp", "vendor"]
+  exclude_dir = ["tmp", "vendor", "ui", "node_modules"]
 
 [log]
   time = true
+
+# Agrega las carpetas a observar explícitamente si necesitas
+[include]
+  dirs = ["app", "api", "cmd", "internal", "pkg", "config"]

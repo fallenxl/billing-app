@@ -1,3 +1,4 @@
+"use client"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,11 +10,41 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useState } from "react"
+import { useAuthStore } from "@/stores"
+import { useRouter } from "next/navigation"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+  const navigate = useRouter()
+  const { login, isAuthenticated } = useAuthStore()
+  const [credentials, setCredentials] = useState({
+    username: "",
+    password: "",
+  })
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!credentials.username || !credentials.password) {
+      alert("Por favor, completa todos los campos.")
+      return
+    }
+
+    login(credentials.username, credentials.password)
+      .then(() => {
+        console.log("Login successful")
+        if (isAuthenticated) {
+          navigate.replace("/")
+        }
+      })
+      .catch((error) => {
+        console.error("Login failed", error)
+        alert("Error de inicio de sesión. Por favor, verifica tus credenciales.")
+      })
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -24,16 +55,19 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleLogin} className="grid gap-6">
             <div className="grid gap-6">
 
               <div className="grid gap-6">
                 <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="username">Email</Label>
                   <Input
-                    id="email"
+                    id="username"
                     type="email"
-                    
+                    onChange={(e) =>
+                      setCredentials({ ...credentials, username: e.target.value })
+                    }
+                    value={credentials.username}
                     placeholder="m@example.com"
                     required
                   />
@@ -49,8 +83,12 @@ export function LoginForm({
                     </a>
                   </div>
                   <Input
-                  placeholder="********"
-                  id="password" type="password" required />
+                    onChange={(e) =>
+                      setCredentials({ ...credentials, password: e.target.value })
+                    }
+                    value={credentials.password}
+                    placeholder="********"
+                    id="password" type="password" required />
                 </div>
                 <Button type="submit" className="w-full">
                   Iniciar sesión
