@@ -18,7 +18,8 @@ func SetupRouter() *gin.Engine {
 
 	api := router.Group("/api/v1")
 	{
-		RegisterAuthRoutes(api) // Registra las rutas de autenticación
+		RegisterAuthRoutes(api)      // Registra las rutas de autenticación
+		RegisterCustomersRoutes(api) // Registra las rutas de clientes
 	}
 
 	return router

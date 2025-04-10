@@ -13,12 +13,13 @@ type Config struct {
 		Port string `mapstructure:"PORT"`
 	} `mapstructure:",squash"`
 	TB struct {
-		URI string `mapstructure:"TB_URI"`
+		URI            string `mapstructure:"TB_URI"`
+		BillingGroupId string `mapstructure:"TB_BILLING_ID"`
 	} `mapstructure:",squash"`
 }
 
 func LoadConfig() {
-	viper.SetConfigFile("../../.env")
+	viper.SetConfigFile(".env")
 	viper.AddConfigPath(".")
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err != nil {

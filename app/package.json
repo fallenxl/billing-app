@@ -4,6 +4,6 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "cd ./cmd/api && air"
+    "dev": "air"
   }
 }
