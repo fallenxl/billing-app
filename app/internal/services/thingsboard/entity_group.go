@@ -1,9 +1,10 @@
-package services
+package thingsboard
 
 import (
 	"app/config"
 	"app/internal/model"
 	"app/pkg/utils"
+
 	"fmt"
 )
 
@@ -19,6 +20,20 @@ func GetEntityGroupCustomersService(groupId string, token string) (model.Custome
 	if response.StatusCode != 200 {
 		fmt.Println("Error: ", response.StatusCode, response.Body)
 		return model.CustomerGroup{}, fmt.Errorf("error: %s", response.Body)
+	}
+
+	for i, customer := range customerGroup.Data {
+		// Get customer attributes
+		attributes, err := GetAttributesService(customer.ID.EntityType, customer.ID.ID, token, []string{"img"})
+		if err != nil {
+			fmt.Println("Error getting customer attributes: ", err)
+			continue
+		}
+		img := FindAttributeByKey(attributes, "img")
+		if img != nil {
+			imgStr := img.(string)
+			customerGroup.Data[i].Img = &imgStr
+		}
 	}
 
 	return customerGroup, nil

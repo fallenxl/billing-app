@@ -10,6 +10,7 @@ import (
 func RegisterCustomersRoutes(r *gin.RouterGroup) {
 	customers := r.Group("/customers", middleware.AuthMiddleware)
 	{
-		customers.GET("/", handlers.GetCustomersHandler)
+		customers.GET("/all", handlers.GetCustomersHandler)
+		customers.GET("/:id/sites", handlers.GetCustomerSitesHandler)
 	}
 }

@@ -9,11 +9,11 @@ func SetupRouter() *gin.Engine {
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
 		// allow all origins
-		AllowOrigins:     []string{"http://localhost:3000"},                 // Dominios permitidos
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH"}, // Métodos HTTP permitidos
-		AllowHeaders:     []string{"Content-Type", "Authorization"},         // Cabeceras permitidas
-		ExposeHeaders:    []string{"Content-Length"},                        // Cabeceras expuestas al cliente
-		AllowCredentials: true,                                              // Permitir credenciales                                    // Tiempo de caché de pre-flight
+		AllowOrigins:     []string{"http://localhost:3000"},                            // Origen permitido (puedes especificar un dominio específico)
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"}, // Métodos HTTP permitidos
+		AllowHeaders:     []string{"Content-Type", "Authorization"},                    // Cabeceras permitidas
+		ExposeHeaders:    []string{"Content-Length"},                                   // Cabeceras expuestas al cliente
+		AllowCredentials: true,                                                         // Permitir credenciales                                    // Tiempo de caché de pre-flight
 	}))
 
 	api := router.Group("/api/v1")

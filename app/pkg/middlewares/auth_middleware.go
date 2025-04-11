@@ -11,14 +11,11 @@ import (
 )
 
 func AuthMiddleware(c *gin.Context) {
-
-	// Obtener header Authorization: Bearer <token>
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Authorization header missing"})
 		return
 	}
-
 	// Validar formato Bearer
 	splitToken := strings.Split(authHeader, " ")
 	if len(splitToken) != 2 || strings.ToLower(splitToken[0]) != "bearer" {
