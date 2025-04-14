@@ -1,3 +1,5 @@
+import { ISite } from "./sites.interface";
+
 interface EntityId {
     entityType: string;
     id: string;
@@ -32,5 +34,6 @@ interface EntityId {
     ownerId: EntityId;
     additionalInfo: AdditionalInfo;
     img: string;
+    sites: ISite[] | null;
   }
   

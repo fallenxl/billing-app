@@ -1,6 +1,7 @@
 export function LoadingPage() {
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+        <div className="absolute top-0 left-0 w-full h-full bg-white dark:bg-gray-900 dark:text-white text-gray-900 text-center z-50">
+       
             <div className="loader">
                 <div className="square" id="sq1"></div>
                 <div className="square" id="sq2"></div>

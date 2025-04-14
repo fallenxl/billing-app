@@ -8,6 +8,7 @@ import { useAuthStore, useCustomersStore } from "@/stores"
 import { RoleGuard } from "@/guards/role.guard"
 import { ROLES } from "@/constants"
 import { useRouter } from "next/navigation"
+import { Skeleton } from "@/components/ui/skeleton"
 
 
 export default function Home() {
@@ -15,8 +16,8 @@ export default function Home() {
   const { user } = useAuthStore()
   const { customers, fetchCustomers } = useCustomersStore()
   const [searchTerm, setSearchTerm] = useState("")
+  const [loading, setLoading] = useState(true)
 
-  // Filter customers based on search term
   const filteredCustomers = customers?.filter((customer) =>
     customer.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -26,6 +27,7 @@ export default function Home() {
       if (!customers) {
         await fetchCustomers()
       }
+      setLoading(false)
     })()
   }, [])
   return (
@@ -34,7 +36,10 @@ export default function Home() {
     <RoleGuard roles={[ROLES.TENANT_ADMIN]} redirect={true} path={`/customer/${user?.customerId}`}>
       <div className="container px-4 mx-auto">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold">Customers</h2>
+
+          <h1 className="text-2xl font-semibold">Customers</h1>
+
+
           <small className="text-gray-500">
             Manage your customers and their billing information.
           </small>
@@ -52,7 +57,21 @@ export default function Home() {
 
         {/* Customer cards grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filteredCustomers?.map((customer) => (
+          {loading && (
+            <>
+              {Array.from({ length: 8 }).map((_, index) => (
+                <Card key={index} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
+                  <CardContent className="p-4">
+                    <div className="flex flex-col items-center text-center">
+                      <Skeleton className="h-20 w-20 rounded-sm mb-3" />
+                      <Skeleton className="h-4 w-24 mb-2" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </>
+          )}
+          {!loading && filteredCustomers?.map((customer) => (
             <Card key={customer.id.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={() => router.push(`/customer/${customer.id.id}`)}>
               <CardContent className="p-4">
                 <div className="flex flex-col items-center text-center">

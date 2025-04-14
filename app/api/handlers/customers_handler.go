@@ -21,6 +21,28 @@ func GetCustomersHandler(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "Customers data", "success": true, "data": data.Data})
 }
 
+func GetCustomerByIdHandler(c *gin.Context) {
+	// get id from url
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(400, gin.H{"error": "ID is required"})
+		return
+	}
+	token, exists := c.Get("token")
+	if !exists {
+		c.JSON(401, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	data, err := thingsboard.GetCustomerInfoService(id, token.(string))
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Error sending request to API"})
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "Customer data", "success": true, "data": data})
+}
+
 func GetCustomerSitesHandler(c *gin.Context) {
 	// get id from url
 	id := c.Param("id")
