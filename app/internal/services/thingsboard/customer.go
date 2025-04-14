@@ -20,11 +20,9 @@ func GetCustomerInfoService(id string, token string) (model.Customer, error) {
 	if err != nil {
 		return model.Customer{}, err
 	}
-	img := FindAttributeByKey(attributes, "img")
-	if img != nil {
-		imgStr := img.(string)
-		customerData.Img = &imgStr
-	}
+	var imgStr string
+	FindAttributeByKey(attributes, "img", &imgStr)
+	customerData.Img = &imgStr
 
 	return customerData, nil
 

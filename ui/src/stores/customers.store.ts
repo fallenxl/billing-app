@@ -1,4 +1,4 @@
-import { ICustomer, ISite } from '@/interfaces';
+import { ICustomer, ILocal, ISite } from '@/interfaces';
 import api from '@/lib/axios';
 import { create } from 'zustand';
 
@@ -9,6 +9,9 @@ interface CustomersState {
     fetchCustomers: () => Promise<void>;
     fetchSitesByCustomerId: (customerId: string) => Promise<ISite[] | null>;
     fetchCustomerById: (customerId: string) => Promise<ICustomer | null>;
+    fetchSiteById: (siteId: string) => Promise<ISite | null>;
+    fetchLocalsBySiteId: (siteId: string) => Promise<ILocal[] | null>;
+    fetchLocalsByCustomerAndSiteId: (customerId: string, siteId: string) => Promise<any>;
 }
 
 export const useCustomersStore = create<CustomersState>((set, get) => ({
@@ -35,10 +38,10 @@ export const useCustomersStore = create<CustomersState>((set, get) => ({
             if (response.status !== 200) {
                 throw new Error('Failed to fetch sites data');
             }
-            const customer = get().customers?.find(customer => customer.id.id === customerId);
+            const customer = get().customersSelected?.find(customer => customer.id.id === customerId);
             if (customer) { 
                 customer.sites = sites;
-                set({ customersSelected: [...get().customersSelected || [], customer] });
+                set({ customersSelected: get().customersSelected?.map(c => c.id.id === customerId ? customer : c) });
             }
             return sites
         } catch (error) {
@@ -48,7 +51,7 @@ export const useCustomersStore = create<CustomersState>((set, get) => ({
     },
     fetchCustomerById: async (customerId) => {
         try {
-            const existingCustomer = get().customers?.find(customer => customer.id.id  === customerId);
+            const existingCustomer = get().customersSelected?.find(customer => customer.id.id  === customerId);
             if (existingCustomer) {
 
                 return existingCustomer as ICustomer;
@@ -61,6 +64,67 @@ export const useCustomersStore = create<CustomersState>((set, get) => ({
             return response.data.data as ICustomer;
         } catch (error) {
             console.error('Error fetching customer by ID:', error);
+            return null;
+        }
+    },
+    fetchSiteById: async (siteId) => {
+        try {
+            const existingCustomer = get().customersSelected?.find(customer => customer.sites?.some(site => site.to.id === siteId));
+            if (existingCustomer) {
+                const site = existingCustomer.sites?.find(site => site.to.id === siteId);
+                return site as ISite;
+            }
+            const response = await api.get(`/sites/${siteId}`);
+            if (response.status !== 200) {
+                throw new Error('Failed to fetch site data');
+            }
+            return response.data.data as ISite;
+        } catch (error) {
+            console.error('Error fetching site by ID:', error);
+            return null;
+        }
+    },
+    fetchLocalsBySiteId: async (siteId) => {
+        try {
+            const existingCustomer = get().customersSelected?.find(customer => customer.sites?.some(site => site.to.id === siteId));
+            if (existingCustomer) {
+                const site = existingCustomer.sites?.find(site => site.to.id === siteId);
+                if (site && site.locals) {
+                    return site.locals as ILocal[];
+                }
+            }
+
+            const response = await api.get(`/sites/${siteId}/locals`);
+            if (response.status !== 200) {
+                throw new Error('Failed to fetch locals data');
+            }
+            const customer = get().customersSelected?.find(customer => customer.sites?.some(site => site.to.id === siteId));
+            if (customer) {
+                const site = customer.sites?.find(site => site.to.id === siteId);
+                if (site) {
+                    site.locals = response.data.data as ILocal[];
+                    customer.sites = customer.sites ? customer.sites.map(s => s.to.id === siteId ? site : s) : null;
+                    set({ customersSelected: get().customersSelected?.map(c => c.id.id === customer.id.id ? customer : c) });
+                }
+            }
+            return response.data.data as ILocal[];
+        } catch (error) {
+            console.error('Error fetching locals by site ID:', error);
+            return null;
+        }
+    },
+
+    fetchLocalsByCustomerAndSiteId: async (customerId, siteId) => {
+        try {
+            
+            const customer = await get().fetchCustomerById(customerId);
+            const site = await get().fetchSiteById(siteId);
+
+            const locals = await get().fetchLocalsBySiteId(siteId);
+            return [customer, site, locals];
+            
+        } catch (error) {
+            console.error('Error fetching locals by customer and site ID:', error);
             return null;
         }
     },

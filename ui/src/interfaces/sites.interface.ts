@@ -1,4 +1,4 @@
-import { EntityId } from ".";
+import { EntityId, ILocal } from ".";
 
 export interface ISite {
     from: EntityId;
@@ -9,6 +9,7 @@ export interface ISite {
     fromName?: string | null;
     toName?: string | null;
     additionalInfo?: any | null;
+    locals: ILocal[] | null;
 }
 
 export type SitesResponse = ISite[];

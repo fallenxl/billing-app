@@ -29,11 +29,9 @@ func GetEntityGroupCustomersService(groupId string, token string) (model.Custome
 			fmt.Println("Error getting customer attributes: ", err)
 			continue
 		}
-		img := FindAttributeByKey(attributes, "img")
-		if img != nil {
-			imgStr := img.(string)
-			customerGroup.Data[i].Img = &imgStr
-		}
+		var imgStr string
+		FindAttributeByKey(attributes, "img", &imgStr)
+		customerGroup.Data[i].Img = &imgStr
 	}
 
 	return customerGroup, nil

@@ -16,15 +16,9 @@ type Attribute struct {
 	LastUpdateTs int64       `json:"lastUpdateTs"`
 }
 
-// Relations models
-type EntityId struct {
-	EntityType string `json:"entityType"`
-	ID         string `json:"id"`
-}
-
 type Relation struct {
-	From           EntityId    `json:"from"`
-	To             EntityId    `json:"to"`
+	From           EntityRef   `json:"from"`
+	To             EntityRef   `json:"to"`
 	Type           string      `json:"type"`
 	TypeGroup      string      `json:"typeGroup"`
 	Version        int64       `json:"version"`
@@ -34,3 +28,24 @@ type Relation struct {
 }
 
 type RelationResponse []Relation
+
+type Group struct {
+	ID   EntityRef `json:"id"`
+	Name string    `json:"name"`
+}
+
+type AssetInfo struct {
+	ID             EntityRef      `json:"id"`
+	CreatedTime    int64          `json:"createdTime"`
+	TenantID       EntityRef      `json:"tenantId"`
+	CustomerID     EntityRef      `json:"customerId"`
+	Name           string         `json:"name"`
+	Type           string         `json:"type"`
+	Label          string         `json:"label"`
+	AssetProfileID EntityRef      `json:"assetProfileId"`
+	Version        int64          `json:"version"`
+	OwnerName      string         `json:"ownerName"`
+	Groups         []Group        `json:"groups"`
+	OwnerID        EntityRef      `json:"ownerId"`
+	AdditionalInfo map[string]any `json:"additionalInfo"` // puedes usar map[string]interface{} también
+}
