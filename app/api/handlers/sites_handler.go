@@ -83,7 +83,11 @@ func GetLocalsBySiteIdHandler(c *gin.Context) {
 		local.From = model.EntityRef(item.From)
 		local.FromName = item.FromName
 		local.ToName = item.ToName
+
 		local.Label = &label
+		if label == "" {
+			label = *item.ToName
+		}
 		local.BuildingOwner = &buildingOwner
 		local.Email = &email
 		local.Phone = &phone
