@@ -1,6 +1,7 @@
 package config
 
 import (
+	"app/internal/model"
 	"fmt"
 	"log"
 	"net/url"
@@ -22,14 +23,17 @@ func InitDB() {
 		dbname,
 		port,
 	)
-	fmt.Println("Conectando a la base de datos...", dsn)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("No se pudo conectar a la base de datos: %v", err)
 	}
 
+	db.AutoMigrate(&model.Site{})
+	db.AutoMigrate(&model.Local{})
+	db.AutoMigrate(&model.Meter{})
+	db.AutoMigrate(&model.Telemetry{})
 	DB = db
-	log.Println("Base de datos conectada exitosamente")
+
 }
 
 func parseDatabaseURI(uri string) (string, string, string, string, string) {

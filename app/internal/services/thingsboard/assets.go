@@ -7,8 +7,8 @@ import (
 	"fmt"
 )
 
-func GetSiteInfoByIdService(id string, token string) (model.Site, error) {
-	var assetInfo model.Site
+func GetSiteInfoByIdService(id string, token string) (model.SiteTB, error) {
+	var assetInfo model.SiteTB
 	uri := fmt.Sprintf("%s/asset/info/%s", config.AppConfig.TB.URI, id)
 	response, err := utils.SendRequest("GET", uri, utils.DefaultHeaderToken(token), nil, &assetInfo)
 	if err != nil {

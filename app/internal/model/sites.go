@@ -1,7 +1,7 @@
 package model
 
-type Site struct {
-	ID          EntityRef `json:"id"`
+type SiteTB struct {
+	ID          EntityRef `json:"id" gorm:"primaryKey"`
 	CustomerID  EntityRef `json:"customerId"`
 	Name        string    `json:"name"`
 	Type        string    `json:"type"`
@@ -17,9 +17,18 @@ type Site struct {
 
 }
 
+type Site struct {
+	ID          string  `json:"id" gorm:"primaryKey;not null"`
+	CustomerID  string  `json:"customerId" gorm:"index;not null"`
+	Name        string  `json:"name" gorm:"type:varchar(255);index;not null"`
+	Type        string  `json:"type" gorm:"type:varchar(255);not null"`
+	Label       *string `json:"label" gorm:"type:varchar(50);null"`
+	LocalsGroup *string `json:"localsGroup" gorm:"type:varchar(255);null"`
+}
+
 type SiteGroup struct {
-	Data          []Site `json:"data"`
-	TotalPages    int    `json:"totalPages"`
-	TotalElements int    `json:"totalElements"`
-	HasNext       bool   `json:"hasNext"`
+	Data          []SiteTB `json:"data"`
+	TotalPages    int      `json:"totalPages"`
+	TotalElements int      `json:"totalElements"`
+	HasNext       bool     `json:"hasNext"`
 }
