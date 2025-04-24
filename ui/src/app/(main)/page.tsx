@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Search } from "lucide-react"
-import { useAuthStore, useCustomersStore } from "@/stores"
+import { useAuthStore, useDataStore } from "@/stores"
 import { RoleGuard } from "@/guards/role.guard"
 import { ROLES } from "@/constants"
 import { useRouter } from "next/navigation"
@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 export default function Home() {
   const router = useRouter()
   const { user } = useAuthStore()
-  const { customers, fetchCustomers } = useCustomersStore()
+  const { customers, fetchCustomers } = useDataStore()
   const [searchTerm, setSearchTerm] = useState("")
   const [loading, setLoading] = useState(true)
 
@@ -72,7 +72,7 @@ export default function Home() {
             </>
           )}
           {!loading && filteredCustomers?.map((customer) => (
-            <Card key={customer.id.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={() => router.push(`/customer/${customer.id.id}`)}>
+            <Card key={customer.id.id} className={`${!customer.sitesGroup && "opacity-50"}  overflow-hidden hover:shadow-md transition-shadow cursor-pointer`} onClick={() => customer.sitesGroup && router.push(`/customer/${customer.id.id}`)}>
               <CardContent className="p-4">
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 rounded-sm overflow-hidden mb-3 bg-gray-100">

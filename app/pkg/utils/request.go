@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func SendRequest(method, url string, headers map[string]string, body interface{}, response interface{}) (*http.Response, error) {
@@ -70,4 +72,12 @@ func DefaultHeaderToken(token string) map[string]string {
 		"Authorization": "Bearer " + token,
 		"Content-Type":  "application/json",
 	}
+}
+
+func GetQueryParam(c *gin.Context, key string, defaultValue string) string {
+	value := c.Query(key)
+	if value == "" {
+		return defaultValue
+	}
+	return value
 }

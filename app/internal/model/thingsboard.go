@@ -1,5 +1,17 @@
 package model
 
+type EntityRef struct {
+	EntityType string `json:"entityType"`
+	ID         string `json:"id"`
+}
+
+type AdditionalInfo struct {
+	Description              string  `json:"description"`
+	AllowWhiteLabeling       bool    `json:"allowWhiteLabeling"`
+	HomeDashboardID          *string `json:"homeDashboardId"`
+	HomeDashboardHideToolbar bool    `json:"homeDashboardHideToolbar"`
+}
+
 // Customer models
 type CustomerGroup struct {
 	Data          []Customer `json:"data"`

@@ -16,7 +16,6 @@ import {
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -35,14 +34,30 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { LocalsOptions } from "@/stores"
 
 interface DataTableProps<T> {
     columns: ColumnDef<T>[]
-    data: T[],
+    data: {
+      data: T[],
+      totalElements: number,
+      totalPages: number,
+      hasNext: boolean,
+    },
     toggleColumns?: boolean,
+    searchOptions?: {
+      column: string[]
+      placeholder: string,
+      paginationFn?: () => void,
+    },
     children?: React.ReactNode
 }
-export function DataTable<T>({ columns, data, toggleColumns = true, children }: DataTableProps<T>) {
+export function DataTable<T>({ columns, data, toggleColumns = true, children, searchOptions =
+  {
+    column: ["email"],
+    placeholder: "Filter emails...",
+    paginationFn: () => {}
+  }}: DataTableProps<T>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -50,12 +65,26 @@ export function DataTable<T>({ columns, data, toggleColumns = true, children }: 
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
-
+  const [globalFilter, setGlobalFilter] = React.useState("")
+  const [options, setOptions] = React.useState<LocalsOptions>({
+    page: 0,
+    size: 10,
+    query:'',
+  })
+  
   const table = useReactTable({
-    data,
+    data: data.data,
     columns,
+    pageCount: data.totalPages,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    globalFilterFn: (row, columnId, filterValue) => {
+      return searchOptions?.column.some((col) => {
+        const value = row.getValue(col)
+        return String(value).toLowerCase().includes(filterValue.toLowerCase())
+      }) || false
+    },
+    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -63,10 +92,15 @@ export function DataTable<T>({ columns, data, toggleColumns = true, children }: 
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
+      pagination: {
+        pageIndex: options.page,
+        pageSize: options.size,
+      },
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
+      globalFilter: globalFilter,
     },
   })
 
@@ -74,10 +108,10 @@ export function DataTable<T>({ columns, data, toggleColumns = true, children }: 
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder={searchOptions?.placeholder}
+          value={globalFilter ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            setGlobalFilter(event.target.value)
           }
           className="max-w-sm"
         />
@@ -162,7 +196,7 @@ export function DataTable<T>({ columns, data, toggleColumns = true, children }: 
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {data.totalElements} row(s) selected.
         </div>
         <div className="space-x-2">
           <Button
@@ -177,7 +211,7 @@ export function DataTable<T>({ columns, data, toggleColumns = true, children }: 
             variant="outline"
             size="sm"
             onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            disabled={!data.hasNext}
           >
             Next
           </Button>

@@ -16,6 +16,9 @@ type Config struct {
 		URI            string `mapstructure:"TB_URI"`
 		BillingGroupId string `mapstructure:"TB_BILLING_ID"`
 	} `mapstructure:",squash"`
+	Datasource struct {
+		URI string `mapstructure:"DATASOURCE_URI"`
+	} `mapstructure:",squash"`
 }
 
 func LoadConfig() {
@@ -23,7 +26,7 @@ func LoadConfig() {
 	viper.AddConfigPath(".")
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalf("Error reading config file, %s", err)
+		log.Printf("Error reading config file, %s", err)
 	}
 
 	AppConfig = &Config{}

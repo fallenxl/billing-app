@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ICustomer, ISite } from "@/interfaces";
-import { useCustomersStore } from "@/stores";
+import { useDataStore } from "@/stores";
 import { Search } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -12,12 +12,12 @@ import { useEffect, useState } from "react";
 export default function CustomerPage() {
   const { id } = useParams();
   const router = useRouter();
-  const { fetchSitesByCustomerId, fetchCustomerById, customers } = useCustomersStore()
+  const { fetchSitesByCustomerId, fetchCustomerById, customers } = useDataStore()
   const [sites, setSites] = useState<ISite[] | null>(customers?.find(customer => customer.id.id === id)?.sites || null)
   const [customer, setCustomer] = useState<ICustomer | null>(customers?.find(customer => customer.id.id === id) || null)
   const [searchTerm, setSearchTerm] = useState("")
   const filteredSites = sites?.filter((site) =>
-    site.toName?.toLowerCase().includes(searchTerm.toLowerCase())
+    site.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
   useEffect(() => {
     const fetchData = async () => {
@@ -73,19 +73,19 @@ export default function CustomerPage() {
           ))
         )}
         {filteredSites && filteredSites.map((site) => (
-          <Card key={site.to.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={() => router.push(`/customer/${id}/site/${site.to.id}`)}>
+          <Card key={site.id.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={() => router.push(`/customer/${id}/site/${site.id.id}`)}>
             <CardContent className="p-4">
               <div className="flex flex-col items-center text-center">
                 <div className="w-20 h-20 rounded-sm overflow-hidden mb-3 bg-gray-100">
                   <img
-                    src={customer?.img || `https://api.dicebear.com/9.x/initials/svg?seed=${site.toName}`}
-                    alt={`${site.toName}'s profile`}
+                    src={customer?.img || `https://api.dicebear.com/9.x/initials/svg?seed=${site.name}`}
+                    alt={`${site.name}'s profile`}
                     width={80}
                     height={80}
                     className="object-cover"
                   />
                 </div>
-                <h3 className="font-medium">{site.toName}</h3>
+                <h3 className="font-medium">{site.name}</h3>
               </div>
             </CardContent>
           </Card>

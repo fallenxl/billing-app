@@ -13,12 +13,12 @@ func GetCustomersHandler(c *gin.Context) {
 		c.JSON(401, gin.H{"error": "Unauthorized"})
 		return
 	}
-	data, err := thingsboard.GetEntityGroupCustomersService(config.AppConfig.TB.BillingGroupId, token.(string))
+	data, err := thingsboard.GetCustomerEntityGroupService(config.AppConfig.TB.BillingGroupId, "", "", "", token.(string))
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Error sending request to API"})
 		return
 	}
-	c.JSON(200, gin.H{"message": "Customers data", "success": true, "data": data.Data})
+	c.JSON(200, gin.H{"message": "Customers data", "success": true, "data": data.Data, "totalPages": data.TotalPages, "totalElements": data.TotalElements, "hasNext": data.HasNext})
 }
 
 func GetCustomerByIdHandler(c *gin.Context) {
@@ -56,11 +56,11 @@ func GetCustomerSitesHandler(c *gin.Context) {
 		return
 	}
 
-	data, err := thingsboard.GetFromRelationsService(id, "CUSTOMER", token.(string))
+	data, err := thingsboard.GetSiteEntityGroupService(id, "", "", "", token.(string))
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Error sending request to API"})
 		return
 	}
 
-	c.JSON(200, gin.H{"message": "Customer sites data", "success": true, "data": data})
+	c.JSON(200, gin.H{"message": "Customer sites data", "success": true, "data": data.Data, "totalPages": data.TotalPages, "totalElements": data.TotalElements, "hasNext": data.HasNext})
 }

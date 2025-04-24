@@ -8,8 +8,14 @@ import (
 	"fmt"
 )
 
-func GetEntityGroupCustomersService(groupId string, token string) (model.CustomerGroup, error) {
-	uri := fmt.Sprintf("%s/entityGroup/%s/customers?pageSize=200&page=0", config.AppConfig.TB.URI, groupId)
+func GetCustomerEntityGroupService(groupId string, pageSize string, page string, textSearch string, token string) (model.CustomerGroup, error) {
+	if pageSize == "" {
+		pageSize = "10"
+	}
+	if page == "" {
+		page = "0"
+	}
+	uri := fmt.Sprintf("%s/entityGroup/%s/customers?pageSize=%s&page=%s&textSearch=%s", config.AppConfig.TB.URI, groupId, pageSize, page, textSearch)
 
 	var customerGroup model.CustomerGroup
 	response, err := utils.SendRequest("GET", uri, utils.DefaultHeaderToken(token), nil, &customerGroup)
@@ -24,16 +30,100 @@ func GetEntityGroupCustomersService(groupId string, token string) (model.Custome
 
 	for i, customer := range customerGroup.Data {
 		// Get customer attributes
-		attributes, err := GetAttributesService(customer.ID.EntityType, customer.ID.ID, token, []string{"img"})
+		attributes, err := GetAttributesService(customer.ID.EntityType, customer.ID.ID, token, []string{"img", "sitesGroup"})
 		if err != nil {
 			fmt.Println("Error getting customer attributes: ", err)
 			continue
 		}
-		var imgStr string
+		var imgStr, sitesGroupStr string
 		FindAttributeByKey(attributes, "img", &imgStr)
+		FindAttributeByKey(attributes, "sitesGroup", &sitesGroupStr)
 		customerGroup.Data[i].Img = &imgStr
+		customerGroup.Data[i].SitesGroup = &sitesGroupStr
 	}
 
 	return customerGroup, nil
+}
 
+func GetSiteEntityGroupService(groupId string, pageSize string, page string, textSearch string, token string) (model.SiteGroup, error) {
+	if pageSize == "" {
+		pageSize = "10"
+	}
+	if page == "" {
+		page = "0"
+	}
+	uri := fmt.Sprintf("%s/entityGroup/%s/assets?pageSize=%s&page=%s&textSearch=%s", config.AppConfig.TB.URI, groupId, pageSize, page, textSearch)
+
+	var siteGroup model.SiteGroup
+	response, err := utils.SendRequest("GET", uri, utils.DefaultHeaderToken(token), nil, &siteGroup)
+	if err != nil {
+		fmt.Println(err)
+		return model.SiteGroup{}, err
+	}
+	if response.StatusCode != 200 {
+		fmt.Println("Error: ", response.StatusCode, response.Body)
+		return model.SiteGroup{}, fmt.Errorf("error: %s", response.Body)
+	}
+
+	for i, site := range siteGroup.Data {
+		// Get customer attributes
+		attributes, err := GetAttributesService(site.ID.EntityType, site.ID.ID, token, []string{"localsGroup"})
+		if err != nil {
+			fmt.Println("Error getting customer attributes: ", err)
+			continue
+		}
+		var localGroupStr string
+		FindAttributeByKey(attributes, "localsGroup", &localGroupStr)
+		siteGroup.Data[i].LocalsGroup = &localGroupStr
+	}
+
+	return siteGroup, nil
+}
+
+func GetLocalEntityGroupService(groupId string, pageSize string, page string, textSearch string, token string) (model.LocalGroup, error) {
+	if pageSize == "" {
+		pageSize = "10"
+	}
+	if page == "" {
+		page = "0"
+	}
+	uri := fmt.Sprintf("%s/entityGroup/%s/assets?pageSize=%s&page=%s&textSearch=%s", config.AppConfig.TB.URI, groupId, pageSize, page, textSearch)
+
+	var localGroup model.LocalGroup
+	response, err := utils.SendRequest("GET", uri, utils.DefaultHeaderToken(token), nil, &localGroup)
+	if err != nil {
+		fmt.Println(err)
+		return model.LocalGroup{}, err
+	}
+	if response.StatusCode != 200 {
+		fmt.Println("Error: ", response.StatusCode, response.Body)
+		return model.LocalGroup{}, fmt.Errorf("error: %s", response.Body)
+	}
+
+	for i, local := range localGroup.Data {
+		// Get customer attributes
+		attributes, err := GetAttributesService(local.ID.EntityType, local.ID.ID, token, []string{"buildingOwner", "email", "phone", "address"})
+		if err != nil {
+			fmt.Println("Error getting customer attributes: ", err)
+			continue
+		}
+		var buildingOwner, email, phone, address string
+		FindAttributeByKey(attributes, "buildingOwner", &buildingOwner)
+		FindAttributeByKey(attributes, "email", &email)
+		FindAttributeByKey(attributes, "phone", &phone)
+		FindAttributeByKey(attributes, "address", &address)
+		localGroup.Data[i].BuildingOwner = &buildingOwner
+		localGroup.Data[i].Email = &email
+		localGroup.Data[i].Phone = &phone
+		localGroup.Data[i].Address = &address
+		var charges []model.Charges
+		FindAttributeByKey(attributes, "charges", &charges)
+		localGroup.Data[i].Charges = &charges
+
+		if localGroup.Data[i].Label == "" {
+			localGroup.Data[i].Label = localGroup.Data[i].Name
+		}
+	}
+
+	return localGroup, nil
 }

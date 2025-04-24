@@ -56,3 +56,9 @@ https://dashboard.lumenenergysolutions.com/api/images/tenant/icon.png?force=fals
     "whiteLabelingList": null,
     "references": null
 }
+
+
+--Search site
+curl -X 'GET' \
+  'https://dashboard.lumenenergysolutions.com/api/entityGroup/34f5ece0-1a0b-11f0-863b-f730addc68ba/assets?pageSize=20&page=0' \
+  -H 'accept: application/json' \

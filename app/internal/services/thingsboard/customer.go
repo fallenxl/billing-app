@@ -16,13 +16,15 @@ func GetCustomerInfoService(id string, token string) (model.Customer, error) {
 	if response.StatusCode != 200 {
 		return model.Customer{}, err
 	}
-	attributes, err := GetAttributesService(customerData.ID.EntityType, customerData.ID.ID, token, []string{"img"})
+	attributes, err := GetAttributesService(customerData.ID.EntityType, customerData.ID.ID, token, []string{"img", "sitesGroup"})
 	if err != nil {
 		return model.Customer{}, err
 	}
-	var imgStr string
+	var imgStr, sitesGroupStr string
+	FindAttributeByKey(attributes, "sitesGroup", &sitesGroupStr)
 	FindAttributeByKey(attributes, "img", &imgStr)
 	customerData.Img = &imgStr
+	customerData.SitesGroup = &sitesGroupStr
 
 	return customerData, nil
 

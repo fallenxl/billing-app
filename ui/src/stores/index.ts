@@ -1,2 +1,3 @@
 export * from './auth.store';
-export * from './customers.store';
+export * from './data.store';
+export * from './local.store';
