@@ -100,30 +100,5 @@ func GetLocalEntityGroupService(groupId string, pageSize string, page string, te
 		return model.LocalGroup{}, fmt.Errorf("error: %s", response.Body)
 	}
 
-	for i, local := range localGroup.Data {
-		// Get customer attributes
-		attributes, err := GetAttributesService(local.ID.EntityType, local.ID.ID, token, []string{"buildingOwner", "email", "phone", "address"})
-		if err != nil {
-			fmt.Println("Error getting customer attributes: ", err)
-			continue
-		}
-		var buildingOwner, email, phone, address string
-		FindAttributeByKey(attributes, "buildingOwner", &buildingOwner)
-		FindAttributeByKey(attributes, "email", &email)
-		FindAttributeByKey(attributes, "phone", &phone)
-		FindAttributeByKey(attributes, "address", &address)
-		localGroup.Data[i].BuildingOwner = &buildingOwner
-		localGroup.Data[i].Email = &email
-		localGroup.Data[i].Phone = &phone
-		localGroup.Data[i].Address = &address
-		var charges []model.Charges
-		FindAttributeByKey(attributes, "charges", &charges)
-		localGroup.Data[i].Charges = &charges
-
-		if localGroup.Data[i].Label == "" {
-			localGroup.Data[i].Label = localGroup.Data[i].Name
-		}
-	}
-
 	return localGroup, nil
 }

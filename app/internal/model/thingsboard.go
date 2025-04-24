@@ -34,8 +34,8 @@ type Relation struct {
 	Type           string      `json:"type"`
 	TypeGroup      string      `json:"typeGroup"`
 	Version        int64       `json:"version"`
-	FromName       *string     `json:"fromName"`       // puede ser null
-	ToName         *string     `json:"toName"`         // puede ser null
+	FromName       string      `json:"fromName"`       // puede ser null
+	ToName         string      `json:"toName"`         // puede ser null
 	AdditionalInfo interface{} `json:"additionalInfo"` // puede ser null o cualquier objeto
 }
 

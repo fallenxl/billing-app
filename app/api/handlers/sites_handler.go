@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"app/internal/services/thingsboard"
+	"app/internal/repository"
 	"app/pkg/utils"
 
 	"github.com/gin-gonic/gin"
@@ -13,16 +13,9 @@ func GetSiteInfoByIdHandler(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "ID is required"})
 		return
 	}
-
-	token, exists := c.Get("token")
-	if !exists {
-		c.JSON(401, gin.H{"error": "Unauthorized"})
-		return
-	}
-
-	data, err := thingsboard.GetSiteInfoByIdService(id, token.(string))
+	data, err := repository.GetSiteInfoById(id)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Error sending request to API"})
+		c.JSON(500, gin.H{"error": "Error getting site data"})
 		return
 	}
 
@@ -41,17 +34,11 @@ func GetLocalsBySiteIdHandler(c *gin.Context) {
 	pageNumber := utils.GetQueryParam(c, "page", "0")
 	textSearch := utils.GetQueryParam(c, "q", "")
 
-	token, exists := c.Get("token")
-	if !exists {
-		c.JSON(401, gin.H{"error": "Unauthorized"})
-		return
-	}
-
-	data, err := thingsboard.GetLocalEntityGroupService(id, pageSize, pageNumber, textSearch, token.(string))
+	data, err := repository.GetLocalsBySiteId(id, utils.StringToInt(pageSize), utils.StringToInt(pageNumber), textSearch)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Error sending request to API"})
+		c.JSON(500, gin.H{"error": "Error getting locals data"})
 		return
 	}
 
-	c.JSON(200, gin.H{"message": "Locals data", "success": true, "data": data.Data, "totalPages": data.TotalPages, "totalElements": data.TotalElements, "hasNext": data.HasNext})
+	c.JSON(200, gin.H{"message": "Locals data", "success": true, "data": data.Data, "totalPages": data.TotalPages, "totalElements": data.Total, "hasNext": data.HasNext})
 }

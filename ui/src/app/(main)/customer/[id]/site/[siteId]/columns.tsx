@@ -61,6 +61,11 @@ export const localsColumns = (
             enableHiding: false,
         },
         {
+            accessorKey: "name",
+            header: () => {},
+            cell: () => {}
+        },
+        {
             accessorKey: "label",
             header: ({ column }) => {
                 return (
@@ -75,7 +80,7 @@ export const localsColumns = (
                 )
             },
             cell: ({ row }) => (
-                <div className="text-left">{row.getValue("label")}</div>
+                <div className="text-left">{row.getValue("label") || row.getValue("name")}</div>
             ),
         },
         {
@@ -117,8 +122,11 @@ export const localsColumns = (
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>Change name</DropdownMenuItem>
                             <DropdownMenuItem
+                            disabled
+                            >Change name</DropdownMenuItem>
+                            <DropdownMenuItem
+                            disabled
                                 onClick={() => editLocalAction(row.original)}
                             >View details</DropdownMenuItem>
                         </DropdownMenuContent>

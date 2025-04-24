@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -80,4 +81,25 @@ func GetQueryParam(c *gin.Context, key string, defaultValue string) string {
 		return defaultValue
 	}
 	return value
+}
+
+func GetBodyParam(c *gin.Context, key string, defaultValue interface{}) (interface{}, error) {
+	var body map[string]interface{}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		return nil, fmt.Errorf("error al leer el cuerpo de la solicitud: %v", err)
+	}
+
+	value, exists := body[key]
+	if !exists {
+		return defaultValue, nil
+	}
+	return value, nil
+}
+
+func StringToInt(s string) int {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		return 0 // o manejar el error de otra manera
+	}
+	return i
 }

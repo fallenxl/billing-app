@@ -48,7 +48,8 @@ export const useDataStore = create<DataState>((set, get) => ({
             if (!existingCustomer) {
                 throw new Error('Customer not found');
             }
-            const response = await api.get(`/customers/${existingCustomer.sitesGroup}/sites`);
+            const response = await api.get(`/customers/${existingCustomer.id.id}/sites`);
+            console.log('response', response)
             const sites = response.data.data as ISite[];
             if (response.status !== 200) {
                 throw new Error('Failed to fetch sites data');
@@ -84,9 +85,9 @@ export const useDataStore = create<DataState>((set, get) => ({
     },
     fetchSiteById: async (siteId) => {
         try {
-            const existingCustomer = get().customersSelected?.find(customer => customer.sites?.some(site => site.id.id === siteId));
+            const existingCustomer = get().customersSelected?.find(customer => customer.sites?.some(site => site.id === siteId));
             if (existingCustomer) {
-                const site = existingCustomer.sites?.find(site => site.id.id === siteId);
+                const site = existingCustomer.sites?.find(site => site.id === siteId);
                 return site as ISite;
             }
             const response = await api.get(`/sites/${siteId}`);
@@ -110,16 +111,16 @@ export const useDataStore = create<DataState>((set, get) => ({
             const page = options?.page || 0;
             const size = options?.size || 10;
             const query = options?.query ? `?query=${options.query}` : '';
-            const response = await api.get(`/sites/${site.localsGroup}/locals?page=${page}&size=${size}&q=${query}`);
+            const response = await api.get(`/sites/${site.id}/locals?page=${page}&size=${size}&q=${query}`);
             if (response.status !== 200) throw new Error('Failed to fetch locals data');
     
             const customers = get().customersSelected ?? [];
             const updatedCustomers = customers.map(customer => {
-                if (customer.sites?.some(s => s.id.id === siteId)) {
+                if (customer.sites?.some(s => s.id === siteId)) {
                     return {
                         ...customer,
                         sites: customer.sites?.map(s => {
-                            if (s.id.id === siteId) {
+                            if (s.id === siteId) {
                                 return {
                                     ...s,
                                     localsData: {

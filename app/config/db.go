@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"os"
 	"strings"
 
 	"gorm.io/driver/postgres"
@@ -32,6 +33,15 @@ func InitDB() {
 	db.AutoMigrate(&model.Local{})
 	db.AutoMigrate(&model.Meter{})
 	db.AutoMigrate(&model.Telemetry{})
+
+	sitesProcedures, err := loadSQLFromFile("db/procedures.sql")
+	if err != nil {
+		log.Fatalf("Error al cargar el archivo de procedimientos: %v", err)
+	}
+
+	if err := db.Exec(sitesProcedures).Error; err != nil {
+		log.Fatalf("Error al ejecutar el procedimiento: %v", err)
+	}
 	DB = db
 
 }
@@ -58,4 +68,12 @@ func parseDatabaseURI(uri string) (string, string, string, string, string) {
 	password := query.Get("password")
 
 	return host, user, password, dbname, port
+}
+
+func loadSQLFromFile(path string) (string, error) {
+	bytes, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	return string(bytes), nil
 }

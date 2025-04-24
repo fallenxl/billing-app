@@ -73,7 +73,7 @@ export default function CustomerPage() {
           ))
         )}
         {filteredSites && filteredSites.map((site) => (
-          <Card key={site.id.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={() => router.push(`/customer/${id}/site/${site.id.id}`)}>
+          <Card key={site.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={() => router.push(`/customer/${id}/site/${site.id}`)}>
             <CardContent className="p-4">
               <div className="flex flex-col items-center text-center">
                 <div className="w-20 h-20 rounded-sm overflow-hidden mb-3 bg-gray-100">

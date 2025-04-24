@@ -10,7 +10,9 @@ var AppConfig *Config
 
 type Config struct {
 	App struct {
-		Port string `mapstructure:"PORT"`
+		Port      string `mapstructure:"PORT"`
+		MaxSites  string `mapstructure:"MAX_SITES"`
+		MaxLocals string `mapstructure:"MAX_LOCALS"`
 	} `mapstructure:",squash"`
 	TB struct {
 		URI            string `mapstructure:"TB_URI"`
@@ -22,6 +24,10 @@ type Config struct {
 }
 
 func LoadConfig() {
+	viper.SetDefault("PORT", "4001")
+	viper.SetDefault("MAX_SITES", 1000)
+	viper.SetDefault("MAX_LOCALS", 1000)
+	viper.SetDefault("TB_URI", "http://localhost:8080/api")
 	viper.SetConfigFile(".env")
 	viper.AddConfigPath(".")
 	viper.AutomaticEnv()

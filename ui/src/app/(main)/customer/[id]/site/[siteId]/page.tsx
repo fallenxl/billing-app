@@ -76,7 +76,7 @@ export default function SiteManagement() {
 
           searchOptions={
             {
-              column: ["label", "email"], placeholder: "Filter locals..."
+              column: ["label", "email", "name"], placeholder: "Filter locals..."
             }
           }
         columns={localsColumns({

@@ -6,8 +6,8 @@ export interface LocalsData {
     totalPages: number;
 }
 export interface ISite {
-    id: EntityId;
-    customerId: EntityId;
+    id: string;
+    customerId: string;
     name: string;
     type: string;
     label: string;
