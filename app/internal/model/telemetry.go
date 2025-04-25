@@ -9,4 +9,6 @@ type Telemetry struct {
 	LastValueTs  int64   `json:"lastValueTs"`
 	Consumption  float64 `json:"consumption" gorm:"type:decimal(10,2)"`
 	UpdatedAt    string  `json:"updatedAt"`
+	LocalID      string  `json:"localId" gorm:"not null"`
+	Local        Local   `json:"local" gorm:"foreignKey:LocalID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }

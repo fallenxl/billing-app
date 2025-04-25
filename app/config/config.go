@@ -17,6 +17,8 @@ type Config struct {
 	TB struct {
 		URI            string `mapstructure:"TB_URI"`
 		BillingGroupId string `mapstructure:"TB_BILLING_ID"`
+		Username       string `mapstructure:"TB_USERNAME"`
+		Password       string `mapstructure:"TB_PASSWORD"`
 	} `mapstructure:",squash"`
 	Datasource struct {
 		URI string `mapstructure:"DATASOURCE_URI"`

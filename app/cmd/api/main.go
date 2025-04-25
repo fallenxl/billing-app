@@ -3,17 +3,18 @@ package main
 import (
 	"app/api/routes"
 	"app/config"
+	"app/cron"
 	"log"
-
-	"github.com/spf13/viper"
 )
 
 func main() {
 
-	viper.SetDefault("PORT", "4001")
-	config.LoadConfig()
-	config.InitDB()
-	router := routes.SetupRouter()
+	config.LoadConfig() // Load the configuration from the config file
+	config.InitDB()     // Initialize the database connection
+
+	router := routes.SetupRouter() // Setup the router with all routes
+
+	cron.InitCronJobs() // Initialize and start the cron jobs
 
 	port := config.AppConfig.App.Port
 

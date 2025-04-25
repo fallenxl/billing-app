@@ -33,6 +33,7 @@ func InitDB() {
 	db.AutoMigrate(&model.Local{})
 	db.AutoMigrate(&model.Meter{})
 	db.AutoMigrate(&model.Telemetry{})
+	db.AutoMigrate(&model.SyncLogs{})
 
 	sitesProcedures, err := loadSQLFromFile("db/procedures.sql")
 	if err != nil {

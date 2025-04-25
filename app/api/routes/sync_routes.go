@@ -11,6 +11,6 @@ func RegisterSyncRoutes(r *gin.RouterGroup) {
 	sync := r.Group("/sync", middleware.AuthMiddleware)
 	{
 		sync.GET("/", handlers.SyncHandler)
-		sync.POST("/telemetry", handlers.SyncHandler)
+		sync.POST("/telemetry/:siteId", handlers.SyncTelemetryBySiteHandler)
 	}
 }

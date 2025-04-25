@@ -83,17 +83,43 @@ func GetQueryParam(c *gin.Context, key string, defaultValue string) string {
 	return value
 }
 
-func GetBodyParam(c *gin.Context, key string, defaultValue interface{}) (interface{}, error) {
+func GetBodyParam(c *gin.Context, key string, response interface{}) error {
 	var body map[string]interface{}
 	if err := c.ShouldBindJSON(&body); err != nil {
-		return nil, fmt.Errorf("error al leer el cuerpo de la solicitud: %v", err)
+		return fmt.Errorf("error al leer el cuerpo de la solicitud: %v", err)
 	}
 
 	value, exists := body[key]
 	if !exists {
-		return defaultValue, nil
+		return fmt.Errorf("el parámetro %s no se encontró en el cuerpo de la solicitud", key)
 	}
-	return value, nil
+
+	switch r := response.(type) {
+	case *string:
+		str, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("se esperaba string para %s", key)
+		}
+		*r = str
+	case *[]string:
+		rawSlice, ok := value.([]interface{})
+		if !ok {
+			return fmt.Errorf("se esperaba arreglo de strings para %s", key)
+		}
+		strs := make([]string, len(rawSlice))
+		for i, v := range rawSlice {
+			str, ok := v.(string)
+			if !ok {
+				return fmt.Errorf("elemento en %s no es string", key)
+			}
+			strs[i] = str
+		}
+		*r = strs
+	default:
+		return fmt.Errorf("tipo de dato no soportado para el parámetro %s", key)
+	}
+
+	return nil
 }
 
 func StringToInt(s string) int {

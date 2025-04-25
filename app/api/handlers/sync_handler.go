@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"app/config"
 	"app/internal/services/sync"
 	"app/pkg/utils"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,24 +27,43 @@ func SyncHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Sync data", "success": true})
 }
 
-func SyncTelemetryByLocalHandler(c *gin.Context) {
+func SyncTelemetryBySiteHandler(c *gin.Context) {
 	token, _ := c.Get("token")
+	siteId := c.Param("siteId")
+	if siteId == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "siteId is required"})
+		return
+	}
 
-	localIds, err := utils.GetBodyParam(c, "localIds", []string{})
+	db := config.DB
+	localsIds, err := db.Table("locals").Select("id").Where("site_id = ?", siteId).Rows()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "localIds is required"})
-		return
-	}
-
-	localIdsArray, ok := localIds.([]string)
-	if !ok || len(localIdsArray) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "localIds must be a non-empty array of strings"})
-		return
-	}
-
-	if err := sync.SyncTelemetryByLocal(token.(string), localIdsArray); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
+	}
+	defer localsIds.Close()
+
+	var localIds []string
+	for localsIds.Next() {
+		var id string
+		if err := localsIds.Scan(&id); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		localIds = append(localIds, id)
+	}
+	if len(localIds) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No locals found for the given siteId"})
+		return
+	}
+
+	startTs := time.Now().Truncate(24*time.Hour).UnixNano() / 1e6
+	endTs := time.Now().Truncate(24*time.Hour).Add(24*time.Hour-1).UnixNano() / 1e6
+	for _, id := range localIds {
+		if err := sync.SyncTelemetryByLocal(token.(string), id, startTs, endTs); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Sync data", "success": true})

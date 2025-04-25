@@ -61,3 +61,8 @@ type AssetInfo struct {
 	OwnerID        EntityRef      `json:"ownerId"`
 	AdditionalInfo map[string]any `json:"additionalInfo"` // puedes usar map[string]interface{} también
 }
+
+type TelemetryValue struct {
+	Ts    int64  `json:"ts"`
+	Value string `json:"value"`
+}
