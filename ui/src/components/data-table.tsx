@@ -68,14 +68,14 @@ export function DataTable<T>({ columns, data, toggleColumns = true, children, se
   const [globalFilter, setGlobalFilter] = React.useState("")
   const [options, setOptions] = React.useState<LocalsOptions>({
     page: 0,
-    size: 10,
+    size: 50,
     query:'',
   })
   
   const table = useReactTable({
     data: data.data,
     columns,
-    pageCount: data.totalPages,
+    // pageCount: data.totalPages,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     globalFilterFn: (row, columnId, filterValue) => {
@@ -92,10 +92,6 @@ export function DataTable<T>({ columns, data, toggleColumns = true, children, se
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
-      pagination: {
-        pageIndex: options.page,
-        pageSize: options.size,
-      },
       sorting,
       columnFilters,
       columnVisibility,
@@ -211,7 +207,7 @@ export function DataTable<T>({ columns, data, toggleColumns = true, children, se
             variant="outline"
             size="sm"
             onClick={() => table.nextPage()}
-            disabled={!data.hasNext}
+            disabled={!table.getCanNextPage()}
           >
             Next
           </Button>

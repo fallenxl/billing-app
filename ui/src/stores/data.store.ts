@@ -109,7 +109,7 @@ export const useDataStore = create<DataState>((set, get) => ({
                 return site.localsData as LocalsData;
             }
             const page = options?.page || 0;
-            const size = options?.size || 10;
+            const size = options?.size || 50;
             const query = options?.query ? `?query=${options.query}` : '';
             const response = await api.get(`/sites/${site.id}/locals?page=${page}&size=${size}&q=${query}`);
             if (response.status !== 200) throw new Error('Failed to fetch locals data');

@@ -81,6 +81,8 @@ export default function Home() {
                       alt={`${customer.name}'s profile`}
                       width={80}
                       height={80}
+                      loading="lazy"
+                    
                       className="object-cover"
                     />
                   </div>

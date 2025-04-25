@@ -41,7 +41,6 @@ export default function SiteManagement() {
   useEffect(() => {
     fetchLocalsByCustomerAndSiteId(id as string, siteId as string).then((states) => {
       const [customer, site, locals] = states
-      console.log("states", states)
       setStates({ customer, site, locals })
     })
   }, [id, siteId, fetchLocalsByCustomerAndSiteId])
