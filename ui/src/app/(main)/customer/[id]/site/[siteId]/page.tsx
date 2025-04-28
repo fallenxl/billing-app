@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ChevronLeft, InfoIcon, Settings } from "lucide-react"
+import { InfoIcon, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useParams, useRouter } from "next/navigation"
-import { LocalsOptions, useDataStore } from "@/stores"
+import { useParams } from "next/navigation"
+import {  useDataStore } from "@/stores"
 import { ICustomer, ILocal, ISite, LocalsData } from "@/interfaces"
 import { DataTable } from "@/components/data-table"
 import { localsColumns } from "./columns"
@@ -22,9 +22,8 @@ interface SiteManagementProps {
   locals: LocalsData | null
 }
 export default function SiteManagement() {
-  const router = useRouter()
   const { id, siteId } = useParams()
-  const { localsSelected } = useLocalsStore()
+  const { localsSelected, resetLocals } = useLocalsStore()
   const [editLocal, setEditLocal] = useState<ILocal | null>(null)
   const [openEditLocal, setOpenEditLocal] = useState(false)
   const [date, setDate] = useState<DateRange | undefined>({
@@ -39,6 +38,7 @@ export default function SiteManagement() {
   const { fetchLocalsByCustomerAndSiteId, fetchLocalsBySiteId } = useDataStore()
 
   useEffect(() => {
+    resetLocals()
     fetchLocalsByCustomerAndSiteId(id as string, siteId as string).then((states) => {
       const [customer, site, locals] = states
       setStates({ customer, site, locals })
@@ -46,12 +46,9 @@ export default function SiteManagement() {
   }, [id, siteId, fetchLocalsByCustomerAndSiteId])
   return (
     <div className="  p-4 ">
-      <div className="bg-white border shadow-sm p-6">
+      <div className="p-6">
         {/* Encabezado */}
         <div className="flex items-center">
-          <Button onClick={() => router.back()} variant="ghost" size="icon" className="mr-2">
-            <ChevronLeft className="h-5 w-5 text-gray-500 " />
-          </Button>
           <div className="flex flex-col">
             <h1 className="text-xl font-medium">
               {states.customer?.name} / <span className="font-bold">{states.site?.name}</span>
@@ -63,7 +60,7 @@ export default function SiteManagement() {
             <Settings className="h-5 w-5" />
           </Button>
         </div>
-        <small className="text-neutral-600 ml-10">
+        <small className="text-neutral-600 ">
           Manage your site and locals
         </small>
         <DataTable data={{
@@ -98,7 +95,7 @@ export default function SiteManagement() {
             </TooltipProvider>
             <RangeDatePicker date={date} setDate={setDate} />
           </div>
-          <ExportModal localsSelected={localsSelected} />
+          {states.site && <ExportModal localsSelected={localsSelected} site={states.site} />}
 
         </div>
       </DataTable>

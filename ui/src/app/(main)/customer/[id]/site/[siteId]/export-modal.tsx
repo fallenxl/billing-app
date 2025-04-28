@@ -10,13 +10,14 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Check } from "lucide-react"
 import Image from "next/image"
-import { ILocal } from "@/interfaces"
+import { ILocal, ISite } from "@/interfaces"
 import { Icon } from "@/icons/icons"
 
 interface ExportModalProps {
     localsSelected: ILocal[]
+    site: ISite
 }
-export default function ExportModal({ localsSelected }: ExportModalProps) {
+export default function ExportModal({ localsSelected, site }: ExportModalProps) {
     const [open, setOpen] = useState(false)
     const [step, setStep] = useState(1)
     const [format, setFormat] = useState("pdf")
@@ -168,14 +169,6 @@ export default function ExportModal({ localsSelected }: ExportModalProps) {
                                     <div className="flex items-center space-x-2">
                                         <Checkbox id="sendEmail" />
                                         <Label htmlFor="sendEmail">Send Email</Label>
-                                    </div>
-
-                                    <div>
-                                        <Label>Selected Locations</Label>
-                                        <div className="flex gap-2 mt-1">
-                                            <Input placeholder="Search locations" />
-                                            <Button variant="outline">Clear</Button>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
