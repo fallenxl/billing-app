@@ -22,7 +22,7 @@ func SyncData(token, customerID string) error {
 		return fmt.Errorf("error getting customer sites: %w", err)
 	}
 
-	var siteIDs, localIDs, meterIDs []string
+	var siteIDs, localIDs []string
 
 	for _, site := range customerSites.Data {
 		siteIDs = append(siteIDs, site.ID.ID)
@@ -57,7 +57,7 @@ func SyncData(token, customerID string) error {
 			}
 
 			for _, meter := range meters {
-				meterIDs = append(meterIDs, meter.To.ID)
+				// meterIDs = append(meterIDs, meter.To.ID)
 
 				meterType := prefixMeterType(meter.ToName)
 				if err := upsertMeter(meter, local.ID.ID, meterType); err != nil {
@@ -67,9 +67,9 @@ func SyncData(token, customerID string) error {
 		}
 	}
 
-	deleteMissing("sites", siteIDs)
-	deleteMissing("locals", localIDs)
-	deleteMissing("meters", meterIDs)
+	deleteMissing("sites", siteIDs, "customer_id", customerID)
+	deleteMissing("locals", localIDs, "customer_id", customerID)
+	// deleteMissing("meters", meterIDs)
 
 	return nil
 }
@@ -86,7 +86,7 @@ func SyncTelemetryByLocal(token, localID string, startTs, endTs int64) error {
 	interval := endTs - startTs
 	oneDay := int64(24 * time.Hour / time.Millisecond)
 	yesterdayStart := startTs - oneDay
-	yesterdayEnd := endTs - oneDay
+	yesterdayEnd := startTs - 1
 
 	for rows.Next() {
 		var id, name, meterType, entityType string
@@ -132,8 +132,11 @@ func SyncTelemetryByLocal(token, localID string, startTs, endTs int64) error {
 }
 
 func SyncAllTelemetry() error {
-	startTs := time.Now().Add(-24*time.Hour).UnixNano() / int64(time.Millisecond)
-	endTs := time.Now().UnixNano() / int64(time.Millisecond)
+	now := time.Now()
+	startOfDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	startTs := startOfDay.UnixNano() / int64(time.Millisecond)
+	endTs := now.UnixNano() / int64(time.Millisecond)
+
 	loginRequest := model.LoginRequest{
 		Username: config.AppConfig.TB.Username,
 		Password: config.AppConfig.TB.Password,
@@ -196,11 +199,14 @@ func upsertMeter(meter model.Relation, localID, meterType string) error {
 		meter.To.ID, meter.ToName, meterType, localID, meter.To.EntityType).Error
 }
 
-func deleteMissing(table string, ids []string) {
+func deleteMissing(table string, ids []string, foreignKey string, id string) {
 	if len(ids) == 0 {
 		return
 	}
-	err := config.DB.Exec(`DELETE FROM `+table+` WHERE id NOT IN ?`, ids).Error
+	err := config.DB.Exec(
+		`DELETE FROM `+table+` WHERE id NOT IN (?) AND `+foreignKey+` = ?`,
+		ids, id,
+	).Error
 	if err != nil {
 		log.Printf("error deleting from %s: %v", table, err)
 	}

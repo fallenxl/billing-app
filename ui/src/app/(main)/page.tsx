@@ -3,33 +3,29 @@
 import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { Search } from "lucide-react"
+import {  Search} from "lucide-react"
 import { useAuthStore, useDataStore } from "@/stores"
 import { RoleGuard } from "@/guards/role.guard"
 import { ROLES } from "@/constants"
-import { useRouter } from "next/navigation"
 import { Skeleton } from "@/components/ui/skeleton"
+import { CustomerCard } from "@/components/customer-card"
 
 
 export default function Home() {
-  const router = useRouter()
   const { user } = useAuthStore()
-  const { customers, fetchCustomers } = useDataStore()
+  const { customers} = useDataStore()
   const [searchTerm, setSearchTerm] = useState("")
   const [loading, setLoading] = useState(true)
 
   const filteredCustomers = customers?.filter((customer) =>
     customer.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
-
   useEffect(() => {
-    (async () => {
-      if (!customers) {
-        await fetchCustomers()
-      }
+    if(customers){
       setLoading(false)
-    })()
-  }, [])
+    }
+  }, [customers])
+
   return (
 
 
@@ -56,15 +52,18 @@ export default function Home() {
         </div>
 
         {/* Customer cards grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
           {loading && (
             <>
               {Array.from({ length: 8 }).map((_, index) => (
                 <Card key={index} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
-                  <CardContent className="p-4">
-                    <div className="flex flex-col items-center text-center">
-                      <Skeleton className="h-20 w-20 rounded-sm mb-3" />
-                      <Skeleton className="h-4 w-24 mb-2" />
+                  <CardContent className="p-4 h-32">
+                    <div className="flex items-center space-x-3">
+                      <Skeleton className="h-10 w-10 rounded-md" />
+                      <div className="flex flex-col">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-4 w-24 mt-1" />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -72,24 +71,9 @@ export default function Home() {
             </>
           )}
           {!loading && filteredCustomers?.map((customer) => (
-            <Card key={customer.id.id} className={`${!customer.sitesGroup && "opacity-50"}  overflow-hidden hover:shadow-md transition-shadow cursor-pointer`} onClick={() => customer.sitesGroup && router.push(`/customer/${customer.id.id}`)}>
-              <CardContent className="p-4">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-20 h-20 rounded-sm overflow-hidden mb-3 bg-gray-100">
-                    <img
-                      src={customer.img || `https://api.dicebear.com/9.x/initials/svg?seed=${customer.name}`}
-                      alt={`${customer.name}'s profile`}
-                      width={80}
-                      height={80}
-                      loading="lazy"
-                    
-                      className="object-cover"
-                    />
-                  </div>
-                  <h3 className="font-medium">{customer.name}</h3>
-                </div>
-              </CardContent>
-            </Card>
+            <div key={customer.id.id} className={`${!customer.sitesGroup && "opacity-50"}  overflow-hidden hover:shadow-md transition-shadow cursor-pointer`} >
+              <CustomerCard {...customer} />
+            </div>
           ))}
         </div>
 
@@ -103,3 +87,5 @@ export default function Home() {
 
   )
 }
+
+

@@ -30,14 +30,5 @@ func InitCronJobs() {
 		panic(err)
 	}
 
-	//  Cada minuto
-	_, err = c.AddFunc("0 * * * * *", func() {
-		utils.PrintLog("Sincronizando datos de Thingsboard a la base de datos")
-		sync.SyncAllTelemetry()
-	})
-	if err != nil {
-		panic(err)
-	}
-
 	c.Start()
 }

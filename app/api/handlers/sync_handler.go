@@ -3,7 +3,6 @@ package handlers
 import (
 	"app/config"
 	"app/internal/services/sync"
-	"app/pkg/utils"
 	"net/http"
 	"time"
 
@@ -12,7 +11,7 @@ import (
 
 func SyncHandler(c *gin.Context) {
 	token, _ := c.Get("token")
-	customerID := utils.GetQueryParam(c, "customerId", "")
+	customerID := c.Param("customerId")
 	if customerID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "customerId is required"})
 		return
