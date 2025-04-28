@@ -30,7 +30,7 @@ export default function Home() {
 
 
     <RoleGuard roles={[ROLES.TENANT_ADMIN]} redirect={true} path={`/customer/${user?.customerId}`}>
-      <div className="container px-4 mx-auto">
+      <div className="p-4 mx-auto">
         <div className="mb-8">
 
           <h1 className="text-2xl font-semibold">Customers</h1>

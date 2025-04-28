@@ -1,5 +1,6 @@
 "use client";
 
+import { SiteCard } from "@/components/site-card";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -34,7 +35,7 @@ export default function CustomerPage() {
     fetchData();
   }, [id]);
   return (
-    <div className="container px-4 mx-auto">
+    <div className=" p-4 mx-auto">
       <div className="mb-8">
         {
           !customer ? (
@@ -73,22 +74,9 @@ export default function CustomerPage() {
           ))
         )}
         {filteredSites && filteredSites.map((site) => (
-          <Card key={site.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={() => router.push(`/customer/${id}/site/${site.id}`)}>
-            <CardContent className="p-4">
-              <div className="flex flex-col items-center text-center">
-                <div className="w-20 h-20 rounded-sm overflow-hidden mb-3 bg-gray-100">
-                  <img
-                    src={customer?.img || `https://api.dicebear.com/9.x/initials/svg?seed=${site.name}`}
-                    alt={`${site.name}'s profile`}
-                    width={80}
-                    height={80}
-                    className="object-cover"
-                  />
-                </div>
-                <h3 className="font-medium">{site.name}</h3>
-              </div>
-            </CardContent>
-          </Card>
+          <div key={site.id} className={`overflow-hidden hover:shadow-md transition-shadow cursor-pointer`} >
+              <SiteCard  site={site} customer={customer!}/>
+            </div>
         ))}
       </div>
 
