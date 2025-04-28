@@ -83,10 +83,7 @@ func SyncTelemetryByLocal(token, localID string, startTs, endTs int64) error {
 	}
 	defer rows.Close()
 
-	interval := endTs - startTs
 	oneDay := int64(24 * time.Hour / time.Millisecond)
-	yesterdayStart := startTs - oneDay
-	yesterdayEnd := startTs - 1
 
 	for rows.Next() {
 		var id, name, meterType, entityType string
@@ -99,32 +96,39 @@ func SyncTelemetryByLocal(token, localID string, startTs, endTs int64) error {
 			continue
 		}
 
-		current, err := thingsboard.GetTelemetryService(id, entityType, keys, startTs, endTs, interval, "MAX", token)
-		if err != nil || len(current) == 0 {
-			log.Printf("no current telemetry data for %s", id)
+		data, err := thingsboard.GetTelemetryService(id, entityType, keys, startTs, endTs, oneDay, "MAX", token)
+		if err != nil || len(data) == 0 {
+			log.Printf("error getting telemetry data for %s: %v", id, err)
 			continue
 		}
 
-		yesterday, err := thingsboard.GetTelemetryService(id, entityType, keys, yesterdayStart, yesterdayEnd, interval, "MAX", token)
-		if err != nil || len(yesterday) == 0 || len(yesterday) != len(current) {
-			log.Printf("invalid yesterday telemetry data for %s", id)
+		values := data[keys[0]]
+		if len(values) < 2 {
+			log.Printf("insufficient telemetry points for %s", id)
 			continue
 		}
 
-		firstValue, err := strconv.ParseFloat(yesterday["energyCount"][0].Value, 64)
-		if err != nil {
-			log.Printf("error parsing firstValue: %v", err)
-			continue
-		}
-		lastValue, err := strconv.ParseFloat(current["energyCount"][0].Value, 64)
-		if err != nil {
-			log.Printf("error parsing lastValue: %v", err)
-			continue
-		}
+		// Procesar cada par de días
+		for i := 0; i < len(values)-1; i++ {
+			first := values[i]
+			last := values[i+1]
 
-		endTs := time.UnixMilli(endTs)
-		if err := saveDailyTelemetry(localID, id, endTs, firstValue, lastValue, yesterday["energyCount"][0].Ts, current["energyCount"][0].Ts); err != nil {
-			log.Printf("error saving telemetry: %v", err)
+			firstValue, err := strconv.ParseFloat(first.Value, 64)
+			if err != nil {
+				log.Printf("error parsing firstValue for %s: %v", id, err)
+				continue
+			}
+			lastValue, err := strconv.ParseFloat(last.Value, 64)
+			if err != nil {
+				log.Printf("error parsing lastValue for %s: %v", id, err)
+				continue
+			}
+
+			saveDate := time.UnixMilli(last.Ts)
+
+			if err := saveDailyTelemetry(localID, id, saveDate, firstValue, lastValue, first.Ts, last.Ts); err != nil {
+				log.Printf("error saving telemetry for %s: %v", id, err)
+			}
 		}
 	}
 
@@ -263,6 +267,6 @@ func keysByMeterType(meterType string) []string {
 	case "Water":
 		return []string{"pulseCount"}
 	default:
-		return nil
+		return []string{"E"}
 	}
 }

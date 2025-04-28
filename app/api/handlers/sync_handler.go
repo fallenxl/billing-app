@@ -3,7 +3,9 @@ package handlers
 import (
 	"app/config"
 	"app/internal/services/sync"
+	"app/pkg/utils"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -34,18 +36,38 @@ func SyncTelemetryBySiteHandler(c *gin.Context) {
 		return
 	}
 
+	// Tiempos
+	now := time.Now()
+	defaultStartTs := time.Date(now.Year(), now.Month(), now.Day()-1, 0, 0, 0, 0, now.Location()).UnixMilli()
+	startTs, _ := strconv.ParseInt(utils.GetQueryParam(c, "startTs", ""), 10, 64)
+	if startTs == 0 {
+		startTs = defaultStartTs
+	}
+
+	defaultEndTs := now.UnixMilli()
+	endTs, _ := strconv.ParseInt(utils.GetQueryParam(c, "endTs", ""), 10, 64)
+	if endTs == 0 {
+		endTs = defaultEndTs
+	}
+
+	if startTs > endTs {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "startTs must be before endTs"})
+		return
+	}
+
+	// Buscar locals
 	db := config.DB
-	localsIds, err := db.Table("locals").Select("id").Where("site_id = ?", siteId).Rows()
+	rows, err := db.Table("locals").Select("id").Where("site_id = ?", siteId).Rows()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	defer localsIds.Close()
+	defer rows.Close()
 
 	var localIds []string
-	for localsIds.Next() {
+	for rows.Next() {
 		var id string
-		if err := localsIds.Scan(&id); err != nil {
+		if err := rows.Scan(&id); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
@@ -56,8 +78,7 @@ func SyncTelemetryBySiteHandler(c *gin.Context) {
 		return
 	}
 
-	startTs := time.Now().Truncate(24*time.Hour).UnixNano() / 1e6
-	endTs := time.Now().Truncate(24*time.Hour).Add(24*time.Hour-1).UnixNano() / 1e6
+	// Ejecutar sincronización
 	for _, id := range localIds {
 		if err := sync.SyncTelemetryByLocal(token.(string), id, startTs, endTs); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -65,5 +86,5 @@ func SyncTelemetryBySiteHandler(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Sync data", "success": true})
+	c.JSON(http.StatusOK, gin.H{"message": "Sync completed successfully", "success": true})
 }

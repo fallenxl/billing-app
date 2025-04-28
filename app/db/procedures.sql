@@ -65,7 +65,6 @@ BEGIN
     IF EXISTS (SELECT 1 FROM meters WHERE id = in_meter_id) THEN
         UPDATE meters
         SET name = in_name,
-            type = in_type,
             local_id = in_local_id,
             entity_type = in_entity_type
         WHERE id = in_meter_id;

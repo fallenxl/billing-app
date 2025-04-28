@@ -45,8 +45,8 @@ export default function SiteManagement() {
     })
   }, [id, siteId, fetchLocalsByCustomerAndSiteId])
   return (
-    <div className="container mx-auto p-4 max-w-screen-2xl">
-      <div className="bg-white rounded-lg border shadow-sm p-6">
+    <div className="  p-4 ">
+      <div className="bg-white border shadow-sm p-6">
         {/* Encabezado */}
         <div className="flex items-center">
           <Button onClick={() => router.back()} variant="ghost" size="icon" className="mr-2">
