@@ -9,6 +9,7 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { Separator } from "@/components/ui/separator"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { AppBreadcrumb } from "@/components/app-breadcrumb"
+import { Toaster } from "@/components/ui/sonner"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -47,7 +48,7 @@ export default function RootLayout({
               </div>
             </SidebarInset>
           </SidebarProvider>
-
+          <Toaster />
         </AuthGuard>
 
       </body>

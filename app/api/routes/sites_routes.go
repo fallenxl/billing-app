@@ -12,5 +12,6 @@ func RegisterSitesRoutes(r *gin.RouterGroup) {
 	{
 		sites.GET("/:id", handlers.GetSiteInfoByIdHandler)
 		sites.GET("/:id/locals", handlers.GetLocalsBySiteIdHandler)
+		sites.PUT("/:id", handlers.UpdateSiteHandler)
 	}
 }

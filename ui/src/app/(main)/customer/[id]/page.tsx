@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 export default function CustomerPage() {
   const { id } = useParams();
   const router = useRouter();
-  const { fetchSitesByCustomerId, fetchCustomerById, customers } = useDataStore()
+  const { fetchSitesByCustomerId, fetchCustomerById, customers, customersSelected } = useDataStore()
   const [sites, setSites] = useState<ISite[] | null>(customers?.find(customer => customer.id.id === id)?.sites || null)
   const [customer, setCustomer] = useState<ICustomer | null>(customers?.find(customer => customer.id.id === id) || null)
   const [searchTerm, setSearchTerm] = useState("")
@@ -34,6 +34,13 @@ export default function CustomerPage() {
     };
     fetchData();
   }, [id]);
+
+  useEffect(() => {
+    if (customersSelected && customersSelected.length > 0) {
+      
+      setSites(customersSelected?.find(customer => customer.id.id === id)?.sites || null)
+    }
+  }, [customersSelected])
   return (
     <div className=" p-4 mx-auto">
       <div className="mb-8">
@@ -75,8 +82,8 @@ export default function CustomerPage() {
         )}
         {filteredSites && filteredSites.map((site) => (
           <div key={site.id} className={`overflow-hidden hover:shadow-md transition-shadow cursor-pointer`} >
-              <SiteCard  site={site} customer={customer!}/>
-            </div>
+            <SiteCard site={site} customer={customer!} />
+          </div>
         ))}
       </div>
 

@@ -13,10 +13,28 @@ export interface ISite {
     label: string;
     localsData: LocalsData;
     localsGroup: string;
-    //  assetProfileId: EntityId; 
-    //  externalId: EntityId | null;
-    //  ownerId: EntityId;
-    //  createdTime: number;
-    //  tenantId: EntityId; 
+    web: string;
+    address: string;
+    phone: string;
+    email: string;
+    paymentInfo: string;
+    supportInfo: string;
+    globalCharges: {
+        id: string;
+        name: string;
+        value: number;
+        type: string;
+    }[]
+    currency: string;
+    tariff: {
+        energyRate: {
+            value: string;
+            unit: string;
+        };
+        waterRate: {
+            value: string;
+            unit: string;
+        };
+    },
 }
 export type SitesResponse = ISite[];

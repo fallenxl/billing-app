@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"app/internal/model"
 	"app/internal/repository"
 	"app/pkg/utils"
 
@@ -41,4 +42,20 @@ func GetLocalsBySiteIdHandler(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"message": "Locals data", "success": true, "data": data.Data, "totalPages": data.TotalPages, "totalElements": data.Total, "hasNext": data.HasNext})
+}
+
+func UpdateSiteHandler(c *gin.Context) {
+	var site model.SiteRequest
+	if err := c.ShouldBindJSON(&site); err != nil {
+		c.JSON(400, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	updatedSite, err := repository.UpdateSite(site)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Error updating site data"})
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "Site updated successfully", "success": true, "data": updatedSite})
 }

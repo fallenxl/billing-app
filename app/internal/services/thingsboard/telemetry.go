@@ -15,7 +15,6 @@ func GetTelemetryService(deviceID string, entityType string, keys []string, star
 	url := fmt.Sprintf("%s/plugins/telemetry/%s/%s/values/timeseries?keys=%s&startTs=%d&endTs=%d&interval=%d&limit=50000&agg=%s&useStrictDataTypes=false", config.AppConfig.TB.URI, entityType, deviceID, strings.Join(keys, ","), startTs, endTs, interval, agg)
 	var response map[string][]model.TelemetryValue
 	resp, err := utils.SendRequest("GET", url, utils.DefaultHeaderToken(token), nil, &response)
-	fmt.Println("Response:", resp)
 	if err != nil {
 		return nil, fmt.Errorf("error getting telemetry data: %v", err)
 	}

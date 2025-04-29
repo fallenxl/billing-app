@@ -15,6 +15,7 @@ import { addDays, endOfMonth, startOfMonth } from "date-fns"
 import { LocalEditDialog } from "./local-edit-dialog"
 import ExportModal from "./export-modal"
 import { useLocalsStore } from "@/stores/local.store"
+import { SiteSettings } from "@/components/site-settings"
 
 interface SiteManagementProps {
   customer: ICustomer | null
@@ -35,7 +36,7 @@ export default function SiteManagement() {
     site: null,
     locals: null,
   })
-  const { fetchLocalsByCustomerAndSiteId, fetchLocalsBySiteId } = useDataStore()
+  const { fetchLocalsByCustomerAndSiteId, fetchSiteById, customersSelected } = useDataStore()
 
   useEffect(() => {
     resetLocals()
@@ -44,6 +45,13 @@ export default function SiteManagement() {
       setStates({ customer, site, locals })
     })
   }, [id, siteId, fetchLocalsByCustomerAndSiteId])
+
+  useEffect(() => {
+    fetchSiteById(siteId as string).then((site) => {
+      setStates((prev) => ({ ...prev, site }))
+    })
+  }, [customersSelected])
+
   return (
     <div className="  p-4 ">
       <div className="p-6">
@@ -51,14 +59,18 @@ export default function SiteManagement() {
         <div className="flex items-center">
           <div className="flex flex-col">
             <h1 className="text-xl font-medium">
-              {states.customer?.name} / <span className="font-bold">{states.site?.name}</span>
+              {states.customer?.name} / <span className="font-bold">{states.site?.label || states.site?.name}</span>
 
             </h1>
 
           </div>
-          <Button variant="ghost" size="icon" className="ml-2">
+          {states.site && <SiteSettings site={states.site} 
+          customBtn={ <Button variant="ghost" size="icon" className="ml-2">
             <Settings className="h-5 w-5" />
-          </Button>
+          </Button>} 
+          
+          />}
+         
         </div>
         <small className="text-neutral-600 ">
           Manage your site and locals

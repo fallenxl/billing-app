@@ -9,9 +9,12 @@ import {  Loader2, MoreHorizontal, RefreshCcw, Settings, Trash } from "lucide-re
 import { useSyncStore } from "@/stores";
 import { useRouter } from "next/navigation";
 import { Badge } from "./ui/badge";
+import { SiteSettings } from "./site-settings";
+import { useState } from "react";
 
 export function SiteCard({site, customer}: {site: ISite, customer: ICustomer}) {
     const router =useRouter()
+    const [openSettings, setOpenSettings] = useState(false)
     return (
         <>
         <Card className={`overflow-hidden transition-all relative hover:shadow-md`}>
@@ -46,7 +49,7 @@ export function SiteCard({site, customer}: {site: ISite, customer: ICustomer}) {
                             {/* <DropdownMenuItem onClick={() => startCustomerSync(customer.sitesGroup!)}>
                                 <RefreshCcw className="text-muted-foreground" />
                                 Sync</DropdownMenuItem> */}
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setOpenSettings(true)}>
                                 <Settings className="text-muted-foreground" />
                                 Settings</DropdownMenuItem>
                             <DropdownMenuSeparator />
@@ -84,6 +87,7 @@ export function SiteCard({site, customer}: {site: ISite, customer: ICustomer}) {
                 </div>
             </CardFooter>
         </Card>
+        <SiteSettings site={site} open={openSettings} setOpen={setOpenSettings}/>
         {/* {!syncInProgress && <LoadingOverlay isLoading={!syncInProgress} message="Sincronizando datos..." />} */}
         </>
     )

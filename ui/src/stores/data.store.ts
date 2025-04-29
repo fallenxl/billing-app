@@ -16,7 +16,7 @@ interface DataState {
     fetchSiteById: (siteId: string) => Promise<ISite | null>;
     fetchLocalsBySiteId: (siteId: string, options?: LocalsOptions) => Promise<LocalsData | null>;
     fetchLocalsByCustomerAndSiteId: (customerId: string, siteId: string) => Promise<any>;
-    
+    updateSiteSelected: (siteId: string, site: ISite) => void;
 }
 
 export const useDataStore = create<DataState>((set, get) => ({
@@ -44,16 +44,15 @@ export const useDataStore = create<DataState>((set, get) => ({
                     existingCustomer = fetchedCustomer;
                 }
             }
-            console.log('existingCustomer', existingCustomer)
             if (!existingCustomer) {
                 throw new Error('Customer not found');
             }
             const response = await api.get(`/customers/${existingCustomer.id.id}/sites`);
-            console.log('response', response)
             const sites = response.data.data as ISite[];
             if (response.status !== 200) {
                 throw new Error('Failed to fetch sites data');
             }
+            console.log('Fetched sites:', sites);
             const customer = get().customersSelected?.find(customer => customer.id.id === customerId);
             if (customer) {
                 customer.sites = sites;
@@ -104,7 +103,7 @@ export const useDataStore = create<DataState>((set, get) => ({
         try {
             const site = await get().fetchSiteById(siteId);
             if (!site) throw new Error('Site not found');
-    
+
             if (site.localsData && site.localsData.locals.length > 0) {
                 return site.localsData as LocalsData;
             }
@@ -113,7 +112,7 @@ export const useDataStore = create<DataState>((set, get) => ({
             const query = options?.query ? `?query=${options.query}` : '';
             const response = await api.get(`/sites/${site.id}/locals?page=${page}&size=${size}&q=${query}`);
             if (response.status !== 200) throw new Error('Failed to fetch locals data');
-    
+
             const customers = get().customersSelected ?? [];
             const updatedCustomers = customers.map(customer => {
                 if (customer.sites?.some(s => s.id === siteId)) {
@@ -138,9 +137,9 @@ export const useDataStore = create<DataState>((set, get) => ({
                 }
                 return customer;
             });
-    
+
             set({ customersSelected: updatedCustomers });
-    
+
             return {
                 locals: response.data.data as ILocal[],
                 hasNext: response.data.hasNext,
@@ -154,11 +153,10 @@ export const useDataStore = create<DataState>((set, get) => ({
     },
     fetchLocalsByCustomerAndSiteId: async (customerId, siteId) => {
         try {
-
             const customer = await get().fetchCustomerById(customerId);
             const site = await get().fetchSiteById(siteId);
-
             const locals = await get().fetchLocalsBySiteId(siteId);
+
             return [customer, site, locals];
 
         } catch (error) {
@@ -166,4 +164,17 @@ export const useDataStore = create<DataState>((set, get) => ({
             return null;
         }
     },
+    updateSiteSelected: (siteId, site) => set((state) => {
+        const updatedCustomers = state.customersSelected.map(customer => {
+            if (customer.sites?.some(s => s.id === siteId)) {
+                return {
+                    ...customer,
+                    sites: customer.sites?.map(s => (s.id === siteId ? { ...s, ...site } : s)),
+                };
+            }
+            return customer;
+        });
+        set({ customersSelected: updatedCustomers });
+        return { customersSelected: updatedCustomers };
+    }),
 }));

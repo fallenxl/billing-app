@@ -38,7 +38,8 @@ func GetSitesByCustomerId(customerId string, pageSize int, pageNumber int, textS
 
 	// Paginación
 	offset := (pageNumber - 1) * pageSize
-	if err := query.Select("id, name, type, customer_id").
+	// all columns
+	if err := query.Select("*").
 		Limit(pageSize).
 		Offset(offset).
 		Find(&sites).Error; err != nil {
@@ -51,4 +52,21 @@ func GetSitesByCustomerId(customerId string, pageSize int, pageNumber int, textS
 		TotalPages: totalElements / int64(pageSize),
 		HasNext:    totalElements > int64(pageSize*(pageNumber+1)),
 	}, nil
+}
+
+func UpdateSite(site model.SiteRequest) (model.Site, error) {
+	data := config.DB.Table("sites").Where("id = ?", site.ID).Updates(site)
+	if data.Error != nil {
+		return model.Site{}, data.Error
+	}
+	if data.RowsAffected == 0 {
+		return model.Site{}, nil
+	}
+
+	var updatedSite model.Site
+	err := config.DB.Table("sites").Where("id = ?", site.ID).First(&updatedSite).Error
+	if err != nil {
+		return model.Site{}, err
+	}
+	return updatedSite, nil
 }
