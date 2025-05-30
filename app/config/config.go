@@ -2,6 +2,7 @@ package config
 
 import (
 	"log"
+	"os"
 
 	"github.com/spf13/viper"
 )
@@ -32,11 +33,12 @@ func LoadConfig() {
 	viper.SetDefault("PORT", "4001")
 	viper.SetDefault("MAX_SITES", 1000)
 	viper.SetDefault("MAX_LOCALS", 1000)
+	viper.SetDefault("DATASOURCE_URI", os.Getenv("DATASOURCE_URI"))
 	viper.SetDefault("FILE_SERVICE_URI", "http://localhost:5000/api/v1/files")
 	viper.SetDefault("TB_URI", "http://localhost:8080/api")
 	viper.SetConfigFile(".env")
 	viper.AddConfigPath(".")
-	viper.AutomaticEnv()
+	viper.AutomaticEnv() // Read environment variables that match the config keys
 	if err := viper.ReadInConfig(); err != nil {
 		log.Printf("Error reading config file, %s", err)
 	}
