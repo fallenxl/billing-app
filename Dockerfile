@@ -32,6 +32,6 @@ RUN npm install --omit=dev
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-EXPOSE 3000 8080
+EXPOSE 3000 4001
 
 CMD ["/entrypoint.sh"]
