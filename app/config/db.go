@@ -15,7 +15,11 @@ import (
 var DB *gorm.DB
 
 func InitDB() {
-	host, user, password, dbname, port := parseDatabaseURI(AppConfig.Datasource.URI)
+	host := AppConfig.Datasource.Host
+	user := AppConfig.Datasource.User
+	password := AppConfig.Datasource.Password
+	dbname := AppConfig.Datasource.DBName
+	port := AppConfig.Datasource.Port
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=America/Tegucigalpa",
 		host,
