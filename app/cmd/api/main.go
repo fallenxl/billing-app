@@ -16,7 +16,7 @@ func main() {
 
 	cron.InitCronJobs() // Initialize and start the cron jobs
 
-	port := config.AppConfig.App.Port
+	port := "4001"
 
 	err := router.Run(":" + port)
 
