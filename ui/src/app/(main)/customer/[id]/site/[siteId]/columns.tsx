@@ -3,8 +3,10 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ILocal } from "@/interfaces"
 import { useLocalsStore } from "@/stores"
-import { ColumnDef, Table } from "@tanstack/react-table"
+import { CheckedState } from "@radix-ui/react-checkbox"
+import { ColumnDef, Row, Table } from "@tanstack/react-table"
 import { table } from "console"
+import { ro } from "date-fns/locale"
 import { ArrowUpDown, MoreHorizontal } from "lucide-react"
 
 interface ILocalsColumns {
@@ -13,28 +15,31 @@ interface ILocalsColumns {
 export const localsColumns = (
     { editLocalAction }: ILocalsColumns
 ): ColumnDef<ILocal>[] => {
-    const {addLocal, removeLocal, localsSelected} = useLocalsStore()
+    const {addLocal, removeLocal, localsSelected, resetLocals} = useLocalsStore()
 
-    const isSelected = (row: ILocal) => {
-        return localsSelected.some((local) => local.id.id === row.id.id)
+    const isSelected = (row: Row<ILocal>) => {
+        return row.getIsSelected()
+        // return localsSelected.some((local) => local.id.id === row.original.id.id)
     }
-    const toggleSelected = (row: ILocal) => {
-        if (isSelected(row)) {
-            removeLocal(row.id.id)
+    const toggleSelected = (row: Row<ILocal>) => {
+        const existLocal = localsSelected.find((local) => local.id === row.original.id)
+        row.toggleSelected(!row.getIsSelected())
+        if (existLocal) {
+            removeLocal(row.original.id)
         } else {
-            addLocal(row)
-        }
+            addLocal(row.original)
+        }7
     }
 
     const isSelectedAll = (table: Table<ILocal>) => {
-        return table.getIsAllPageRowsSelected() || table.getIsSomePageRowsSelected()
+        return table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")
     }
-    const toggleSelectedAll = ( table: Table<ILocal>) => {
-        if (isSelectedAll(table)) {
-            table.toggleAllPageRowsSelected(false)
-            localsSelected.forEach((local) => removeLocal(local.id.id))
+    const toggleSelectedAll = ( table: Table<ILocal>, value:CheckedState) => {
+        if (table.getIsAllPageRowsSelected() || table.getIsSomePageRowsSelected()) {
+            table.toggleAllPageRowsSelected(!!value)
+            table.getRowModel().rows.forEach((row) => removeLocal(row.original.id))
         } else {
-            table.toggleAllPageRowsSelected(true)
+            table.toggleAllPageRowsSelected(!!value)
             table.getRowModel().rows.forEach((row) => addLocal(row.original))
         }
     }
@@ -46,14 +51,14 @@ export const localsColumns = (
                     checked={
                         isSelectedAll(table)
                     }
-                    onCheckedChange={(value) => toggleSelectedAll(table)}
+                    onCheckedChange={(value) => toggleSelectedAll(table, value)}
                     aria-label="Select all"
                 />
             ),
             cell: ({ row }) => (
                 <Checkbox
-                    checked={isSelected(row.original)}
-                    onCheckedChange={() => toggleSelected(row.original)}
+                    checked={isSelected(row)}
+                    onCheckedChange={() => toggleSelected(row)}
                     aria-label="Select row"
                 />
             ),

@@ -43,3 +43,45 @@ func GetLocalsBySiteId(siteId string, pageSize int, pageNumber int, textSearch s
 		HasNext:    totalElements > int64(pageSize*(pageNumber+1)),
 	}, nil
 }
+
+func GetDevicesByLocalId(localId string, pageSize int, pageNumber int) ([]model.MeterExport, error) {
+	var devices []model.Meter
+	var exportDevices []model.MeterExport
+	query := config.DB.Table("meters").Where("local_id = ?", localId)
+
+	// Paginación
+	offset := (pageNumber - 1) * pageSize
+	if err := query.Select("id, entity_type, name, type, local_id").
+		Limit(pageSize).
+		Offset(offset).
+		Find(&devices).Error; err != nil {
+		return nil, err
+	}
+	for _, device := range devices {
+		exportDevice := model.MeterExport{
+			ID:          device.ID,
+			EntityType:  device.EntityType,
+			Name:        device.Name,
+			Type:        device.Type,
+			Description: device.Description,
+			LocalID:     device.LocalID,
+			Local:       device.Local,
+			Telemetry:   nil, // Telemetry will be fetched later
+		}
+		exportDevices = append(exportDevices, exportDevice)
+	}
+
+	return exportDevices, nil
+}
+
+func GetTelemetryByMeterId(meterId string, startTs string, endTs string) ([]model.Telemetry, error) {
+	var telemetry []model.Telemetry
+
+	query := config.DB.Table("telemetries").Where("meter_id = ? AND date BETWEEN ? AND ?", meterId, startTs, endTs).Order("date ASC")
+
+	if err := query.Find(&telemetry).Error; err != nil {
+		return nil, err
+	}
+
+	return telemetry, nil
+}

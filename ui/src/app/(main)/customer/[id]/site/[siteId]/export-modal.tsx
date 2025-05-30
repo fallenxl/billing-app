@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,20 +10,55 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Check } from "lucide-react"
 import Image from "next/image"
-import { ILocal, ISite } from "@/interfaces"
+import { ICustomer, IExportData, ILocal, ISite } from "@/interfaces"
 import { Icon } from "@/icons/icons"
+import { useLocalsStore } from "@/stores"
+import { useParams } from "next/navigation"
+import { useExportStore } from "@/stores/export.store"
 
 interface ExportModalProps {
-    localsSelected: ILocal[]
-    site: ISite
+    site: ISite,
+    customer: ICustomer
+    exportData: {
+        startDate: Date
+        endDate: Date,
+    }
 }
-export default function ExportModal({ localsSelected, site }: ExportModalProps) {
+export default function ExportModal({  site, customer, exportData }: ExportModalProps) {
     const [open, setOpen] = useState(false)
     const [step, setStep] = useState(1)
-    const [format, setFormat] = useState("pdf")
+    const [format, setFormat] = useState< "excel" | "support">("excel")
+    const { localsSelected } = useLocalsStore()
+    const {startExport} = useExportStore()
+    const [exportPayload, setExportPayload] = useState<IExportData>({
+        customer : customer,
+        site : site,
+        localsSelected: localsSelected,
+        format: format,
+        startDate: exportData.startDate,
+        endDate: exportData.endDate,
+        settings: {
+            tariff: site.tariff,
+            globalCharges: site.globalCharges,
+            currency: site.currency,
+        }
+    })
+
+    useEffect(() => {
+        setExportPayload({
+            ...exportPayload,
+            localsSelected: localsSelected,
+            format: format,
+            customer: customer,
+            site: site,
+            startDate: exportData.startDate,
+            endDate: exportData.endDate,
+        })
+    },[localsSelected])
 
     const handleNext = () => {
-        setStep(step + 1)
+        const nextStep = step + 1
+        setStep(nextStep)
     }
 
     const handleBack = () => {
@@ -36,11 +71,14 @@ export default function ExportModal({ localsSelected, site }: ExportModalProps) 
     }
 
     const handleExport = () => {
-        // Implement export functionality here
-        console.log("Exporting in format:", format)
-        setOpen(false)
-        setStep(1)
+        setStep(2)
+        startExport(exportPayload).then(() => {
+            
+        }).catch((error) => {
+            console.error("Export failed:", error)
+        })
     }
+
 
     return (
         <div className="p-4">
@@ -59,23 +97,20 @@ export default function ExportModal({ localsSelected, site }: ExportModalProps) 
                     <div className="mt-4">
                         {/* Progress indicator */}
                         <div className="relative mb-8">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-gray-200"></div>
-                            </div>
-                            <div className="relative flex justify-between z-10">
-                                <div className="flex flex-col items-center">
+
+                            <div className="relative flex justify-center  items-center z-10">
+                                <div className="flex flex-col items-center justify-center mt-4">
                                     <div
                                         className={`w-8 h-8 rounded-full border flex items-center justify-center ${step >= 1 ? "bg-black text-white" : "bg-white"}`}
                                     >
                                         {step > 1 ? <Check className="h-4 w-4" /> : 1}
                                     </div>
                                     <span className="mt-2 text-xs text-center">
-                                        Select
-                                        <br />
-                                        Format
+                                        Select Format
                                     </span>
                                 </div>
-                                <div className="flex flex-col items-center">
+                                <div className="w-full h-[0.1em] mb-5 bg-gray-200"></div>
+                                <div className="flex flex-col items-cente ml-4">
                                     <div
                                         className={`w-8 h-8 rounded-full border flex items-center justify-center ${step >= 2 ? "bg-black text-white" : "bg-white"}`}
                                     >
@@ -83,17 +118,7 @@ export default function ExportModal({ localsSelected, site }: ExportModalProps) 
                                     </div>
                                     <span className="mt-2 text-xs text-center">
                                         Export
-                                        <br />
-                                        Settings
                                     </span>
-                                </div>
-                                <div className="flex flex-col items-center">
-                                    <div
-                                        className={`w-8 h-8 rounded-full border flex items-center justify-center ${step >= 3 ? "bg-black text-white" : "bg-white"}`}
-                                    >
-                                        3
-                                    </div>
-                                    <span className="mt-2 text-xs text-center">Export</span>
                                 </div>
                             </div>
                         </div>
@@ -102,19 +127,7 @@ export default function ExportModal({ localsSelected, site }: ExportModalProps) 
                         {step === 1 && (
                             <div>
                                 <h3 className="text-lg font-medium mb-4">Select Format</h3>
-                                <RadioGroup value={format} onValueChange={setFormat} className="grid grid-cols-3 gap-4">
-                                    <div className={`border rounded-md p-4 ${format === "pdf" ? "ring-2 ring-black" : ""}`}>
-                                        <div className="flex items-start space-x-2">
-                                            <RadioGroupItem value="pdf" id="pdf" />
-                                            <Label htmlFor="pdf">PDF</Label>
-                                        </div>
-                                        <div className="mt-2">
-                                            <div className="bg-gray-100 rounded-md p-2 h-32 flex items-center justify-center">
-                                                <Icon.Pdf />
-                                            </div>
-                                        </div>
-                                    </div>
-
+                                <RadioGroup value={format} onValueChange={(value: string) => setFormat(value as  "excel" | "support")} className="grid grid-cols-3 gap-4">
                                     <div className={`border rounded-md p-4 ${format === "excel" ? "ring-2 ring-black" : ""}`}>
                                         <div className="flex items-start space-x-2">
                                             <RadioGroupItem value="excel" id="excel" />
@@ -142,52 +155,11 @@ export default function ExportModal({ localsSelected, site }: ExportModalProps) 
                             </div>
                         )}
 
-                        {/* Step 2: Export Settings */}
-                        {step === 2 && (
-                            <div>
-                                <h3 className="text-lg font-medium mb-4">Export Settings</h3>
-                                <div className="space-y-4">
-                                    <div>
-                                        <Label htmlFor="branch">Branch</Label>
-                                        <Input id="branch" defaultValue="ZIP Calpules" className="mt-1" />
-                                    </div>
-
-                                    <div>
-                                        <Label htmlFor="currency">Currency</Label>
-                                        <Select defaultValue="lempira">
-                                            <SelectTrigger className="mt-1">
-                                                <SelectValue placeholder="Select currency" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="lempira">Lempira</SelectItem>
-                                                <SelectItem value="usd">USD</SelectItem>
-                                                <SelectItem value="euro">Euro</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    <div className="flex items-center space-x-2">
-                                        <Checkbox id="sendEmail" />
-                                        <Label htmlFor="sendEmail">Send Email</Label>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
                         {/* Step 3: Export Confirmation */}
-                        {step === 3 && (
+                        {step === 2 && (
                             <div className="py-8 text-center">
                                 <h3 className="text-lg font-medium mb-2">Ready to Export</h3>
                                 <p className="text-gray-500 mb-4">Your data will be exported in {format.toUpperCase()} format</p>
-                                <div className="flex justify-center">
-                                    <Image
-                                        src="/placeholder.svg?height=150&width=200"
-                                        alt="Export preview"
-                                        width={200}
-                                        height={150}
-                                        className="object-contain"
-                                    />
-                                </div>
                             </div>
                         )}
 
@@ -203,7 +175,7 @@ export default function ExportModal({ localsSelected, site }: ExportModalProps) 
                                 </Button>
                             )}
 
-                            {step < 3 ? <Button onClick={handleNext}>Next</Button> : <Button onClick={handleExport}>Export</Button>}
+                            {step < 1 ? <Button onClick={handleNext}>Next</Button> : <Button onClick={handleExport}>Export</Button>}
                         </div>
                     </div>
                 </DialogContent>

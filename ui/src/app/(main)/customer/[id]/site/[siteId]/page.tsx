@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { InfoIcon, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useParams } from "next/navigation"
-import {  useDataStore } from "@/stores"
+import { useDataStore } from "@/stores"
 import { ICustomer, ILocal, ISite, LocalsData } from "@/interfaces"
 import { DataTable } from "@/components/data-table"
 import { localsColumns } from "./columns"
@@ -42,6 +42,7 @@ export default function SiteManagement() {
     resetLocals()
     fetchLocalsByCustomerAndSiteId(id as string, siteId as string).then((states) => {
       const [customer, site, locals] = states
+      console.log("Fetched locals:", locals, "for site:", site, "and customer:", customer)
       setStates({ customer, site, locals })
     })
   }, [id, siteId, fetchLocalsByCustomerAndSiteId])
@@ -53,8 +54,8 @@ export default function SiteManagement() {
   }, [customersSelected])
 
   return (
-    <div className="  p-4 ">
-      <div className="p-6">
+    <div className="  md:p-4 ">
+      <div className="md:p-6">
         {/* Encabezado */}
         <div className="flex items-center">
           <div className="flex flex-col">
@@ -64,13 +65,13 @@ export default function SiteManagement() {
             </h1>
 
           </div>
-          {states.site && <SiteSettings site={states.site} 
-          customBtn={ <Button variant="ghost" size="icon" className="ml-2">
-            <Settings className="h-5 w-5" />
-          </Button>} 
-          
+          {states.site && <SiteSettings site={states.site}
+            customBtn={<Button variant="ghost" size="icon" className="ml-2">
+              <Settings className="h-5 w-5" />
+            </Button>}
+
           />}
-         
+
         </div>
         <small className="text-neutral-600 ">
           Manage your site and locals
@@ -87,32 +88,41 @@ export default function SiteManagement() {
               column: ["label", "email", "name"], placeholder: "Filter locals..."
             }
           }
-        columns={localsColumns({
-          editLocalAction: (local: ILocal) => {
-            setEditLocal(local)
-            setOpenEditLocal(true)
-          },
-        })} toggleColumns={false} >
-        <div className="w-full flex items-center justify-end">
-          <div className="flex items-center gap-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <InfoIcon className="h-4 w-4 text-gray-500" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>The date range is set to the current month</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <RangeDatePicker date={date} setDate={setDate} />
-          </div>
-          {states.site && <ExportModal localsSelected={localsSelected} site={states.site} />}
+          columns={localsColumns({
+            editLocalAction: (local: ILocal) => {
+              setEditLocal(local)
+              setOpenEditLocal(true)
+            },
+          })} toggleColumns={false} >
+          <div className="w-full flex flex-col-reverse md:flex-row  items-end  md:items-center justify-end">
+            <div className="flex items-center gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <InfoIcon className="h-4 w-4 text-gray-500" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>The date range is set to the current month</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <RangeDatePicker date={date} setDate={setDate} />
+            </div>
+            {(states.site && states.customer)&& <ExportModal
 
-        </div>
-      </DataTable>
-    </div>
-      { editLocal && <LocalEditDialog local={editLocal} onSave={(updatedLocal) => { }} open={openEditLocal} setOpen={setOpenEditLocal} /> }
+              site={states.site}
+              customer={states.customer}
+              exportData={
+                {
+                  startDate: date?.from || new Date(),
+                  endDate: date?.to || new Date(),
+                }
+              } />}
+
+          </div>
+        </DataTable>
+      </div>
+      {editLocal && <LocalEditDialog local={editLocal} onSave={(updatedLocal) => { }} open={openEditLocal} setOpen={setOpenEditLocal} />}
     </div >
   )
 }

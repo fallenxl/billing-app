@@ -9,6 +9,9 @@ import (
 var AppConfig *Config
 
 type Config struct {
+	FileService struct {
+		URI string `mapstructure:"FILE_SERVICE_URI"`
+	} `mapstructure:",squash"`
 	App struct {
 		Port      string `mapstructure:"PORT"`
 		MaxSites  string `mapstructure:"MAX_SITES"`
@@ -29,6 +32,7 @@ func LoadConfig() {
 	viper.SetDefault("PORT", "4001")
 	viper.SetDefault("MAX_SITES", 1000)
 	viper.SetDefault("MAX_LOCALS", 1000)
+	viper.SetDefault("FILE_SERVICE_URI", "http://localhost:5000/api/v1/files")
 	viper.SetDefault("TB_URI", "http://localhost:8080/api")
 	viper.SetConfigFile(".env")
 	viper.AddConfigPath(".")

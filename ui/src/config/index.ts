@@ -1,5 +1,5 @@
 export default {
     api: {
-        uri: "http://localhost:4001/api/v1",
+        uri: process.env.NEXT_PUBLIC_API_URI,
     }
 }

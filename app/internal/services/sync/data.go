@@ -91,17 +91,18 @@ func SyncTelemetryByLocal(token, localID string, startTs, endTs int64) error {
 			return fmt.Errorf("error scanning meters: %w", err)
 		}
 
+		fmt.Println("meter", id, name, meterType, entityType)
 		keys := keysByMeterType(meterType)
 		if keys == nil {
 			continue
 		}
 
 		data, err := thingsboard.GetTelemetryService(id, entityType, keys, startTs, endTs, oneDay, "MAX", token)
-		if err != nil || len(data) == 0 {
+		if err != nil {
 			log.Printf("error getting telemetry data for %s: %v", id, err)
 			continue
 		}
-
+		fmt.Println("startTs", time.UnixMilli(startTs).Format(time.RFC3339), "endTs", time.UnixMilli(endTs).Format(time.RFC3339))
 		values := data[keys[0]]
 		if len(values) < 2 {
 			log.Printf("insufficient telemetry points for %s", id)
@@ -137,7 +138,7 @@ func SyncTelemetryByLocal(token, localID string, startTs, endTs int64) error {
 
 func SyncAllTelemetry() error {
 	now := time.Now()
-	startOfDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	startOfDay := time.Date(now.Year(), now.Month(), now.Day()-1, 0, 0, 0, 0, now.Location())
 	startTs := startOfDay.UnixNano() / int64(time.Millisecond)
 	endTs := now.UnixNano() / int64(time.Millisecond)
 

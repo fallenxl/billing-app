@@ -102,7 +102,7 @@ export function DataTable<T>({ columns, data, toggleColumns = true, children, se
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
+      <div className="flex flex-col md:flex-row   md:items-center py-4">
         <Input
           placeholder={searchOptions?.placeholder}
           value={globalFilter ?? ""}

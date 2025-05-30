@@ -19,22 +19,26 @@ export interface ISite {
     email: string;
     paymentInfo: string;
     supportInfo: string;
-    globalCharges: {
-        id: string;
-        name: string;
-        value: number;
-        type: string;
-    }[]
+    globalCharges: ICharge[]
     currency: string;
-    tariff: {
-        energyRate: {
-            value: string;
-            unit: string;
-        };
-        waterRate: {
-            value: string;
-            unit: string;
-        };
-    },
+    tariff: ITariff;
+}
+
+export interface ICharge {
+    name: string;
+    value: number;
+    type: string;
+}
+
+
+export interface ITariff {
+    energyRate: {
+        value: string;
+        unit: string;
+    };
+    waterRate: {
+        value: string;
+        unit: string;
+    };
 }
 export type SitesResponse = ISite[];

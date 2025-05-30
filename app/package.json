@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "air"
+    "dev": "air",
+    "init-file-service": "cd ./services/file-service && python main.py"
   }
 }

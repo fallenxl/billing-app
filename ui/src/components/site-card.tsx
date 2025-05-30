@@ -22,7 +22,7 @@ export function SiteCard({site, customer}: {site: ISite, customer: ICustomer}) {
             <CardHeader className="p-4 pb-0">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                        {customer.img ? (
+                        {customer?.img ? (
                             <Avatar className="h-10 w-10 rounded-md">
                                 <AvatarImage src={customer.img || `https://api.dicebear.com/9.x/initials/svg?seed=${customer.name}`} alt={customer.name} />
                                 <AvatarFallback className="rounded-md">{customer.name.substring(0, 2)}</AvatarFallback>

@@ -7,8 +7,8 @@
   "license": "MIT",
   "description": "Billing application for Lumen Energy Solutions",
   "scripts": {
-    "deploy-server": "cd ./server && npm run deploy",
-    "start-server": "cd ./server && npm run dev",
-    "start-client": "cd ./client && npm run dev"
+    "dev-server": "cd ./app && air",
+    "start-service": "cd ./services/file-service && python main.py",
+    "dev-ui": "cd ./ui && npm run dev"
   }
 }

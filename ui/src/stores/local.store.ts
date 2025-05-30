@@ -10,7 +10,14 @@ interface LocalsState {
 
 export const useLocalsStore = create<LocalsState>((set, get) => ({
     localsSelected: [],
-    addLocal: (local) => set((state) => ({ localsSelected: [...state.localsSelected, local] })),
-    removeLocal: (localId) => set((state) => ({ localsSelected: state.localsSelected.filter(local => local.id.id !== localId) })),
-    resetLocals: () => set({ localsSelected: [] }),
+    addLocal: (local) => set((state) => {
+        const existLocal = state.localsSelected.find(existingLocal => existingLocal.id === local.id);
+        if (existLocal) {
+            // If the local already exists, do not add it again
+            return state;
+        }
+        return { localsSelected: [...state.localsSelected, local] }
+    }),
+    removeLocal: (localId) => set((state) => ({ localsSelected: state.localsSelected.filter(local => local.id !== localId) })),
+    resetLocals: () => set(() => ({ localsSelected: [] }))
 }));

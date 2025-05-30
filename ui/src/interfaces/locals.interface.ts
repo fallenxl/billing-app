@@ -1,9 +1,6 @@
-import { EntityId } from "./thingsboard.interface";
-
-
 export interface ILocal {
-    id: EntityId;
-    customerId: EntityId;
+    id: string;
+    customerId: string;
     name: string;
     type: string;
     buildingOwner: string; 

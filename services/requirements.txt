@@ -1,0 +1,4 @@
+Flask==3.1.1
+Flask_Cors==3.0.10
+fpdf==1.7.2
+pandas==2.2.3

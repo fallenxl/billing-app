@@ -22,6 +22,7 @@ func SetupRouter() *gin.Engine {
 		RegisterCustomersRoutes(api) // Registra las rutas de clientes
 		RegisterSitesRoutes(api)     // Registra las rutas de sitios
 		RegisterSyncRoutes(api)      // Registra las rutas de sincronización
+		RegisterExportRoutes(api)    // Registra las rutas de exportación
 	}
 
 	return router
