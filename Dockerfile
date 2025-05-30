@@ -5,16 +5,16 @@ COPY ui/ ./
 RUN npm install && npm run build
 
 # Etapa 2: Construcción del backend (Go)
-FROM golang:1.21 AS builder-go
+FROM golang:1.24 AS builder-go
 WORKDIR /app
 COPY app/ ./
 RUN go mod tidy && go build -o server
 
-# Etapa final: Unificación
-FROM debian:bullseye-slim
+# Etapa final: Unificación (usar Node.js para servir UI y correr Go backend)
+FROM node:18-slim
 
-# Instalar dependencias mínimas para Node.js y Go
-RUN apt-get update && apt-get install -y ca-certificates nodejs npm && rm -rf /var/lib/apt/lists/*
+# Instalar solo dependencias mínimas del sistema
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
 # Copiar backend compilado
 COPY --from=builder-go /app/server /app/server
@@ -24,7 +24,7 @@ COPY --from=builder-ui /ui/public /ui/public
 COPY --from=builder-ui /ui/.next /ui/.next
 COPY --from=builder-ui /ui/package.json /ui/package.json
 
-# Instalar solo dependencias necesarias para producción
+# Instalar dependencias de producción del UI
 WORKDIR /ui
 RUN npm install --omit=dev
 
