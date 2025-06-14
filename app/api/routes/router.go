@@ -9,7 +9,7 @@ func SetupRouter() *gin.Engine {
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
 		// allow all origins
-		AllowOrigins:     []string{"http://localhost:3000"},                            // Origen permitido (puedes especificar un dominio específico)
+		AllowOrigins:     []string{"*"},                                                // Origen permitido (puedes especificar un dominio específico)
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"}, // Métodos HTTP permitidos
 		AllowHeaders:     []string{"Content-Type", "Authorization"},                    // Cabeceras permitidas
 		ExposeHeaders:    []string{"Content-Length"},                                   // Cabeceras expuestas al cliente
