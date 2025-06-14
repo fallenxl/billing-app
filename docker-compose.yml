@@ -28,7 +28,7 @@ services:
       DB_PORT: 5432
       TB_URI: https://dashboard.lumenenergysolutions.com/api 
       TB_BILLING_ID: ce0482e0-5425-11ef-aa15-a127638e3a77 
-      TB_USERNAME: axl.santos@lumenenergysolutions.com
-      TB_PASSWORD: Asantos_10
+      TB_USERNAME: <username>
+      TB_PASSWORD: <password>
 volumes:
   pgdata:
