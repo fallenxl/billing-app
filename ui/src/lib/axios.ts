@@ -1,10 +1,11 @@
 // lib/axios.ts
+"use client";
 import axios from 'axios';
 import { getAuthToken } from '@/stores/auth.store';
 import config from '@/config';
 
 const api = axios.create({
-  baseURL: config.api.uri, // ajusta si tienes otro host o puerto
+  baseURL:(typeof window !== 'undefined' && window.location.hostname) ? `http://${window.location.hostname}:${process.env.PORT || 4001}/api/v1` : config.api.uri,
 });
 
 api.interceptors.request.use((config) => {

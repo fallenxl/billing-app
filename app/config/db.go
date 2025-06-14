@@ -2,12 +2,12 @@ package config
 
 import (
 	"app/internal/model"
+	"database/sql"
 	"fmt"
 	"log"
-	"net/url"
 	"os"
-	"strings"
 
+	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -20,6 +20,10 @@ func InitDB() {
 	password := AppConfig.Datasource.Password
 	dbname := AppConfig.Datasource.DBName
 	port := AppConfig.Datasource.Port
+
+	if err := createDatabaseIfNotExists(host, user, password, dbname, port); err != nil {
+		log.Fatalf("Error al crear la base de datos: %v", err)
+	}
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=America/Tegucigalpa",
 		host,
@@ -30,6 +34,7 @@ func InitDB() {
 	)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
+
 		log.Fatalf("No se pudo conectar a la base de datos: %v", err)
 	}
 
@@ -51,28 +56,26 @@ func InitDB() {
 
 }
 
-func parseDatabaseURI(uri string) (string, string, string, string, string) {
-	uri = strings.TrimPrefix(uri, "jdbc:")
-
-	u, err := url.Parse(uri)
+func createDatabaseIfNotExists(host, user, password, dbname, port string) error {
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=postgres port=%s sslmode=disable", host, user, password, port)
+	db, err := sql.Open("postgres", dsn)
 	if err != nil {
-		fmt.Println("Error parsing URI:", err)
-		return "", "", "", "", ""
+		return err
 	}
+	defer db.Close()
 
-	// Extraer el host y puerto
-	host := "localhost"
-	port := u.Port()
-
-	// Extraer el nombre de la base de datos del path
-	dbname := strings.TrimPrefix(u.Path, "/")
-
-	// Extraer user y password de los parámetros
-	query := u.Query()
-	user := query.Get("user")
-	password := query.Get("password")
-
-	return host, user, password, dbname, port
+	var exists bool
+	err = db.QueryRow("SELECT EXISTS(SELECT 1 FROM pg_database WHERE datname = $1)", dbname).Scan(&exists)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		_, err = db.Exec("CREATE DATABASE " + dbname)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func loadSQLFromFile(path string) (string, error) {

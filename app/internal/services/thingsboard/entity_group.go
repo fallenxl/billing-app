@@ -16,7 +16,7 @@ func GetCustomerEntityGroupService(groupId string, pageSize string, page string,
 		page = "0"
 	}
 	uri := fmt.Sprintf("%s/entityGroup/%s/customers?pageSize=%s&page=%s&textSearch=%s", config.AppConfig.TB.URI, groupId, pageSize, page, textSearch)
-
+	fmt.Println("URI: ", uri)
 	var customerGroup model.CustomerGroup
 	response, err := utils.SendRequest("GET", uri, utils.DefaultHeaderToken(token), nil, &customerGroup)
 	if err != nil {

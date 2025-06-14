@@ -7,8 +7,10 @@ RUN npm install && npm run build
 # Etapa 2: Construcción del backend (Go)
 FROM golang:1.24 AS builder-go
 WORKDIR /app
-COPY app/ ./
-RUN go mod tidy && go build -o server
+COPY app/ ./app/
+WORKDIR /app/app
+RUN go mod tidy
+RUN go build -o /app/server ./cmd/api
 
 # Etapa final: Unificación (usar Node.js para servir UI y correr Go backend)
 FROM node:18-slim
@@ -18,6 +20,7 @@ RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/
 
 # Copiar backend compilado
 COPY --from=builder-go /app/server /app/server
+COPY app/db/procedures.sql /app/db/procedures.sql
 
 # Copiar UI compilado
 COPY --from=builder-ui /ui/public /ui/public

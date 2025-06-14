@@ -16,7 +16,7 @@ func GetCustomersHandler(c *gin.Context) {
 	}
 	data, err := thingsboard.GetCustomerEntityGroupService(config.AppConfig.TB.BillingGroupId, "", "", "", token.(string))
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Error sending request to API"})
+		c.JSON(500, gin.H{"error": "Error sending request to API", "details": err.Error()})
 		return
 	}
 	c.JSON(200, gin.H{"message": "Customers data", "success": true, "data": data.Data, "totalPages": data.TotalPages, "totalElements": data.TotalElements, "hasNext": data.HasNext})
